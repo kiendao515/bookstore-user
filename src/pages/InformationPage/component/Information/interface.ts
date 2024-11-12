@@ -1,0 +1,3 @@
+interface IInformation {
+    title? : string
+}

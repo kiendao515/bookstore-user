@@ -1,0 +1,3 @@
+interface IFindBookFormProps {
+    title?: string;
+}

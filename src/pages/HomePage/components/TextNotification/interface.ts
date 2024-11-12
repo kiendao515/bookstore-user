@@ -1,0 +1,3 @@
+interface ITextNotificationProps {
+    content?: string;
+}
