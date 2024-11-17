@@ -1,7 +1,7 @@
 const Footer = (props: IFooterProps) => {
     const { } = props;
     return (
-        <div className="grid grid-cols-3 justify-between mx-[188px] pb-[84px] pt-[10px] border-t-[1px] border-black">
+        <div className="grid grid-cols-3 justify-between mx-[100px] pb-[84px] pt-[10px] border-t-[1px] border-black">
             <div className="flex flex-col gap-[5px]">
                 <div>Chính sách mua hàng</div>
                 <div>Khiếu nại</div>

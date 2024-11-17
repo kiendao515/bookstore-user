@@ -20,7 +20,7 @@ const MainLayout = (props: IMainLayoutProps) => {
                     setToggleCart={setToggleCart}
                 />
                 <WelcomeSection/>
-                <div className="mx-[188px]">
+                <div className="mx-[100px]">
                     {children}
                 </div>
                 <Footer />

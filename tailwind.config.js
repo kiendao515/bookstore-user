@@ -1,5 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  plugins: [
+    require('@tailwindcss/line-clamp'),
+    // other plugins
+  ],
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     fontFamily: {
