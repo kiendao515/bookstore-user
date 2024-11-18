@@ -1,17 +1,24 @@
-import Button from "@/ui/Button";
+import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
+import { RootState } from "@/store";
+import { getUser } from "@/store/duck/auth/slice";
+import { setToggleByKey } from "@/store/duck/togglePopUp/slice";
 import { HeartOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
-import { Input } from "antd";
+import { Typography } from "antd";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 
 const Header = (props: IHeaderProps) => {
-    const { toggleFindBook, setToggleFindBook, toggleCart, setToggleCart } = props;
-    const [count, setCount] = useState<number>(3);
+    const { } = props;
+    const [count, setCount] = useState<number>(0);
+    const cart = useAppSelector((state: RootState) => state.cart.items);
+    const { toggleAuth } = useAppSelector((state: RootState) => state.togglePopUp);
+    const dispatch = useAppDispatch();
+    const user = useAppSelector(getUser);
+
     useEffect(() => {
-        setCount(JSON.parse(localStorage.getItem('cart') || '[]').length)
-    }, [])
-    const navigate = useNavigate();
+        setCount(cart.length);
+    }, [cart]);
+
     return (
         <header className="flex items-center justify-between p-4 bg-white">
             <div className="flex items-center space-x-4">
@@ -32,7 +39,14 @@ const Header = (props: IHeaderProps) => {
                 <div className="flex space-x-4 text-blue-600">
                     <HeartOutlined />
                     <ShoppingCartOutlined />
-                    <UserOutlined/>
+                    {user.id == "" &&
+                        <UserOutlined onClick={() => dispatch(setToggleByKey({ key: 'toggleAuth', value: !toggleAuth }))} />
+                    }
+                    {user.id != "" &&
+                        <Typography style={{ margin: 0 }}>
+                            Xin chào {user.full_name}
+                        </Typography>
+                    }
                 </div>
             </div>
         </header>

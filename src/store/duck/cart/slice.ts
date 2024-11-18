@@ -11,6 +11,7 @@ interface CartItem {
 }
 
 interface CartState {
+    isCartOpen: boolean;
     items: CartItem[];
 }
 
@@ -21,6 +22,7 @@ interface CartItemIdentifier {
 
 // Define the initial state with the type CartState
 const initialState: CartState = {
+    isCartOpen: false,
     items: [], // Ensure items is always an array
 };
 
@@ -59,7 +61,6 @@ const cartSlice = createSlice({
 
             // Find if the item already exists in the cart
             const itemIndex = state.items.findIndex(item => item.id === id && item.type === type);
-            console.log(action.payload)
 
             if (itemIndex !== -1) {
                 // If item exists, update the quantity
@@ -76,9 +77,18 @@ const cartSlice = createSlice({
         clearCart: (state) => {
             state.items = []; // Reset to an empty array
         },
+        toggleCart: (state) => {
+            state.isCartOpen = !state.isCartOpen;
+        },
+        openCart: (state) => {
+            state.isCartOpen = true;
+        },
+        closeCart: (state) => {
+            state.isCartOpen = false;
+        }
     },
 });
 
 // Export the actions and the reducer
-export const { setCart, addToCart, clearCart, removeItemFromCart, incrementCartItemQuantity, decrementCartItemQuantity } = cartSlice.actions;
+export const { setCart, addToCart, clearCart, removeItemFromCart, incrementCartItemQuantity, decrementCartItemQuantity, toggleCart, openCart, closeCart } = cartSlice.actions;
 export default cartSlice.reducer;

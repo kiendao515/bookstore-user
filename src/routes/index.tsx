@@ -1,10 +1,13 @@
 import BookDetailPage from "@/pages/BookDetailPage";
 import BookStorePage from "@/pages/BookStorePage";
 import CollectionPage from "@/pages/CollectionPage/CollectionPage";
+import ConfirmRegistrationPage from "@/pages/ConfirmRegistrationPage/ConfirmRegistrationPage";
 import HomePage from "@/pages/HomePage/HomePage";
 import IntroductionPage from "@/pages/InformationPage";
 import OtherBookPage from "@/pages/OtherBookPage";
 import { createBrowserRouter } from "react-router-dom";
+import RequireAuth from "./Pages/RequireAuth";
+import { RoleEnum } from "@/utils/enum/role.enum";
 
 
 export enum RouterPath {
@@ -19,7 +22,10 @@ export enum UserRouterPath {
     otherBook = '/other-book',
     bookStore = '/book-store',
     login = '/login',
-    bookDetail = '/book-detail/:id'
+    bookDetail = '/book-detail/:id',
+    confirmRegistrationPage = "/confirm-registration",
+    resetPasswordPage = "/reset-password",
+    changePasswordPage = "/change-password",
 }
 
 export enum AdminRouterPath {
@@ -63,6 +69,25 @@ export const router = createBrowserRouter([
     },
     {
         path: UserRouterPath.bookDetail,
-        element: <BookDetailPage/>
+        element: <BookDetailPage />
+    },
+    {
+        path: UserRouterPath.confirmRegistrationPage,
+        element: <ConfirmRegistrationPage />,
+    },
+    {
+        path: UserRouterPath.resetPasswordPage,
+        element: <HomePage />,
+    },
+    {
+        path: UserRouterPath.changePasswordPage,
+
+        element: (
+            < RequireAuth roles={[RoleEnum.USER]}>
+                <div>auth</div>
+            </RequireAuth >
+        )
     }
+
+
 ]);
