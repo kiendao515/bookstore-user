@@ -2,23 +2,25 @@ import { useQuery } from 'react-query';
 
 import { COOKIES, getCookies } from '@/utils/cookies';
 
-import { getProfile, getSummary } from './request';
-import { IUserProfileResponse } from './types';
+import { confirmRegistration, getProfile } from './request';
+import { IConfirmRegistrationParams, IUserProfileResponse } from './types';
 
-export const useUser = () => {
+
+export const useUserProfile = (reload?: number) => {
   const token = getCookies(COOKIES.token);
-  const { data, ...rest } = useQuery<IUserProfileResponse, Error>([`/api/v1/users/profile`, token], async () => {
+  const { data, ...rest } = useQuery<IUserProfileResponse, Error>([`/api/v1/users/profile`, token, reload], async () => {
     const data = await getProfile();
     return data;
   });
   return { user: data, ...rest };
 };
 
-export const useUserSummary = () => {
-  const token = getCookies(COOKIES.token);
-  const { data, ...rest } = useQuery([`/api/v1/users/summary`, token], async () => {
-    const data = await getSummary();
+export const useRegistrationConfirm = (params: IConfirmRegistrationParams) => {
+  const { data, ...rest } = useQuery([`/api/v1/auth/register/confirm`, params], async () => {
+    const data = await confirmRegistration(params);
     return data;
+  }, {
+    enabled: params.token != null
   });
-  return { user: data, ...rest };
+  return { data, ...rest };
 };

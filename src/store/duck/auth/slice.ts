@@ -1,20 +1,8 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 
 import { RootState } from '@/store';
+import { IUser } from '@/api/auth';
 
-export interface IRole {
-  id: number;
-  name: string;
-}
-interface IUser {
-  id: number;
-  email: string;
-  fullName: string;
-  teacherCode: string;
-  createAt: string;
-  updateAt: string;
-  permissions: string[];
-}
 
 interface IAuthenticateStore {
   user: IUser;
@@ -23,13 +11,12 @@ interface IAuthenticateStore {
 
 const initialState: IAuthenticateStore = {
   user: {
+    id: "",
     email: '',
-    createAt: '',
-    teacherCode: '',
-    updateAt: '',
-    fullName: '',
-    id: 0,
-    permissions: [],
+    full_name: '',
+    role: "",
+    date_of_birth: '',
+    phone_number: '',
   },
   isAuth: false,
 };
@@ -49,13 +36,12 @@ export const authSlice = createSlice({
       localStorage.removeItem('persist:root');
       return {
         user: {
+          id: "",
           email: '',
-          createAt: '',
-          teacherCode: '',
-          updateAt: '',
-          fullName: '',
-          id: 0,
-          permissions: [],
+          full_name: '',
+          role: "",
+          date_of_birth: '',
+          phone_number: '',
         },
         isAuth: false,
       };
@@ -66,10 +52,10 @@ export const authSlice = createSlice({
 export const { setAuth, setLogout } = authSlice.actions;
 
 export const getUser = (state: RootState) => {
-  const { permissions, ...user } = state.auth.user;
+  const { role, ...user } = state.auth.user;
   return user;
 };
 export const getAuth = (state: RootState) => state.auth.isAuth;
-export const getPermissions = (state: RootState) => state.auth.user.permissions;
+export const getRoles = (state: RootState) => state.auth.user.role;
 
 export default authSlice.reducer;
