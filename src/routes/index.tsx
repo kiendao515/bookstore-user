@@ -1,3 +1,4 @@
+import BookDetailPage from "@/pages/BookDetailPage";
 import BookStorePage from "@/pages/BookStorePage";
 import CollectionPage from "@/pages/CollectionPage/CollectionPage";
 import HomePage from "@/pages/HomePage/HomePage";
@@ -17,7 +18,8 @@ export enum UserRouterPath {
     category = '/category',
     otherBook = '/other-book',
     bookStore = '/book-store',
-    login = '/login'
+    login = '/login',
+    bookDetail = '/book-detail'
 }
 
 export enum AdminRouterPath {
@@ -58,5 +60,9 @@ export const router = createBrowserRouter([
     {
         path: UserRouterPath.bookStore,
         element: <BookStorePage />,
+    },
+    {
+        path: UserRouterPath.bookDetail,
+        element: <BookDetailPage/>
     }
 ]);

@@ -4,4 +4,5 @@ interface BookCardProps {
     author: string;
     price: number;
     soldCount: number;
+    link : string
 }
