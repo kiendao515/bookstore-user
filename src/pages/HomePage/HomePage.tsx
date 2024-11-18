@@ -7,6 +7,7 @@ import BookCollection from "./components/BookCollection";
 import Collection from "@/ui/Collection";
 import FilterCollection from "./components/FilterCollection";
 import { RightOutlined } from "@ant-design/icons";
+import WelcomeSection from "@/layout/Welcome/Welcome";
 
 const HomePage = () => {
     const [collections, setCollections] = useState<ICollectionCardProps[]>([
@@ -51,6 +52,9 @@ const HomePage = () => {
     return (
         <MainLayout>
             <div className="flex flex-col gap-5 col-span-1 pb-5">
+                <div className="">
+                    <WelcomeSection />
+                </div>
                 {/* <div className="flex gap-[30px] w-full">
                     <div className="w-full">
                         <FindBookForm title="tim sach" />

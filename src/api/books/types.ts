@@ -18,7 +18,7 @@ export interface IBook {
   content_image: string[]
   tags: string[],
   number_of_books: number,
-  categories: ICategory[]
+  category: ICategory
   book_inventories: IBookReality[]
   book_store: IBookStore
   created_at: string

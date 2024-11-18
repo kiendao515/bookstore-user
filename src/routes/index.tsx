@@ -19,7 +19,7 @@ export enum UserRouterPath {
     otherBook = '/other-book',
     bookStore = '/book-store',
     login = '/login',
-    bookDetail = '/book-detail'
+    bookDetail = '/book-detail/:id'
 }
 
 export enum AdminRouterPath {

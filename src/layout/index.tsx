@@ -4,7 +4,6 @@ import Header from "./Header";
 import FindBook from "@/pages/FindBook";
 import { useState } from "react";
 import CartPopUp from "@/pages/CartPopUp";
-import WelcomeSection from "./Welcome/Welcome";
 
 const MainLayout = (props: IMainLayoutProps) => {
     const { children } = props;
@@ -19,7 +18,6 @@ const MainLayout = (props: IMainLayoutProps) => {
                     toggleCart={toggleCart}
                     setToggleCart={setToggleCart}
                 />
-                <WelcomeSection/>
                 <div className="mx-[100px]">
                     {children}
                 </div>
