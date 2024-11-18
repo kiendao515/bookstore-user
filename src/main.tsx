@@ -12,7 +12,6 @@ import { Provider } from 'react-redux';
 import { persistor, store } from './store';
 import { AuthToggleProvider } from './context/AuthToggleContext';
 import { PersistGate } from 'redux-persist/integration/react';
-
 const queryClientOption = {
   defaultOptions: {
     queries: { refetchOnWindowFocus: false, retry: false, staleTime: 1000 * 5 },
