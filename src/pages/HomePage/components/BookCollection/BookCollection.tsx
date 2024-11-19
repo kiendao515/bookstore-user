@@ -8,7 +8,9 @@ const BookCollection = (props: IBookCollectionProps) => {
     const { title } = props;
     const [bookParams, setBookParams] = useState<IReqParams>({
         page: 0,
-        size: 8
+        size: 8,
+        created_at :"",
+        updated_at :""
     });
     const { books } = useBooks({ ...bookParams });
     const newBooks = useMemo(() => {

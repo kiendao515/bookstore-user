@@ -1,5 +1,5 @@
 export interface IBaseResponse<T = undefined> {
-    success: boolean;
+    result: boolean;
     data: T;
-    message: string;
+    reason: string;
 }

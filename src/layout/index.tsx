@@ -34,12 +34,7 @@ const MainLayout = (props: IMainLayoutProps) => {
     return (
         <div>
             <div className="flex flex-col w-full">
-                <Header
-                    toggleFindBook={toggleFindBook}
-                    setToggleFindBook={setToggleFindBook}
-                    toggleCart={toggleCart}
-                    setToggleCart={setToggleCart}
-                />
+                <Header/>
                 <div className="mx-[100px]">
                     {children}
                 </div>

@@ -7,6 +7,9 @@ export const CLIENT_ID = '627cc14526dbae6bc42fa82b';
 export const REDIRECT_URL = 'http://localhost:3000/oauth/callback';
 // export const REDIRECT_URL = 'https://bitkub-nft.vercel.app/oauth/callback';
 export const LOGOUT_URL = `https://accounts.bitkubnext.com/logout?from=http://localhost:3000`;
+export const COUNTDOWN_TIME = import.meta.env.VITE_COUNTDOWN_TIME ? Number(import.meta.env.VITE_COUNTDOWN_TIME) : 3 * 60 * 1000;
+export const AMOUNT_FREE_SHIP = import.meta.env.VITE_AMOUNT_FREE_SHIP ? Number(import.meta.env.VITE_AMOUNT_FREE_SHIP) : 500000;
+export const AMOUNT_SHIPPING_FEE = import.meta.env.VITE_AMOUNT_SHIPPING_FEE ? Number(import.meta.env.VITE_AMOUNT_SHIPPING_FEE) : 25000;
 
 export const LOCAL_STORAGE_KEY = {
   token: 'token',

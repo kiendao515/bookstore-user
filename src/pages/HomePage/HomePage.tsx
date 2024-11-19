@@ -69,10 +69,10 @@ const HomePage = () => {
                 {/* <div className="py-3">
                     <BookCollection title="COLLECTION" />
                 </div> */}
-                {/* <div className="py-3">
+                <div className="py-3">
                     <Collection title="collections" collectionCards={collections} />
                 </div>
-                <div>
+                {/* <div>
                     <Collection title="sach ngoai Hop" collectionCards={stores} />
                 </div> */}
                 <div className="py-3">

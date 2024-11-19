@@ -48,7 +48,7 @@ const BookDetail = () => {
 
       <Row gutter={32}>
         {/* Cột Trái: Hình ảnh */}
-        <Col span={10}>
+        <Col span={8}>
           <Image
             width="100%"
             src={book?.data.cover_image}
@@ -76,14 +76,14 @@ const BookDetail = () => {
         <Col span={1}></Col>
         <Col span={13}>
           {/* Tiêu đề */}
-          <div className="flex justify-between items-center mb-4">
-            <Title level={3}>{book?.data.name} ({book?.data.author_name})</Title>
+          <div className="flex justify-between items-center">
+            <Title level={3}>{book?.data.name}</Title>
             <div className="flex items-center space-x-4">
               <HeartOutlined className="text-lg cursor-pointer text-gray-500" />
               <ShareAltOutlined className="text-lg cursor-pointer text-gray-500" />
             </div>
           </div>
-
+          <div className="flex justify-between items-center"><Title level={5}>{book?.data.author_name}</Title></div>
           <div className="flex items-center text-sm text-gray-500 mb-4">
             <Text>{book?.data.sold_quantity} đã bán</Text>
             <Divider type="vertical" />

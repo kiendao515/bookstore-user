@@ -96,6 +96,8 @@ export interface IReqParams {
   author_id?: string | null;
   store_id?: string | null;
   reload?: number;
+  created_at: string;
+  updated_at : string
 }
 
 export interface ICreateBook {

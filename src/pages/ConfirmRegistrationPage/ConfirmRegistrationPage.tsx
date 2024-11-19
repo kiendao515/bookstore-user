@@ -11,8 +11,8 @@ const ConfirmRegistrationPage = () => {
     });
     useEffect(() => {
         if (data) {
-            if (data.success) {
-                toast.success(data.message)
+            if (data.result) {
+                // toast.success(data.data)
                 navigate("/?is_confirm_success=1")
             } else {
                 toast.error("Invalid token");

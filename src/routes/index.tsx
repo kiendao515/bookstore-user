@@ -8,6 +8,7 @@ import OtherBookPage from "@/pages/OtherBookPage";
 import { createBrowserRouter } from "react-router-dom";
 import RequireAuth from "./Pages/RequireAuth";
 import { RoleEnum } from "@/utils/enum/role.enum";
+import ViewCart from "@/pages/Cart";
 
 
 export enum RouterPath {
@@ -26,6 +27,7 @@ export enum UserRouterPath {
     confirmRegistrationPage = "/confirm-registration",
     resetPasswordPage = "/reset-password",
     changePasswordPage = "/change-password",
+    viewCart = "/cart"
 }
 
 export enum AdminRouterPath {
@@ -87,7 +89,10 @@ export const router = createBrowserRouter([
                 <div>auth</div>
             </RequireAuth >
         )
+    },
+    {
+        path : UserRouterPath.viewCart,
+        element: <ViewCart/>
     }
-
 
 ]);
