@@ -38,3 +38,6 @@ export const LANGUAGES = [
   { label: 'Vietnam', code: 'vi' },
   { label: 'English', code: 'en' },
 ];
+
+export const phoneRegExp = /^(\+\d{1,3}[- ]?)?\d{10}$/;
+export const MAX_FILE_SIZE = 3 * 1024 * 1024; // 5MB

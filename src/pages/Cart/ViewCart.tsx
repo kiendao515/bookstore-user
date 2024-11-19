@@ -24,7 +24,7 @@ const ViewCart = () => {
         {
             id: "1",
             name: "Sách Truyện Kiều",
-            type: "Mới",
+            type: "NEW",
             quantity: 1,
             price: 83000,
             image: "https://via.placeholder.com/80", // URL ảnh giả lập
@@ -32,7 +32,7 @@ const ViewCart = () => {
         {
             id: "2",
             name: "Sách C Programming",
-            type: "Cũ",
+            type: "OLD",
             quantity: 2,
             price: 120000,
             image: "https://via.placeholder.com/80",
@@ -40,7 +40,7 @@ const ViewCart = () => {
         {
             id: "3",
             name: "Sách Harry Potter",
-            type: "Mới",
+            type: "GOOD",
             quantity: 1,
             price: 150000,
             image: "https://via.placeholder.com/80",
@@ -90,6 +90,12 @@ const ViewCart = () => {
             render: (type: string) => <Text>{handleStatusBook(type)}</Text>,
         },
         {
+            title: "Đơn giá",
+            dataIndex: "price",
+            key: "price",
+            render: (price: number) => <Text>{price.toLocaleString()} đ</Text>,
+        },
+        {
             title: "Số lượng",
             key: "quantity",
             dataIndex: "quantity",
@@ -109,12 +115,7 @@ const ViewCart = () => {
                 </Space>
             ),
         },
-        {
-            title: "Giá",
-            dataIndex: "price",
-            key: "price",
-            render: (price: number) => <Text>{price.toLocaleString()} đ</Text>,
-        },
+
         {
             title: "Thành tiền",
             key: "total",

@@ -123,9 +123,7 @@ export const reportType = (type: string) => {
 export const handleStatusBook = (status: string) => {
   switch (status) {
     case "OLD":
-      return "tạm"
-    case "MEDIUM":
-      return "khá"
+      return "cũ"
     case "GOOD":
       return "đẹp"
     case "NEW":
