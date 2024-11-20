@@ -3,9 +3,8 @@ import * as yup from "yup";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "react-query";
-import toast from "react-hot-toast";
 import { IForgotPasswordForm, IFormValue } from "./interface";
-import { Button, Form, Typography } from "antd";
+import { Button, Form, message, Typography } from "antd";
 import TextInput from "@/ui/FormInput/TextInput";
 
 const { Text } = Typography;
@@ -33,14 +32,14 @@ const ForgotPasswordForm = (props: IForgotPasswordForm) => {
 
     const { mutate, isLoading } = useMutation(sendResetPassword, {
         onSuccess: (data) => {
-            if (data.success) {
-                toast.success(data.message);
+            if (data.result) {
+                message.success(data.reason);
             } else {
-                toast.error(data.message);
+                message.error(data.reason);
             }
         },
         onError: (error: any) => {
-            toast.error(error?.response?.data?.message || "An error occurred.");
+            message.error(error?.response?.data?.message || "An error occurred.");
         },
     });
 

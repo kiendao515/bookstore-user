@@ -1,10 +1,9 @@
-import toast from 'react-hot-toast';
-
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-
+import { message } from 'antd';
 import { capitalizeFirstLetter } from '@/utils/common';
 import { API_URL } from '@/utils/constant';
 import { COOKIES, getCookies, removeCookies } from '@/utils/cookies';
+import toast from 'react-hot-toast';
 
 export const request = axios.create({
   baseURL: API_URL,

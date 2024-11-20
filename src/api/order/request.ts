@@ -1,6 +1,6 @@
 import { request } from "../axios";
 import { IBaseResponse } from "../interface";
-import { IAddressRes, ICreateOrder, ICreateOrderRes, IFullAddressRes, IOrderResponse, IReqParams, IUpdateOrder, OrderDetailRes, RetryPayment } from "./types";
+import { IAddressRes, ICreateCart, ICreateOrder, ICreateOrderRes, IFullAddressRes, IOrderResponse, IReqParams, IUpdateOrder, OrderDetailRes, RetryPayment } from "./types";
 
 export const createNewOrder = async (body: ICreateOrder): Promise<ICreateOrderRes> => {
   const { data } = await request({
@@ -73,3 +73,21 @@ export const retryPayment = async (id: string): Promise<RetryPayment> => {
   });
   return data;
 }
+
+export const addToCart = async (body:ICreateCart) => {
+  const { data } = await request({
+    url: '/api/v1/carts',
+    method: 'POST',
+    data: body,
+  });
+  return data;
+};
+
+
+export const getCarts = async (): Promise<IAddressRes> => {
+  const { data } = await request({
+    url: `/api/v1/carts`,
+    method: 'GET',
+  });
+  return data;
+};

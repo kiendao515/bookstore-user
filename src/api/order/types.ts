@@ -1,4 +1,9 @@
-import { IBook } from "../book";
+import { BookTypeInfo } from "@/pages/BookDetailPage/interface";
+import { IBook, ICreateBook } from "../books";
+export interface ICreateCart{
+    book_inventory_id: string;
+    quantity:number
+}
 
 export interface ICreateOrder {
     customer_name: string;
@@ -40,6 +45,16 @@ export interface IOrderResponse {
     size: number
     total_elements: number
     total_pages: number
+}
+export interface ICart{
+    result: boolean,
+    data : Cart[]
+}
+export interface Cart{
+    id: string,
+    book: IBook,
+    type: string,
+    quantity: number
 }
 export interface IAddressRes {
     success: boolean;

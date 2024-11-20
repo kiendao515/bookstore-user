@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { getCities, getDistricts, getFullAddress, getOrderById, getOrders, getWards } from './request';
+import { getCarts, getCities, getDistricts, getFullAddress, getOrderById, getOrders, getWards } from './request';
 import { IReqParams } from './types';
 
 export const useOrderDetail = (id: string, reload?: number) => {
@@ -75,4 +75,14 @@ export const useFullAddress = (wardId: string, reload?: number) => {
 
     );
     return { fullAddress: data, ...rest };
+}
+
+export const useCart = (reload?: number) => {
+    const { data, ...rest } = useQuery([`/api/v1/carts`, reload],
+        async () => {
+            const result = await getCarts();
+            return result;
+        },
+    );
+    return { data: data, ...rest };
 }

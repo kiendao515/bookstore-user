@@ -5,6 +5,7 @@ import { setToggleByKey } from "@/store/duck/togglePopUp/slice";
 import { HeartOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
 import { Typography } from "antd";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 
 const Header = (props: IHeaderProps) => {
@@ -14,6 +15,7 @@ const Header = (props: IHeaderProps) => {
     const { toggleAuth } = useAppSelector((state: RootState) => state.togglePopUp);
     const dispatch = useAppDispatch();
     const user = useAppSelector(getUser);
+    const navigate = useNavigate()
 
     useEffect(() => {
         setCount(cart.length);
@@ -37,8 +39,8 @@ const Header = (props: IHeaderProps) => {
             </div>
             <div className="flex items-center space-x-4">
                 <div className="flex space-x-4 text-blue-600">
-                    <HeartOutlined />
-                    <ShoppingCartOutlined />
+                    <HeartOutlined/>
+                    <ShoppingCartOutlined onClick={()=> navigate('/cart') }/>
                     {user.id == "" &&
                         <UserOutlined onClick={() => dispatch(setToggleByKey({ key: 'toggleAuth', value: !toggleAuth }))} />
                     }

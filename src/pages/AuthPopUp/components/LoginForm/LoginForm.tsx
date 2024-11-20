@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Form, Typography, Space, notification } from "antd";
-import toast from "react-hot-toast";
+import { Button, Form, Typography, Space, notification, message } from "antd";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
@@ -29,7 +28,7 @@ const LoginForm = (props: ILoginForm) => {
 
     useEffect(() => {
         if (searchParams.get("is_confirm_success") === "1") {
-            toast.success("Registration confirmed successfully!");
+            message.success("Registration confirmed successfully!");
         }
     }, [searchParams]);
 
@@ -78,7 +77,7 @@ const LoginForm = (props: ILoginForm) => {
             }
         },
         onError: (error: any) => {
-            toast.error(error?.response?.data?.message || "Login failed.");
+            message.error(error?.response?.data?.message || "Login failed.");
         },
     });
 

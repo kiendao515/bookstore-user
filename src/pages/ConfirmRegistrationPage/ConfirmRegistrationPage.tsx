@@ -1,6 +1,6 @@
 import { useRegistrationConfirm } from "@/api/auth";
+import { message } from "antd";
 import { useEffect } from "react"
-import toast from "react-hot-toast";
 import { useNavigate, useSearchParams } from "react-router-dom"
 
 const ConfirmRegistrationPage = () => {
@@ -12,14 +12,13 @@ const ConfirmRegistrationPage = () => {
     useEffect(() => {
         if (data) {
             if (data.result) {
-                // toast.success(data.data)
                 navigate("/?is_confirm_success=1")
             } else {
-                toast.error("Invalid token");
+                message.error("Invalid token");
                 navigate("/")
             }
         } else if (error) {
-            toast.error("An error occurs");
+            message.error("An error occurs");
             navigate("/")
         }
     }, [data, error, navigate])

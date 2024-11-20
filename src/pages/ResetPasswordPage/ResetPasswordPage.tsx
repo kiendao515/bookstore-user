@@ -2,10 +2,10 @@ import * as yup from 'yup';
 import { useForm } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useMutation } from "react-query";
-import toast from 'react-hot-toast';
 import { useNavigate, useSearchParams } from "react-router-dom"
 import { IFormValue } from './interface';
 import { resetPassword } from '@/api/auth';
+import { message } from 'antd';
 
 const ResetPasswordPage = () => {
     let [searchParams] = useSearchParams();
@@ -34,15 +34,15 @@ const ResetPasswordPage = () => {
 
     const { mutate, isLoading } = useMutation(resetPassword, {
         onSuccess: (data) => {
-            if (data.success) {
-                toast.success(data.message);
+            if (data.result) {
+                message.success(data.result);
                 navigate("/");
             } else {
-                toast.error(data.message);
+                message.error(data.result);
             }
         },
         onError: (error: any) => {
-            toast.error(error?.response.data.message);
+            message.error(error?.response.data.message);
         }
     })
 

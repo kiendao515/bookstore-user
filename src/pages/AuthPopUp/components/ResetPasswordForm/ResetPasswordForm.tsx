@@ -2,8 +2,7 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useMutation } from "react-query";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import toast from "react-hot-toast";
-import { Button, Form, Typography } from "antd";
+import { Button, Form, message, Typography } from "antd";
 import * as yup from "yup";
 import TextInput from "@/ui/FormInput/TextInput";
 import { IFormValue, IResetPasswordForm } from "./interface";
@@ -46,16 +45,16 @@ const ResetPasswordForm = (props: IResetPasswordForm) => {
 
     const { mutate, isLoading } = useMutation(resetPassword, {
         onSuccess: (data) => {
-            if (data.success) {
-                toast.success(data.message);
+            if (data.result) {
+                message.success(data.result);
                 setIndex(1);
                 navigate("/?is_change_pwd_success=1");
             } else {
-                toast.error(data.message);
+                message.error(data.reason);
             }
         },
         onError: (error: any) => {
-            toast.error(error?.response?.data?.message || "An error occurred.");
+            message.error(error?.response?.data?.message || "An error occurred.");
         },
     });
 

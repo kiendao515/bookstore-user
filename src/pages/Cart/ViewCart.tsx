@@ -4,12 +4,23 @@ import { useNavigate } from "react-router-dom";
 import { handleStatusBook } from "@/utils/common";
 import { AMOUNT_FREE_SHIP } from "@/utils/constant";
 import MainLayout from "@/layout";
+import { useCart } from "@/api/order/queries";
 
 const { Text } = Typography;
-
+interface CartItem {
+    id: string;
+    name: string;
+    type: string;
+    quantity: number;
+    price: number;
+    image: string;
+}
 const ViewCart = () => {
     const navigate = useNavigate();
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+    const { data } = useCart();
+    console.log(data);
+
 
     useEffect(() => {
         const handleResize = () => {
@@ -20,33 +31,21 @@ const ViewCart = () => {
     }, []);
 
     // Fake data giỏ hàng
-    const [cartItems, setCartItems] = useState([
-        {
-            id: "1",
-            name: "Sách Truyện Kiều",
-            type: "NEW",
-            quantity: 1,
-            price: 83000,
-            image: "https://via.placeholder.com/80", // URL ảnh giả lập
-        },
-        {
-            id: "2",
-            name: "Sách C Programming",
-            type: "OLD",
-            quantity: 2,
-            price: 120000,
-            image: "https://via.placeholder.com/80",
-        },
-        {
-            id: "3",
-            name: "Sách Harry Potter",
-            type: "GOOD",
-            quantity: 1,
-            price: 150000,
-            image: "https://via.placeholder.com/80",
-        },
-    ]);
-
+    const [cartItems, setCartItems] = useState<CartItem[]>([]); // State giỏ hàng
+    useEffect(() => {
+        // Chuyển đổi dữ liệu từ API thành dữ liệu phù hợp với bảng
+        if (data?.data) {
+            const mappedItems: CartItem[] = data.data.map((item: any) => ({
+                id: item.id,
+                name: item.book.name,
+                type: item.type,
+                quantity: item.quantity,
+                price: item.book.price || 0, // Nếu không có giá, mặc định là 0
+                image: item.book.coverImage,
+            }));
+            setCartItems(mappedItems);
+        }
+    }, [data]);
     const incrementQuantity = (id: string) => {
         setCartItems((prevItems) =>
             prevItems.map((item) =>

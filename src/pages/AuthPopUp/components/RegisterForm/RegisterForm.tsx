@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Button, Form, Typography } from "antd";
+import { Button, Form, message, Typography } from "antd";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { useMutation } from "react-query";
-import toast from "react-hot-toast";
 import { userRegisterRequest } from "@/api/auth";
 import { IFormValue, IRegisterFormProps } from "./interface";
 import TextInput from "@/ui/FormInput/TextInput";
@@ -61,7 +60,7 @@ const RegisterForm = (props: IRegisterFormProps) => {
             }
         },
         onError: (error: any) => {
-            toast.error(error?.response?.data?.message || "Registration failed.");
+        message.error(error?.response?.data?.message || "Registration failed.");
         },
     });
 

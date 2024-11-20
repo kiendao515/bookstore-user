@@ -5,7 +5,8 @@ import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import MainLayout from "@/layout";
 import { useBookDetail } from "@/api/books";
 import { useParams } from "react-router-dom";
-
+import { addToCart } from "@/api/order";
+import { message } from "antd";
 const { Title, Text } = Typography;
 
 const BookDetail = () => {
@@ -22,6 +23,7 @@ const BookDetail = () => {
   const prices = book?.data.book_inventories.map((inventory) => inventory.price) || [];
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
+  const [quantity, setQuantity] = useState<number>(1);
 
 
   const handleTypeChange = (type: string) => {
@@ -32,6 +34,34 @@ const BookDetail = () => {
       (inventory) => inventory.type === type
     );
     setSelectedPrice(selectedInventory?.price || null);
+  };
+
+  const handleAddToCart = async () => {
+    if (!selectedType) {
+      message.warning("Vui lòng chọn phân loại trước khi thêm vào giỏ hàng.")
+      return;
+    }
+
+    const selectedInventory = book?.data.book_inventories.find(
+      (inventory) => inventory.type === selectedType
+    );
+
+    if (!selectedInventory) {
+      message.error("Không tìm thấy thông tin phân loại sách.");
+      return;
+    }
+
+    try {
+      let rs = await addToCart({book_inventory_id: selectedInventory.id, quantity:quantity});
+      if(rs.result){
+        message.success("Đã thêm vào giỏ hàng!");
+      }else{
+        message.error(rs.reason)
+      }
+
+    } catch (error) {
+      message.error("Thêm vào giỏ hàng thất bại. Vui lòng thử lại.");
+    }
   };
   return (
     <MainLayout>
@@ -119,7 +149,10 @@ const BookDetail = () => {
           {/* Số lượng */}
           <div className="mb-6">
             <Text strong>Số lượng:</Text>
-            <InputNumber min={1} defaultValue={1} className="ml-4" />
+            <InputNumber min={1}
+                defaultValue={1}
+                value={quantity}
+                onChange={(value) => setQuantity(value || 1)} className="ml-4" />
           </div>
 
           {/* Nút hành động */}
@@ -129,6 +162,7 @@ const BookDetail = () => {
               icon={<ShoppingCartOutlined />}
               size="large"
               className="bg-blue-600"
+              onClick={handleAddToCart} // Gọi hàm thêm vào giỏ hàng
             >
               Thêm vào giỏ hàng
             </Button>
