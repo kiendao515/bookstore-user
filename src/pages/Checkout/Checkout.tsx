@@ -1,16 +1,24 @@
-import React from "react";
+import React, { useState } from "react";
 import { Form, Input, Button, Select, Radio, Typography, Card, Divider, Space, Row, Col } from "antd";
 import MainLayout from "@/layout";
+import { useDistricts, useProvinces, useWards } from "@/api/order/queries";
+import { useForm } from "react-hook-form";
 
 const { Title, Text } = Typography;
 
 const Checkout = () => {
-    const onFinish = (values) => {
+    const formMethod = useForm();
+    const { watch, control, handleSubmit } = formMethod;
+    const onFinish = (values: any) => {
         console.log("Form Submitted: ", values);
     };
 
     const totalPrice = 270300; // Example total price
-    const shippingFee = 25000; // Example shipping fee
+    const shippingFee = 25000;
+
+    const { provinces } = useProvinces();;
+    const { districts } = useDistricts(formMethod.watch("province_code") || "");
+    const { wards } = useWards(formMethod.watch("district_code") || "");
 
     return (
         <MainLayout>
@@ -49,30 +57,37 @@ const Checkout = () => {
                                     name="province"
                                     rules={[{ required: true, message: "Vui lòng chọn tỉnh/thành phố" }]}
                                 >
-                                    <Select placeholder="Chọn tỉnh/thành phố">
-                                        <Select.Option value="hanoi">Hà Nội</Select.Option>
-                                        <Select.Option value="hcm">Hồ Chí Minh</Select.Option>
-                                    </Select>
+                                    <Select
+                                        placeholder="Chọn tỉnh/thành phố"
+                                        
+                                        options={provinces?.data.map((province: any) => ({
+                                            value: province.code,
+                                            label: province.full_name,
+                                        }))}
+                                    />
                                 </Form.Item>
                                 <Form.Item
                                     label="Quận/Huyện"
                                     name="district"
                                     rules={[{ required: true, message: "Vui lòng chọn quận/huyện" }]}
                                 >
-                                    <Select placeholder="Chọn quận/huyện">
-                                        <Select.Option value="dongda">Đống Đa</Select.Option>
-                                        <Select.Option value="caugiay">Cầu Giấy</Select.Option>
-                                    </Select>
+                                    <Select
+                                        placeholder="Chọn quận/huyện"
+                                        onChange={handleDistrictChange}
+                                        options={districts}
+                                        disabled={!selectedProvince}
+                                    />
                                 </Form.Item>
                                 <Form.Item
                                     label="Xã/Phường"
                                     name="ward"
                                     rules={[{ required: true, message: "Vui lòng chọn xã/phường" }]}
                                 >
-                                    <Select placeholder="Chọn xã/phường">
-                                        <Select.Option value="phuong1">Phường 1</Select.Option>
-                                        <Select.Option value="phuong2">Phường 2</Select.Option>
-                                    </Select>
+                                    <Select
+                                        placeholder="Chọn xã/phường"
+                                        options={wards}
+                                        disabled={!selectedDistrict}
+                                    />
                                 </Form.Item>
                                 <Form.Item
                                     label="Địa chỉ cụ thể"
@@ -122,7 +137,10 @@ const Checkout = () => {
                         <Card bordered style={{ marginTop: "20px" }}>
                             <Title level={4}>Phương thức thanh toán</Title>
                             <Form layout="vertical">
-                                <Form.Item name="paymentMethod" rules={[{ required: true, message: "Chọn phương thức thanh toán" }]}>
+                                <Form.Item
+                                    name="paymentMethod"
+                                    rules={[{ required: true, message: "Chọn phương thức thanh toán" }]}
+                                >
                                     <Radio.Group>
                                         <Space direction="vertical">
                                             <Radio value="cod">Thanh toán khi nhận hàng (COD)</Radio>
