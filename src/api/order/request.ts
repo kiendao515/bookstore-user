@@ -1,10 +1,10 @@
 import { request } from "../axios";
 import { IBaseResponse } from "../interface";
-import { IAddressRes, ICreateCart, ICreateOrder, ICreateOrderRes, IFullAddressRes, IOrderResponse, IReqParams, IUpdateOrder, OrderDetailRes, RetryPayment } from "./types";
+import { BaseResponse, IAddressRes, ICalculateFee, ICreateCart, ICreateOrder, ICreateOrderRes, IFullAddressRes, IOrderResponse, IReqParams, IUpdateOrder, OrderDetailRes, RetryPayment } from "./types";
 
 export const createNewOrder = async (body: ICreateOrder): Promise<ICreateOrderRes> => {
   const { data } = await request({
-    url: '/api/v2/orders',
+    url: '/api/v1/orders',
     method: 'POST',
     data: body,
   });
@@ -91,3 +91,12 @@ export const getCarts = async (): Promise<IAddressRes> => {
   });
   return data;
 };
+
+export const calculateFee = async(body : ICalculateFee): Promise<BaseResponse>=>{
+  const { data } = await request({
+    url: '/api/v1/shipping/fee',
+    method: 'POST',
+    data: body,
+  });
+  return data;
+}

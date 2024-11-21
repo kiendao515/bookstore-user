@@ -1,40 +1,96 @@
-import React, { useState } from "react";
-import { Form, Input, Button, Select, Radio, Typography, Card, Divider, Space, Row, Col } from "antd";
+import React, { useEffect, useMemo, useState } from "react";
+import { Form, Input, Button, Select, Radio, Typography, Card, Divider, Space, Row, Col, message, FormProps } from "antd";
 import MainLayout from "@/layout";
-import { useDistricts, useProvinces, useWards } from "@/api/order/queries";
-import { useForm } from "react-hook-form";
+import { useDistricts, useFee, useProvinces, useWards } from "@/api/order/queries";
+import { Controller, useForm } from "react-hook-form";
+import { getUser } from "@/store/duck/auth/slice";
+import { useAppSelector } from "@/hooks/useRedux";
+import { calculateFee, createNewOrder } from "@/api/order";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
 
 const Checkout = () => {
     const formMethod = useForm();
-    const { watch, control, handleSubmit } = formMethod;
-    const onFinish = (values: any) => {
-        console.log("Form Submitted: ", values);
+    const { watch, setValue, handleSubmit } = formMethod;
+    const { provinces } = useProvinces();
+    const { districts } = useDistricts(watch("province_code") || "");
+    const { wards } = useWards(watch("district_code") || "");
+    const [provinceName, setProvinceName] = useState("");
+    const [districtName, setDistrictName] = useState("");
+    const user = useAppSelector(getUser);
+    const [fee, setFee] = useState(25000)
+    const location = useLocation();
+    const { cartItems, totalPrice } = location.state || { cartItems: [], totalPrice: 0 };
+    console.log(cartItems);
+    
+    const feeBody = useMemo(() => ({
+        address: watch("street") || "",
+        province: provinceName,
+        district: districtName,
+        weight: 2000,
+        value: totalPrice,
+    }), [districtName]);
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        const fetchFee = async () => {
+            try {
+                const rs = await calculateFee(feeBody);
+                setFee(rs.data);
+            } catch (error) {
+                console.error("Failed to fetch fee:", error);
+            }
+        };
+
+        if (feeBody.province && feeBody.district) {
+            fetchFee();
+        }
+    }, [feeBody]);
+
+    const handleCheckout = async (values: any) => {
+        console.log(values);
+        const orderPayload = {
+            customer_name: values.customerName,
+            customer_phone: values.phone,
+            email: user.email,
+            order_items: cartItems.map((item: any) => ({
+                book_inventory_id: item.book_inventory_id,
+                quantity: item.quantity
+            })),
+            payment_method: values.paymentMethod === "cod" ? false : true,
+            note: values.note || "",
+            province_code: watch("province_code"),
+            district_code: watch("district_code"),
+            ward_code: watch("ward_code"),
+            street: values.street,
+        };
+
+        try {
+            const response = await createNewOrder(orderPayload);
+            if(response.result){
+                message.success("Đặt hàng thành công!");
+                navigate("/order-confirmation", { state: { orderId: response.data.id } });
+            }
+        } catch (error) {
+            console.error("Failed to create order:", error);
+            message.error("Đặt hàng thất bại. Vui lòng thử lại!");
+        }
     };
-
-    const totalPrice = 270300; // Example total price
-    const shippingFee = 25000;
-
-    const { provinces } = useProvinces();;
-    const { districts } = useDistricts(formMethod.watch("province_code") || "");
-    const { wards } = useWards(formMethod.watch("district_code") || "");
-
     return (
         <MainLayout>
             <div style={{ padding: "20px" }}>
-                <Row gutter={24}>
-                    {/* Left Column: Customer Information */}
-                    <Col xs={24} lg={14}>
-                        <Card bordered style={{ marginBottom: "20px" }}>
-                            <Title level={4} style={{ marginBottom: "20px" }}>
-                                Thông tin khách hàng
-                            </Title>
-                            <Form layout="vertical" onFinish={onFinish}>
+                <Form layout="vertical" onFinish={handleCheckout}>
+                    <Row gutter={24}>
+                        <Col xs={24} lg={14}>
+                            <Card bordered style={{ marginBottom: "20px" }}>
+                                <Title level={4} style={{ marginBottom: "20px" }}>
+                                    Thông tin khách hàng
+                                </Title>
                                 <Form.Item
                                     label="Họ và tên"
                                     name="customerName"
-                                    rules={[{ required: true, message: "Vui lòng nhập họ và tên" }]}
+                                    rules={[{ required: true, message: "Vui lòng nhập tên người nhận" }]}
                                 >
                                     <Input placeholder="Họ và tên" />
                                 </Form.Item>
@@ -43,14 +99,14 @@ const Checkout = () => {
                                     name="phone"
                                     rules={[{ required: true, message: "Vui lòng nhập số điện thoại" }]}
                                 >
-                                    <Input addonBefore="+84" placeholder="Số điện thoại" />
+                                    <Input addonBefore="+84" type="number" placeholder="Số điện thoại" />
                                 </Form.Item>
                                 <Form.Item
                                     label="Email"
                                     name="email"
-                                    rules={[{ required: true, type: "email", message: "Vui lòng nhập email hợp lệ" }]}
+                                // rules={[{ required: true, type: "email", message: "Vui lòng nhập email hợp lệ" }]}
                                 >
-                                    <Input placeholder="Email" />
+                                    <Input value={user.email} defaultValue={user.email} disabled />
                                 </Form.Item>
                                 <Form.Item
                                     label="Tỉnh/Thành phố"
@@ -59,11 +115,16 @@ const Checkout = () => {
                                 >
                                     <Select
                                         placeholder="Chọn tỉnh/thành phố"
-                                        
-                                        options={provinces?.data.map((province: any) => ({
+                                        options={provinces?.data?.map((province: any) => ({
                                             value: province.code,
                                             label: province.full_name,
                                         }))}
+                                        onChange={(value, option) => {
+                                            setProvinceName(option?.label);
+                                            setValue("province_code", value);
+                                            setValue("district_code", "");
+                                            setValue("ward_code", "");
+                                        }}
                                     />
                                 </Form.Item>
                                 <Form.Item
@@ -73,9 +134,16 @@ const Checkout = () => {
                                 >
                                     <Select
                                         placeholder="Chọn quận/huyện"
-                                        onChange={handleDistrictChange}
-                                        options={districts}
-                                        disabled={!selectedProvince}
+                                        options={districts?.data?.map((district: any) => ({
+                                            value: district.code,
+                                            label: district.full_name,
+                                        }))}
+                                        onChange={(value, option) => {
+                                            setDistrictName(option?.label);
+                                            setValue("district_code", value);
+                                            setValue("ward_code", "");
+                                        }}
+                                        disabled={!watch("province_code")}
                                     />
                                 </Form.Item>
                                 <Form.Item
@@ -85,8 +153,14 @@ const Checkout = () => {
                                 >
                                     <Select
                                         placeholder="Chọn xã/phường"
-                                        options={wards}
-                                        disabled={!selectedDistrict}
+                                        options={wards?.data?.map((ward: any) => ({
+                                            value: ward.code,
+                                            label: ward.full_name,
+                                        }))}
+                                        onChange={(value, option) => {
+                                            setValue("ward_code", value);
+                                        }}
+                                        disabled={!watch("district_code")}
                                     />
                                 </Form.Item>
                                 <Form.Item
@@ -99,44 +173,68 @@ const Checkout = () => {
                                 <Form.Item label="Ghi chú giao hàng" name="note">
                                     <Input.TextArea rows={3} placeholder="Ghi chú giao hàng (nếu có)" />
                                 </Form.Item>
-                            </Form>
-                        </Card>
-                    </Col>
+                            </Card>
+                        </Col>
 
-                    {/* Right Column: Order Summary */}
-                    <Col xs={24} lg={10}>
-                        <Card bordered>
-                            <Title level={4} style={{ marginBottom: "20px" }}>
-                                Thông tin đơn hàng
-                            </Title>
-                            <div>
-                                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-                                    <Text>Mái Đừng Xa Tôi</Text>
-                                    <Text>x1</Text>
-                                    <Text>270,300đ</Text>
+                        <Col xs={24} lg={10}>
+                            <Card bordered>
+                                <Title level={4} style={{ marginBottom: "20px" }}>
+                                    Thông tin đơn hàng
+                                </Title>
+                                <div>
+                                    {cartItems.map((item: any) => (
+                                        <div
+                                            key={item.id}
+                                            style={{
+                                                display: "flex",
+                                                justifyContent: "space-between",
+                                                marginBottom: "10px",
+                                            }}
+                                        >
+                                            <Text>{item.name}</Text>
+                                            <Text>x{item.quantity}</Text>
+                                            <Text>{(item.price * item.quantity).toLocaleString()}đ</Text>
+                                        </div>
+                                    ))}
+                                    <Divider />
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            marginBottom: "10px",
+                                        }}
+                                    >
+                                        <Text>Tạm tính</Text>
+                                        <Text>{totalPrice.toLocaleString()}đ</Text>
+                                    </div>
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            marginBottom: "10px",
+                                        }}
+                                    >
+                                        <Text>Phí vận chuyển</Text>
+                                        <Text>{fee.toLocaleString()}đ</Text>
+                                    </div>
+                                    <Divider />
+                                    <div
+                                        style={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            fontWeight: "bold",
+                                        }}
+                                    >
+                                        <Text>Tổng cộng</Text>
+                                        <Text style={{ color: "#1E90FF", fontSize: "18px" }}>
+                                            {(totalPrice + fee).toLocaleString()}đ
+                                        </Text>
+                                    </div>
                                 </div>
-                                <Divider />
-                                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-                                    <Text>Tạm tính</Text>
-                                    <Text>{totalPrice.toLocaleString()}đ</Text>
-                                </div>
-                                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-                                    <Text>Phí vận chuyển</Text>
-                                    <Text>{shippingFee.toLocaleString()}đ</Text>
-                                </div>
-                                <Divider />
-                                <div style={{ display: "flex", justifyContent: "space-between", fontWeight: "bold" }}>
-                                    <Text>Tổng cộng</Text>
-                                    <Text style={{ color: "#1E90FF", fontSize: "18px" }}>
-                                        {(totalPrice + shippingFee).toLocaleString()}đ
-                                    </Text>
-                                </div>
-                            </div>
-                        </Card>
+                            </Card>
 
-                        <Card bordered style={{ marginTop: "20px" }}>
-                            <Title level={4}>Phương thức thanh toán</Title>
-                            <Form layout="vertical">
+                            <Card bordered style={{ marginTop: "20px" }}>
+                                <Title level={4}>Phương thức thanh toán</Title>
                                 <Form.Item
                                     name="paymentMethod"
                                     rules={[{ required: true, message: "Chọn phương thức thanh toán" }]}
@@ -148,18 +246,19 @@ const Checkout = () => {
                                         </Space>
                                     </Radio.Group>
                                 </Form.Item>
-                            </Form>
-                            <Space style={{ marginTop: "20px" }}>
-                                <Button onClick={() => console.log("Go Back")}>Quay lại</Button>
-                                <Button type="primary" htmlType="submit">
-                                    Đặt hàng
-                                </Button>
-                            </Space>
-                        </Card>
-                    </Col>
-                </Row>
+                                <Space style={{ marginTop: "20px" }}>
+                                    <Button onClick={() => console.log("Go Back")}>Quay lại</Button>
+                                    <Button type="primary" htmlType="submit">
+                                        Đặt hàng
+                                    </Button>
+                                </Space>
+                            </Card>
+                        </Col>
+                    </Row>
+                </Form>
             </div>
         </MainLayout>
+
     );
 };
 

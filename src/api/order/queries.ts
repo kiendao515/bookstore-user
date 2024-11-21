@@ -1,6 +1,6 @@
 import { useQuery } from 'react-query';
-import { getCarts, getCities, getDistricts, getFullAddress, getOrderById, getOrders, getWards } from './request';
-import { IReqParams } from './types';
+import { calculateFee, getCarts, getCities, getDistricts, getFullAddress, getOrderById, getOrders, getWards } from './request';
+import { ICalculateFee, IReqParams } from './types';
 
 export const useOrderDetail = (id: string, reload?: number) => {
     const { data, ...rest } = useQuery([`/api/v2/orders`, id, reload],
@@ -86,3 +86,14 @@ export const useCart = (reload?: number) => {
     );
     return { data: data, ...rest };
 }
+
+export const useFee = (body:ICalculateFee, reload?: number) => {
+    const { data, ...rest } = useQuery([`/api/v1/shipping/fee`, reload],
+        async () => {
+            const result = await calculateFee(body);
+            return result;
+        },
+    );
+    return { data: data?.data, ...rest };
+}
+

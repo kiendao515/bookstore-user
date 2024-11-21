@@ -8,15 +8,18 @@ export interface ICreateCart{
 export interface ICreateOrder {
     customer_name: string;
     customer_phone: string;
-    customer_email: string;
+    email: string;
     province_code: string;
     district_code: string;
     ward_code: string;
     street: string;
-    payment_type: number;
-    shipping_address_id?: string;
+    payment_method: boolean;
     note?: string,
-    book_orders: IBookOrder[];
+    order_items: IOrderItem[];
+}
+export interface IOrderItem{
+    book_inventory_id: string,
+    quantity:number
 }
 
 export interface IBookOrder {
@@ -26,8 +29,8 @@ export interface IBookOrder {
 }
 
 export interface ICreateOrderRes {
-    success: boolean;
-    message: string;
+    result: boolean;
+    reason: string;
     data: ICreateOrderData;
 }
 export interface ICreateOrderData {
@@ -157,4 +160,16 @@ export interface IUpdateOrder {
     shipping_code: string,
     shipping_company: string
     is_paid?: boolean
+}
+export interface BaseResponse{
+    result: boolean,
+    reason: string,
+    data: number
+}
+export interface ICalculateFee{
+    address: string,
+    province: string,
+    district: string,
+    weight: number,
+    value: number
 }

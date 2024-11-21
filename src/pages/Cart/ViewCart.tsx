@@ -14,6 +14,7 @@ interface CartItem {
     quantity: number;
     price: number;
     image: string;
+    book_inventory_id: string
 }
 const ViewCart = () => {
     const navigate = useNavigate();
@@ -40,8 +41,9 @@ const ViewCart = () => {
                 name: item.book.name,
                 type: item.type,
                 quantity: item.quantity,
-                price: item.book.price || 0, // Nếu không có giá, mặc định là 0
+                price: item.price || 0, 
                 image: item.book.coverImage,
+                book_inventory_id: item.book_inventory_id
             }));
             setCartItems(mappedItems);
         }
@@ -164,7 +166,7 @@ const ViewCart = () => {
                         <Button
                             type="primary"
                             style={{ marginLeft: 20 }}
-                            onClick={() => navigate("/checkout")}
+                            onClick={() => navigate("/checkout",{ state: { cartItems, totalPrice }})}
                         >
                             Thanh toán
                         </Button>
