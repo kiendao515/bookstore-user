@@ -1,5 +1,5 @@
-import axios, { AxiosRequestConfig, AxiosResponse } from 'axios';
-import { message } from 'antd';
+import axios, { AxiosResponse } from 'axios';
+
 import { capitalizeFirstLetter } from '@/utils/common';
 import { API_URL } from '@/utils/constant';
 import { COOKIES, getCookies, removeCookies } from '@/utils/cookies';
@@ -10,22 +10,25 @@ export const request = axios.create({
 });
 
 const handleError = async (error: any) => {
-  const data = error?.response?.data;
 
-  if (error.response.status === 401) {
-    localStorage.clear();
+  if (error.response?.status === 401 || error.response?.status === 403) {
+    removeCookies(COOKIES.user);
     removeCookies(COOKIES.token);
-    if (data.error.message === 'TokenExpire') {
-      location.href = '/';
-      toast.error('Session expired !');
+    localStorage.clear();
+    if (window.location.pathname.includes('/admin')) {
+      window.location.href = '/admin/login';
+    } else {
+      window.location.href = '/';
     }
+    toast.success("Vui lòng đăng nhập lại hệ thống");
   }
 
-  const message = data?.meta?.message;
+  const message = error?.message;
   if (!!message && error.config.method?.toUpperCase() !== 'GET') {
-    toast.error(capitalizeFirstLetter(typeof message === 'string' ? message : message[0]));
+    console.log(capitalizeFirstLetter(typeof message === 'string' ? message : message[0]));
   }
-  return Promise.reject(data);
+
+  return Promise.reject(error);
 };
 
 const handleSuccess = (res: AxiosResponse): any => {

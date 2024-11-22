@@ -9,6 +9,7 @@ interface TextInputProps {
   control: any; // Replace `any` with the specific type from react-hook-form
   errors?: FieldError;
   type?: "text" | "password";
+  [key: string]: any; // Accept additional props dynamically
 }
 
 const TextInput: React.FC<TextInputProps> = ({
@@ -18,6 +19,7 @@ const TextInput: React.FC<TextInputProps> = ({
   control,
   errors,
   type = "text",
+  ...props
 }) => {
   return (
     <Form.Item
@@ -30,9 +32,9 @@ const TextInput: React.FC<TextInputProps> = ({
         control={control}
         render={({ field }) =>
           type === "password" ? (
-            <Input.Password {...field} placeholder={placeholder} />
+            <Input.Password {...field} placeholder={placeholder} {...props} />
           ) : (
-            <Input {...field} placeholder={placeholder} />
+            <Input {...field} placeholder={placeholder}  {...props} />
           )
         }
       />

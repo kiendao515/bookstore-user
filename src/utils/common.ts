@@ -123,7 +123,9 @@ export const reportType = (type: string) => {
 export const handleStatusBook = (status: string) => {
   switch (status) {
     case "OLD":
-      return "cũ"
+      return "tạm"
+    case "MEDIUM":
+      return "khá"
     case "GOOD":
       return "đẹp"
     case "NEW":
@@ -133,3 +135,22 @@ export const handleStatusBook = (status: string) => {
   }
 }
 
+
+export const handleOrderStatus = (status: string) => {
+  switch (status) {
+    case "CREATED":
+      return "Chờ xác nhận";
+    case "READY_TO_PACKAGE":
+      return "Chờ gói hàng";
+    case "READY_TO_SHIP":
+      return "Sẵn sàng gửi";
+    case "SHIPPING":
+      return "Đang gửi";
+    case "DONE":
+      return "Thành công";
+    case "CANCEL":
+      return "Hủy"
+    default:
+      return "Trạng thái không xác định"; // Fallback for unknown statuses
+  }
+}

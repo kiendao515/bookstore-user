@@ -10,6 +10,7 @@ import RequireAuth from "./Pages/RequireAuth";
 import { RoleEnum } from "@/utils/enum/role.enum";
 import ViewCart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
+import AccountPage from "@/pages/AccountPage/AccountPage";
 
 
 export enum RouterPath {
@@ -18,6 +19,7 @@ export enum RouterPath {
 
 export enum UserRouterPath {
     home = '/',
+    account = "/account",
     introduction = '/introduction',
     collection = '/collection',
     category = '/category',
@@ -29,7 +31,7 @@ export enum UserRouterPath {
     resetPasswordPage = "/reset-password",
     changePasswordPage = "/change-password",
     viewCart = "/cart",
-    checkout= "/checkout"
+    checkout = "/checkout"
 }
 
 export enum AdminRouterPath {
@@ -72,6 +74,12 @@ export const router = createBrowserRouter([
         element: <BookStorePage />,
     },
     {
+        path: UserRouterPath.account,
+        element: (
+            <AccountPage />
+        )
+    },
+    {
         path: UserRouterPath.bookDetail,
         element: <BookDetailPage />
     },
@@ -93,12 +101,12 @@ export const router = createBrowserRouter([
         )
     },
     {
-        path : UserRouterPath.viewCart,
-        element: <ViewCart/>
+        path: UserRouterPath.viewCart,
+        element: <ViewCart />
     },
     {
-        path : UserRouterPath.checkout,
-        element : <Checkout/>
+        path: UserRouterPath.checkout,
+        element: <Checkout />
     }
 
 ]);
