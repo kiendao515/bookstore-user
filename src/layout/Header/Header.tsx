@@ -44,10 +44,8 @@ const Header = (props: IHeaderProps) => {
                     {user.id == "" &&
                         <UserOutlined onClick={() => dispatch(setToggleByKey({ key: 'toggleAuth', value: !toggleAuth }))} />
                     }
-                    {user.id != "" &&
-                        <Typography style={{ margin: 0 }}>
-                            Xin chào {user.full_name}
-                        </Typography>
+                    {user.id != "" && 
+                        <UserOutlined onClick={()=> navigate('/account') }/>
                     }
                 </div>
             </div>
