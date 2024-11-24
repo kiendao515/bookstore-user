@@ -31,7 +31,7 @@ export interface IBookOrder {
 export interface ICreateOrderRes {
     result: boolean;
     reason: string;
-    data: ICreateOrderData;
+    data:  ICreateOrderRes | string;
 }
 export interface ICreateOrderData {
     message: string;

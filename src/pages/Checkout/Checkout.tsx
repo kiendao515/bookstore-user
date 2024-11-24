@@ -5,7 +5,7 @@ import { useDistricts, useFee, useProvinces, useWards } from "@/api/order/querie
 import { Controller, useForm } from "react-hook-form";
 import { getUser } from "@/store/duck/auth/slice";
 import { useAppSelector } from "@/hooks/useRedux";
-import { calculateFee, createNewOrder } from "@/api/order";
+import { calculateFee, createNewOrder, ICreateOrderRes } from "@/api/order";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const { Title, Text } = Typography;
@@ -47,6 +47,9 @@ const Checkout = () => {
             fetchFee();
         }
     }, [feeBody]);
+    function isICreateOrder(obj: any): obj is ICreateOrderRes {
+        return obj && typeof obj === "object" && "result" in obj && "reason" in obj && "data" in obj;
+    }
 
     const handleCheckout = async (values: any) => {
         console.log(values);
@@ -70,7 +73,12 @@ const Checkout = () => {
             const response = await createNewOrder(orderPayload);
             if(response.result){
                 message.success("Đặt hàng thành công!");
-                navigate("/order-confirmation", { state: { orderId: response.data.id } });
+                if(values.paymentMethod !== "cod" && response.data != null && typeof response.data === 'string'){
+                    window.location.href = response.data;
+                }else if(typeof response.data == 'object'){
+                    navigate("/order-confirmation", { state: { orderId: response.data?.id } });
+                }
+                
             }
         } catch (error) {
             console.error("Failed to create order:", error);
