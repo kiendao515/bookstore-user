@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import BookCard from "../../../../ui/BookCard";
-import Pagination from "../../../../ui/Pagination/Pagination";
+import { Pagination as AntPagination } from "antd";
 import { RightOutlined } from '@ant-design/icons';
 import { IReqParams, useBooks } from '@/api/books';
 import { useCategories } from '@/api/category';
@@ -8,26 +8,29 @@ import { useCategories } from '@/api/category';
 interface IFilterCollectionProps {
     title: string;
 }
+
 export interface IFilterValue {
     id: string;
     label: string;
     quantity?: number;
 }
+
 const FilterCollection: React.FC<IFilterCollectionProps> = ({ title }) => {
     const [bookParams, setBookParams] = useState<IReqParams>({
         page: 0,
         size: 12,
-        created_at:"",
-        updated_at:""
+        created_at: "",
+        updated_at: ""
     });
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
     const { books } = useBooks({ ...bookParams });
-
     const { categories } = useCategories({});
+
+    // Tạo danh sách category từ API
     const filterValues = useMemo(() => {
         const result: IFilterValue[] = [];
-        categories?.data?.map((category) => {
+        categories?.data?.forEach((category) => {
             result.push({
                 id: category.id,
                 label: category.name,
@@ -37,38 +40,36 @@ const FilterCollection: React.FC<IFilterCollectionProps> = ({ title }) => {
         return result;
     }, [categories]);
 
+    // Tạo danh sách sách từ API
     const newBooks = useMemo(() => {
-        return books?.data?.map(book => {
-            const { minPrice, type } = (book?.book_inventories?.length > 0
-                ? book.book_inventories.reduce((acc, reality) => {
-                    if (reality.price != null && reality.price < acc.minPrice) {
-                        return { minPrice: reality.price, type: reality.type };
-                    }
-                    return acc;
-                }, { minPrice: Number.MAX_VALUE, type: "OLD" })
-                : { minPrice: 0, type: "OLD" });
-
-            return {
-                link: `/book-detail/${book?.id}`,
-                name: book?.name,
-                price: minPrice,
-                type: type,
-                quantity: book?.number_of_books,
-                description: book?.description || '',
-                author: book?.author_name || '',
-                image: book?.cover_image || '',
-                id: book?.id,
-                soldCount: book?.sold_quantity
-            };
-        }) || [];
+        return books?.data?.map(book => ({
+            link: `/book-detail/${book?.id}`,
+            name: book?.name,
+            price: book?.price || 0,
+            quantity: book?.number_of_books,
+            description: book?.description || '',
+            image: book?.cover_image || '',
+            id: book?.id,
+            soldCount: book?.sold_quantity || 0
+        })) || [];
     }, [books]);
 
+    // Khi chọn category
     const handleCategoryClick = (categoryId: string) => {
         setSelectedCategory(categoryId);
         setBookParams(prev => ({
             ...prev,
-            category_id: categoryId, // Assuming the API accepts a `category` parameter
-            page: 0 // Reset to the first page when the category changes
+            category_id: categoryId,
+            page: 0 // Reset về trang đầu tiên
+        }));
+    };
+
+    // Khi thay đổi trang trong pagination
+    const handlePageChange = (page: number, pageSize?: number) => {
+        setBookParams(prev => ({
+            ...prev,
+            page: page - 1, // Ant Design pagination là 1-based, API có thể là 0-based
+            size: pageSize || prev.size
         }));
     };
 
@@ -108,19 +109,26 @@ const FilterCollection: React.FC<IFilterCollectionProps> = ({ title }) => {
                     <div className="grid grid-cols-3 gap-6">
                         {newBooks.map(book => (
                             <BookCard
-                                link = {book.link}
+                                link={book.link}
                                 key={book.id}
                                 image={book.image}
                                 title={book.name}
-                                author={book.author}
                                 price={book.price}
                                 soldCount={book.soldCount}
                             />
                         ))}
                     </div>
+
                     {/* Pagination */}
                     <div className="flex justify-end mt-8">
-                        <Pagination />
+                        <AntPagination
+                            current={bookParams.page + 1} // Hiển thị trang hiện tại
+                            total={books?.total_elements || 0} // Tổng số mục từ API
+                            pageSize={bookParams.size} // Số mục trên mỗi trang
+                            onChange={handlePageChange} // Callback khi thay đổi trang
+                            showSizeChanger // Cho phép thay đổi số mục mỗi trang
+                            pageSizeOptions={['6', '12', '24']} // Lựa chọn số mục mỗi trang
+                        />
                     </div>
                 </div>
             </div>
