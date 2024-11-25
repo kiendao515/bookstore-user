@@ -86,7 +86,7 @@ const BookDetail = () => {
             className="rounded-md"
           />
           <Space className="mt-4" size={12}>
-            {book?.data.content_image.map((_, index) => (
+            {book?.data.content_image?.map((_, index) => (
               <Image
                 key={index}
                 width={64}

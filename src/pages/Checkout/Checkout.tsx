@@ -7,6 +7,7 @@ import { getUser } from "@/store/duck/auth/slice";
 import { useAppSelector } from "@/hooks/useRedux";
 import { calculateFee, createNewOrder, ICreateOrderRes } from "@/api/order";
 import { useLocation, useNavigate } from "react-router-dom";
+import { handleStatusBook } from "@/utils/common";
 
 const { Title, Text } = Typography;
 
@@ -201,6 +202,7 @@ const Checkout = () => {
                                         >
                                             <Text>{item.name}</Text>
                                             <Text>x{item.quantity}</Text>
+                                            <Text>{handleStatusBook(item.type)}</Text>
                                             <Text>{(item.price * item.quantity).toLocaleString()}đ</Text>
                                         </div>
                                     ))}

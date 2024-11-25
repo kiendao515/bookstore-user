@@ -16,7 +16,9 @@ export interface IFilterValue {
 const FilterCollection: React.FC<IFilterCollectionProps> = ({ title }) => {
     const [bookParams, setBookParams] = useState<IReqParams>({
         page: 0,
-        size: 12
+        size: 12,
+        created_at:"",
+        updated_at:""
     });
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -106,6 +108,7 @@ const FilterCollection: React.FC<IFilterCollectionProps> = ({ title }) => {
                     <div className="grid grid-cols-3 gap-6">
                         {newBooks.map(book => (
                             <BookCard
+                                link = {book.link}
                                 key={book.id}
                                 image={book.image}
                                 title={book.name}
