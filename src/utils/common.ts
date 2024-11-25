@@ -1,3 +1,4 @@
+import { IWebContent } from '@/store/duck/webContent/slice';
 import { NotificationType } from './enum/notification-type.enum';
 import { ISelectBox } from './interfaces';
 
@@ -120,6 +121,47 @@ export const reportType = (type: string) => {
   }
 };
 
+export const imageUrlToFile = async (url: string): Promise<File> => {
+  // Extract filename and MIME type from the URL
+  const filename = url.split('/').pop() || 'file';
+  const mimeType = `image/${filename.split('.').pop() || 'jpeg'}`;
+
+  // Load the image
+  const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const image = new Image();
+    image.crossOrigin = "Anonymous"; // This is necessary to avoid CORS issues
+    image.src = url;
+
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Image failed to load"));
+  });
+
+  // Create a canvas to draw the image on
+  const canvas = document.createElement("canvas");
+  canvas.width = img.width;
+  canvas.height = img.height;
+  const ctx = canvas.getContext("2d");
+
+  if (!ctx) {
+    throw new Error("Failed to get canvas context");
+  }
+
+  // Draw the image onto the canvas
+  ctx.drawImage(img, 0, 0);
+
+  // Convert the canvas content to a Blob
+  const blob = await new Promise<Blob | null>((resolve) => {
+    canvas.toBlob((blob) => resolve(blob), mimeType, 1.0);
+  });
+
+  if (!blob) {
+    throw new Error("Canvas is empty");
+  }
+
+  // Create and return a File object from the Blob
+  return new File([blob], filename, { type: mimeType });
+}
+
 export const handleStatusBook = (status: string) => {
   switch (status) {
     case "OLD":
@@ -135,6 +177,14 @@ export const handleStatusBook = (status: string) => {
   }
 }
 
+export const getContent = (contents: IWebContent[], key: string) => {
+  let contentArr = contents.filter((content) => content.key == key)
+  if(contentArr.length == 0) return "";
+  let content = contentArr[0];
+  if(content.property == "TEXT") return content.value;
+  if(content.property == "IMAGE") return content.image.link;
+  return ""
+}
 
 export const handleOrderStatus = (status: string) => {
   switch (status) {
@@ -153,4 +203,36 @@ export const handleOrderStatus = (status: string) => {
     default:
       return "Trạng thái không xác định"; // Fallback for unknown statuses
   }
+}
+
+export const ccyFormat = (num: number) => {
+  return `${num.toFixed(2)}`;
+}
+
+// utils/romanConverter.js
+export const convertToRoman = (num: number) => {
+  const romanNumerals = [
+    { value: 1000, numeral: 'M' },
+    { value: 900, numeral: 'CM' },
+    { value: 500, numeral: 'D' },
+    { value: 400, numeral: 'CD' },
+    { value: 100, numeral: 'C' },
+    { value: 90, numeral: 'XC' },
+    { value: 50, numeral: 'L' },
+    { value: 40, numeral: 'XL' },
+    { value: 10, numeral: 'X' },
+    { value: 9, numeral: 'IX' },
+    { value: 5, numeral: 'V' },
+    { value: 4, numeral: 'IV' },
+    { value: 1, numeral: 'I' }
+  ];
+
+  let result = '';
+  for (const { value, numeral } of romanNumerals) {
+    while (num >= value) {
+      result += numeral;
+      num -= value;
+    }
+  }
+  return result;
 }

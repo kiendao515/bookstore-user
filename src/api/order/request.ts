@@ -61,7 +61,7 @@ export const getFullAddress = async (wardCode: string): Promise<IFullAddressRes>
 
 export const getOrderById = async (id: string): Promise<OrderDetailRes> => {
   const { data } = await request({
-    url: `/api/v2/orders/${id}`,
+    url: `/api/v1/orders/detail/${id}`,
     method: 'GET',
   });
   return data;

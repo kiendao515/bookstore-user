@@ -1,3 +1,0 @@
-interface IInformation {
-    title? : string
-}

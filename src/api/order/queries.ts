@@ -3,7 +3,7 @@ import { calculateFee, getCarts, getCities, getDistricts, getFullAddress, getOrd
 import { ICalculateFee, IReqParams } from './types';
 
 export const useOrderDetail = (id: string, reload?: number) => {
-    const { data, ...rest } = useQuery([`/api/v2/orders`, id, reload],
+    const { data, ...rest } = useQuery([`/api/v1/orders/detail`, id, reload],
         async () => {
             const result = await getOrderById(id);
             return result;

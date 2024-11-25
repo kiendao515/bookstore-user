@@ -23,3 +23,15 @@ export interface ITab {
     label: string;
     isShow: boolean;
 }
+
+export interface IOptionType {
+    label: string;
+    value: string;
+}
+
+export interface IImage {
+    id: string;
+    link: string;
+    name: string;
+    size: number;
+}

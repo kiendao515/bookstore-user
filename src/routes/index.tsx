@@ -11,6 +11,7 @@ import { RoleEnum } from "@/utils/enum/role.enum";
 import ViewCart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
 import AccountPage from "@/pages/AccountPage/AccountPage";
+import OrderResult from "@/pages/OrderResult";
 
 
 export enum RouterPath {
@@ -31,7 +32,9 @@ export enum UserRouterPath {
     resetPasswordPage = "/reset-password",
     changePasswordPage = "/change-password",
     viewCart = "/cart",
-    checkout = "/checkout"
+    checkout = "/checkout",
+    orderResult = "/order-result",
+    intro = "/introduction"
 }
 
 export enum AdminRouterPath {
@@ -107,6 +110,13 @@ export const router = createBrowserRouter([
     {
         path: UserRouterPath.checkout,
         element: <Checkout />
+    },
+    {
+        path : UserRouterPath.orderResult,
+        element: <OrderResult/>
+    },
+    {
+        path: UserRouterPath.intro,
+        element: <IntroductionPage/>
     }
-
 ]);

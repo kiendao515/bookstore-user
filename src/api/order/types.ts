@@ -91,7 +91,7 @@ export interface OrderDetail {
     customer_email: string
     street: string
     status: string
-    payment_type: number
+    payment_type: boolean
     shipping_code: string
     shipping_company: string
     note: string
