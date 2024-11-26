@@ -103,7 +103,16 @@ export interface OrderDetail {
     is_paid: boolean
     book_orders: IBookOrderDetail[]
     created_at: string
-    updated_at: any
+    updated_at: any,
+    address:string,
+    order_items: OrderItem[],
+    total_amount: number
+}
+export interface OrderItem{
+    bookName: string,
+    quantity: number,
+    price: number,
+    type:string
 }
 
 export interface IAddress {

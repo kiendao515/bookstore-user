@@ -12,7 +12,7 @@ export const createNewOrder = async (body: ICreateOrder): Promise<ICreateOrderRe
 };
 export const getOrders = async (params: IReqParams): Promise<IOrderResponse> => {
   const { data } = await request({
-    url: `/api/v2/orders?` + new URLSearchParams(params as any),
+    url: `/api/v1/orders?` + new URLSearchParams(params as any),
     method: 'GET',
   });
   return data;
@@ -61,7 +61,7 @@ export const getFullAddress = async (wardCode: string): Promise<IFullAddressRes>
 
 export const getOrderById = async (id: string): Promise<OrderDetailRes> => {
   const { data } = await request({
-    url: `/api/v1/orders/detail/${id}`,
+    url: `/api/v1/orders/${id}`,
     method: 'GET',
   });
   return data;

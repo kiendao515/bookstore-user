@@ -4,7 +4,7 @@ import { handleOrderStatus } from "@/utils/common";
 import OrderDetailPopUp from "./component/OrderDetailPopUp/OrderDetailPopUp";
 import { useOrders } from "@/api/order/queries";
 import moment from "moment";
-import { Modal, Table, Typography, Button, Image, Space } from "antd";
+import { Modal, Table, Typography, Button, Image, Space, Tag } from "antd";
 
 const { Text } = Typography;
 
@@ -26,57 +26,54 @@ const Order = (props: IOrderProps) => {
     const columns = [
         {
             title: "Đơn hàng",
-            dataIndex: "orderBook",
-            key: "orderBook",
-            render: (text: string, record: any) => (
-                <Space>
-                    <Image
-                        src={
-                            record.book_orders.length > 0
-                                ? record.book_orders[0].thumbnail
-                                : ""
-                        }
-                        alt="Book"
-                        width={80}
-                        height={80}
-                        style={{ display: record.book_orders.length > 0 ? "block" : "none" }}
-                    />
-                    <Text>
-                        {text.length > 18 ? `${text.slice(0, 18)}...` : text}
-                    </Text>
-                </Space>
+            dataIndex: "orderCode",
+            key: "orderCode",
+            render: (_: any, record: any) => (
+                <Text >
+                    {record.orderCode}...
+                </Text>
             ),
         },
         {
             title: "Tình trạng",
             dataIndex: "status",
             key: "status",
-            render: (status: string) => <Text>{handleOrderStatus(status)}</Text>,
+            render: (status: string) => (
+                <Tag color={status === "DONE" ? "green" : "volcano"}>
+                    {handleOrderStatus(status)}
+                </Tag>
+            ),
             align: "center",
         },
-        ...(isMobile
-            ? []
-            : [
-                  {
-                      title: "Số lượng",
-                      dataIndex: "quantity",
-                      key: "quantity",
-                      render: (quantity: number) => <Text>{quantity} quyển</Text>,
-                      align: "center",
-                  },
-              ]),
+        {
+            title: "Số lượng",
+            dataIndex: "quantity",
+            key: "quantity",
+            render: (_: any, record: any) =>
+                `${record.quantity} quyển`,
+            align: "center",
+        },
         {
             title: "Tổng tiền",
-            dataIndex: "total_price",
-            key: "total_price",
-            render: (price: number) => <Text>{price.toLocaleString()}đ</Text>,
+            dataIndex: "totalAmount",
+            key: "totalAmount",
+            render: (price: number) =>
+                price ? (
+                    <Text style={{ fontWeight: "bold" }}>
+                        {price.toLocaleString()}đ
+                    </Text>
+                ) : (
+                    <Text>Chưa thanh toán</Text>
+                ),
             align: "center",
         },
         {
             title: "Ngày tạo",
-            dataIndex: "created_at",
-            key: "created_at",
-            render: (date: string) => <Text>{moment(date).format("DD/MM/YYYY")}</Text>,
+            dataIndex: "createdAt",
+            key: "createdAt",
+            render: (date: string) => (
+                <Text>{moment(date).format("DD/MM/YYYY")}</Text>
+            ),
             align: "center",
         },
         {
@@ -85,12 +82,13 @@ const Order = (props: IOrderProps) => {
             render: (_: any, record: any) => (
                 <Button
                     type="link"
+                    style={{ color: "#007bff" }}
                     onClick={() => {
                         setToggleDetail(true);
                         setSelectedId(record.id);
                     }}
                 >
-                    Chi tiết
+                    chi tiết
                 </Button>
             ),
             align: "center",
@@ -99,22 +97,18 @@ const Order = (props: IOrderProps) => {
 
     const dataSource = orders?.data.map((order: any) => ({
         key: order.id,
-        orderBook:
-            order.book_orders.length > 1
-                ? order.book_orders.map((book: any) => book.name).join(", ")
-                : order.book_orders.map((book: any) => book.name).join(","),
+        orderCode: order.order_code,
         status: order.status,
-        quantity: order.book_orders.reduce((total: number, book: any) => total + book.quantity, 0),
-        total_price: order.total_price,
-        created_at: order.created_at,
+        quantity: Array.isArray(order.order_items)
+        ? order.order_items.reduce((total: number, item: any) => total + item.quantity, 0) : 0,
+        totalAmount: order.total_amount,
+        createdAt: order.created_at,
         id: order.id,
-        book_orders: order.book_orders,
     }));
 
     return (
         <>
             <div>
-                {!isMobile && <Text style={{ color: "#888888" }}>[ đơn hàng ]</Text>}
                 <div style={{ marginTop: 30, paddingBottom: 200 }}>
                     <Table
                         dataSource={dataSource}
@@ -122,6 +116,7 @@ const Order = (props: IOrderProps) => {
                         pagination={false}
                         rowKey="key"
                         bordered
+                        style={{ background: "#fff" }}
                     />
                 </div>
             </div>

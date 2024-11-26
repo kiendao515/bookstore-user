@@ -15,7 +15,7 @@ export const useOrderDetail = (id: string, reload?: number) => {
     return { order: data, ...rest };
 };
 export const useOrders = (params: IReqParams) => {
-    const { data, ...rest } = useQuery([`/api/v2/orders`, params],
+    const { data, ...rest } = useQuery([`/api/v1/orders`, params],
         async () => {
             const result = await getOrders(params);
             return result;
