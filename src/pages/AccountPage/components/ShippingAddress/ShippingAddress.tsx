@@ -3,8 +3,8 @@ import { IShippingAddressProps } from "./interface";
 import UpdateShippingAddressPopUp from "./component/UpdateShippingAddressPopUp";
 import CreateShippingAddressPopUp from "./component/CreateShippingAddressPopUp";
 import NarrowIcon from "@/icons/NarrowIcon";
-import { useShippingAddresses } from "@/api/shipment";
-import { Modal, Button, Typography, List, Row, Col, Tag } from "antd";
+import { deleteShipment, useShippingAddresses } from "@/api/shipment";
+import { Modal, Button, Typography, List, Row, Col, Tag, message } from "antd";
 
 const { Text } = Typography;
 
@@ -15,6 +15,12 @@ const ShippingAddress = (props: IShippingAddressProps) => {
     const [reload, setReload] = useState(0);
     const { shippingAddresses } = useShippingAddresses({ reload });
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1280);
+    const handleDelete = async(id:string)=>{
+        let rs = await deleteShipment(id);
+        if(rs.result){
+            message.success("Xóa thành công!")
+        }
+    }
 
     useEffect(() => {
         const handleResize = () => {

@@ -105,6 +105,7 @@ const UserInfo = (props: IUserInfoProps) => {
                     name="email"
                     label="Email đăng nhập"
                     placeholder="Email đăng nhập"
+                    disabled
                     control={formMethod.control}
                     errors={formMethod.formState.errors.email}
                 />
@@ -145,7 +146,6 @@ const UserInfo = (props: IUserInfoProps) => {
                         width: isMobile ? "100%" : 92,
                         height: isMobile ? 35 : 30,
                     }}
-                    icon={<NarrowIcon style={{ marginRight: isMobile ? 5 : 10 }} />}
                 >
                     Lưu
                 </Button>

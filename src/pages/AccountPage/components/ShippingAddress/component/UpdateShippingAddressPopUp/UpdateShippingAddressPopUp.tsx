@@ -143,11 +143,17 @@ const UpdateShippingAddressPopUp = (props: IUpdateShippingAddressPopUp) => {
                     errors={formMethod.formState.errors.street}
                 />
 
+                <Form.Item name="default" valuePropName="checked">
+                    <Space>
+                        <input
+                            type="checkbox"
+                            {...formMethod.register('default')}
+                        />
+                        <label>Địa chỉ mặc định</label>
+                    </Space>
+                </Form.Item>
                 <Form.Item>
                     <Space>
-                        <Checkbox {...formMethod.register("default")}>
-                            Địa chỉ mặc định
-                        </Checkbox>
                         <Button
                             type="primary"
                             htmlType="submit"
