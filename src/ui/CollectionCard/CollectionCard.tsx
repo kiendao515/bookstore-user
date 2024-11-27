@@ -1,14 +1,32 @@
+import { Card } from "antd";
+const { Meta } = Card;
 const CollectionCard = (props: ICollectionCardProps) => {
     const { title, imageLink } = props;
     return (
-        <div className="flex flex-col w-[368px] h-[473px]">
-            <div className="flex items-center justify-center  w-full h-[368px] bg-bookcard">
-                <img src={imageLink} className="w-[349px] h-[349px]" />
-            </div>
-            <div className="flex pt-[10px]">
-                <div>{title}</div>
-            </div>
-        </div>
+        <Card
+            hoverable
+            style={{ width: 300, height: 400 }}
+            cover={
+                <img
+                    src={imageLink}
+                    alt={title}
+                    style={{
+                        width: "100%",
+                        height: 280,
+                        objectFit: "cover",
+                    }}
+                />
+            }
+        >
+            <Meta
+                title={title}
+                style={{
+                    textAlign: "center",
+                    fontSize: "16px",
+                    fontWeight: "500",
+                }}
+            />
+        </Card>
     )
 };
 

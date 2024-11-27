@@ -59,55 +59,58 @@ const ShippingAddress = (props: IShippingAddressProps) => {
                         renderItem={(shippingAddress) => (
                             <List.Item
                                 style={{
-                                    borderBottom: "1px solid #888888",
+                                    borderBottom: "1px solid #e0e0e0",
                                     marginBottom: 20,
-                                    paddingBottom: 10,
+                                    paddingBottom: 15,
                                 }}
                                 key={shippingAddress.id}
                             >
                                 <div style={{ width: "100%" }}>
-                                    <Row justify="space-between" align="middle">
-                                        <Col>
-                                            <Row gutter={10}>
-                                                <Col style={{ color: "#1E71FF" }}>
-                                                    {shippingAddress.full_name}
-                                                </Col>
-                                                <Col>|</Col>
-                                                <Col>{shippingAddress.phone_number}</Col>
-                                            </Row>
+                                    <Row justify="space-between" align="top">
+                                        <Col style={{ flex: 1 }}>
+                                            <div style={{ fontSize: 16, fontWeight: "bold" }}>
+                                                Họ tên: {shippingAddress.full_name}
+                                            </div>
+                                            <div style={{ marginTop: 5 }}>
+                                                Địa chỉ: {`${shippingAddress.street}, ${shippingAddress.district?.full_name || ""
+                                                    }, ${shippingAddress.province?.full_name || ""}`}
+                                            </div>
+                                            <div style={{ marginTop: 5 }}>Số điện thoại: {shippingAddress.phone_number}</div>
                                         </Col>
                                         <Col>
+                                            {shippingAddress.default && (
+                                                <Tag color="green" style={{ marginBottom: 10 }}>
+                                                    Địa chỉ mặc định
+                                                </Tag>
+                                            )}
                                             <Button
                                                 type="link"
-                                                style={{ color: "#888888", fontStyle: "italic" }}
+                                                style={{
+                                                    color: "#1E71FF",
+                                                    fontWeight: 500,
+                                                }}
                                                 onClick={() => {
                                                     setSelectedId(shippingAddress.id);
                                                     setToggleDetail(true);
                                                 }}
                                             >
-                                                Sửa
+                                                Chỉnh sửa địa chỉ
+                                            </Button>
+                                            <Button
+                                                type="link"
+                                                danger
+                                                onClick={() => handleDelete(shippingAddress.id)}
+                                            >
+                                                Xóa
                                             </Button>
                                         </Col>
                                     </Row>
-                                    <div style={{ marginTop: 5 }}>
-                                        {`${shippingAddress.street}, ${shippingAddress.district.full_name}`}
-                                    </div>
-                                    <div style={{ marginTop: 5 }}>
-                                        {`${shippingAddress.ward.full_name}, ${shippingAddress.province.full_name}`}
-                                    </div>
-                                    {shippingAddress.default && (
-                                        <Tag
-                                            color="blue"
-                                            style={{ marginTop: 5, fontStyle: "italic" }}
-                                        >
-                                            Mặc định
-                                        </Tag>
-                                    )}
                                 </div>
                             </List.Item>
                         )}
                     />
                 </div>
+
             </div>
             <Modal
                 open={toggleDetail}

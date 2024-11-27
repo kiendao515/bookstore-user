@@ -70,7 +70,7 @@ const HomePage = () => {
                     <BookCollection title="COLLECTION" />
                 </div> */}
                 <div className="py-3">
-                    <Collection title="collections" collectionCards={collections} />
+                    <Collection title="Bộ sưu tập"/>
                 </div>
                 {/* <div>
                     <Collection title="sach ngoai Hop" collectionCards={stores} />

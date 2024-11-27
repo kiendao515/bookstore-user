@@ -9,20 +9,23 @@ const BookCollection = (props: IBookCollectionProps) => {
     const [bookParams, setBookParams] = useState<IReqParams>({
         page: 0,
         size: 8,
-        created_at :"",
-        updated_at :""
+        created_at: "",
+        updated_at: ""
     });
     const { books } = useBooks({ ...bookParams });
     const newBooks = useMemo(() => {
         return books?.data?.map(book => {
-            const { minPrice, type } = (book?.book_inventories?.length > 0
-                ? book.book_inventories.reduce((acc, reality) => {
-                    if (reality.price != null && reality.price < acc.minPrice) {
-                        return { minPrice: reality.price, type: reality.type };
+            const validInventories = book?.book_inventories?.filter(inventory => inventory.price > 0) || [];
+
+            // Find the minimum price and its type
+            const { minPrice, type } = validInventories.length > 0
+                ? validInventories.reduce((acc, inventory) => {
+                    if (inventory.price < acc.minPrice) {
+                        return { minPrice: inventory.price, type: inventory.type };
                     }
                     return acc;
-                }, { minPrice: Number.MAX_VALUE, type: "OLD" })
-                : { minPrice: 0, type: "OLD" });
+                }, { minPrice: Number.MAX_VALUE, type: "UNKNOWN" }) // Default type if none is found
+                : { minPrice: 0, type: "UNKNOWN" }; // Default values if no valid inventory exists  
 
             return {
                 link: `/book-detail/${book?.id}`,
@@ -35,11 +38,11 @@ const BookCollection = (props: IBookCollectionProps) => {
                 author: book?.author_name || '',
                 image: book?.cover_image || '',
                 id: book?.id,
-                soldCount : book?.sold_quantity
+                soldCount: book?.sold_quantity
             };
         }) || [];
     }, [books]);
-    
+
     return (
         <div className="p-8">
             <section className="flex items-center justify-between bg-gray-100 p-4 mt-[100px] mb-[64px]">
@@ -53,9 +56,9 @@ const BookCollection = (props: IBookCollectionProps) => {
                     newBooks?.map(book => {
                         return (
                             <BookCard
-                                link = {book.link}
-                                key={book.id} 
-                                image= {book.image}
+                                link={book.link}
+                                key={book.id}
+                                image={book.image}
                                 title={book.name}
                                 author={book.author}
                                 price={book.price}
