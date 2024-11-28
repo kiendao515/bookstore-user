@@ -61,6 +61,14 @@ export const getFullAddress = async (wardCode: string): Promise<IFullAddressRes>
 
 export const getOrderById = async (id: string): Promise<OrderDetailRes> => {
   const { data } = await request({
+    url: `/api/v1/orders/detail/${id}`,
+    method: 'GET',
+  });
+  return data;
+}
+
+export const getOrderByOrderCode = async (id: string): Promise<OrderDetailRes> => {
+  const { data } = await request({
     url: `/api/v1/orders/${id}`,
     method: 'GET',
   });
@@ -78,6 +86,14 @@ export const addToCart = async (body:ICreateCart) => {
   const { data } = await request({
     url: '/api/v1/carts',
     method: 'POST',
+    data: body,
+  });
+  return data;
+};
+export const saveCart = async (body:ICreateCart) => {
+  const { data } = await request({
+    url: '/api/v1/carts',
+    method: 'PUT',
     data: body,
   });
   return data;

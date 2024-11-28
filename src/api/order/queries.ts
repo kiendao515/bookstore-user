@@ -1,11 +1,24 @@
 import { useQuery } from 'react-query';
-import { calculateFee, getCarts, getCities, getDistricts, getFullAddress, getOrderById, getOrders, getWards } from './request';
+import { calculateFee, getCarts, getCities, getDistricts, getFullAddress, getOrderById, getOrderByOrderCode, getOrders, getWards } from './request';
 import { ICalculateFee, IReqParams } from './types';
 
 export const useOrderDetail = (id: string, reload?: number) => {
     const { data, ...rest } = useQuery([`/api/v1/orders/detail`, id, reload],
         async () => {
             const result = await getOrderById(id);
+            return result;
+        },
+        {
+            enabled: id != undefined && id != ''
+        }
+    );
+    return { order: data, ...rest };
+};
+
+export const useOrderDetailForUser = (id: string, reload?: number) => {
+    const { data, ...rest } = useQuery([`/api/v1/orders/detail/user`, id, reload],
+        async () => {
+            const result = await getOrderByOrderCode(id);
             return result;
         },
         {

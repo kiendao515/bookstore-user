@@ -217,7 +217,7 @@ export interface IBookFavorite {
 }
 
 export interface IBookFavoriteResponse {
-  success: boolean
+  result: boolean
   data: IBookFavorite
   message: string
 }

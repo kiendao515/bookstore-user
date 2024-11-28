@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, InputNumber, Card, Typography, Space } from "antd";
+import { Table, Button, InputNumber, Card, Typography, Space, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { handleStatusBook } from "@/utils/common";
 import { AMOUNT_FREE_SHIP } from "@/utils/constant";
 import MainLayout from "@/layout";
 import { useCart } from "@/api/order/queries";
+import { saveCart } from "@/api/order";
 
 const { Text } = Typography;
 interface CartItem {
@@ -20,7 +21,6 @@ const ViewCart = () => {
     const navigate = useNavigate();
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const { data } = useCart();
-    console.log(data);
 
 
     useEffect(() => {
@@ -48,27 +48,49 @@ const ViewCart = () => {
             setCartItems(mappedItems);
         }
     }, [data]);
-    const incrementQuantity = (id: string) => {
-        setCartItems((prevItems) =>
-            prevItems.map((item) =>
-                item.id === id ? { ...item, quantity: item.quantity + 1 } : item
-            )
-        );
+    const incrementQuantity = async(id: string) => {
+        let updateCart = await saveCart({book_inventory_id:id, quantity: 1,delete: false})
+        if(updateCart.result){
+            message.success("Lưu giỏ hàng thành công!")
+            setCartItems((prevItems) =>
+                prevItems.map((item) =>
+                    item.book_inventory_id === id ? { ...item, quantity: item.quantity + 1 } : item
+                )
+            );
+        }else{
+            message.warning(updateCart.reason)
+        }
     };
 
-    const decrementQuantity = (id: string) => {
-        setCartItems((prevItems) =>
-            prevItems.map((item) =>
-                item.id === id && item.quantity > 1
-                    ? { ...item, quantity: item.quantity - 1 }
-                    : item
-            )
-        );
+    const decrementQuantity = async(id: string) => {
+        let updateCart = await saveCart({book_inventory_id:id, quantity: -1,delete: false})
+        if(updateCart.result){
+            message.success("Lưu giỏ hàng thành công!")
+            setCartItems((prevItems) =>
+                prevItems.map((item) =>
+                    item.book_inventory_id === id && item.quantity > 1
+                        ? { ...item, quantity: item.quantity - 1 }
+                        : item
+                )
+            );
+        }else{
+            message.warning(updateCart.reason)
+        }
     };
 
-    const handleRemoveItem = (id: string) => {
-        setCartItems((prevItems) => prevItems.filter((item) => item.id !== id));
+    const handleRemoveItem = async(id: string) => {
+        let updateCart = await saveCart({book_inventory_id:id, quantity: -1,delete: true})
+        if(updateCart.result){
+            message.success("Lưu giỏ hàng thành công!")
+            setCartItems((prevItems) => prevItems.filter((item) => item.book_inventory_id !== id));
+        }else{
+            message.warning(updateCart.reason)
+        }
     };
+
+    useEffect(()=>{
+        console.log("change",cartItems);
+    },[cartItems])
 
     const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -103,14 +125,16 @@ const ViewCart = () => {
             render: (quantity: number, record: any) => (
                 <Space>
                     <Button
-                        onClick={() => decrementQuantity(record.id)}
+                        onClick={() => {
+                            decrementQuantity(record.book_inventory_id)
+                        }}
                         size="small"
                         disabled={quantity <= 1}
                     >
                         -
                     </Button>
                     <InputNumber value={quantity} readOnly style={{ width: 30 }} />
-                    <Button onClick={() => incrementQuantity(record.id)} size="small">
+                    <Button onClick={() => incrementQuantity(record.book_inventory_id)} size="small">
                         +
                     </Button>
                 </Space>
@@ -128,7 +152,7 @@ const ViewCart = () => {
             title: "Thao tác",
             key: "action",
             render: (text: any, record: any) => (
-                <Button type="link" danger onClick={() => handleRemoveItem(record.id)}>
+                <Button type="link" danger onClick={() => handleRemoveItem(record.book_inventory_id)}>
                     Xóa
                 </Button>
             ),

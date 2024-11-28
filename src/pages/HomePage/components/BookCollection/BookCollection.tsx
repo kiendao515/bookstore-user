@@ -56,6 +56,7 @@ const BookCollection = (props: IBookCollectionProps) => {
                     newBooks?.map(book => {
                         return (
                             <BookCard
+                                id = {book.id}
                                 link={book.link}
                                 key={book.id}
                                 image={book.image}

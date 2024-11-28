@@ -1,8 +1,9 @@
 import { BookTypeInfo } from "@/pages/BookDetailPage/interface";
 import { IBook, ICreateBook } from "../books";
-export interface ICreateCart{
+export interface ICreateCart {
     book_inventory_id: string;
-    quantity:number
+    quantity: number,
+    delete: boolean
 }
 
 export interface ICreateOrder {
@@ -17,9 +18,9 @@ export interface ICreateOrder {
     note?: string,
     order_items: IOrderItem[];
 }
-export interface IOrderItem{
+export interface IOrderItem {
     book_inventory_id: string,
-    quantity:number
+    quantity: number
 }
 
 export interface IBookOrder {
@@ -31,7 +32,25 @@ export interface IBookOrder {
 export interface ICreateOrderRes {
     result: boolean;
     reason: string;
-    data:  ICreateOrderRes | string;
+    data: IOrder | string;
+}
+export interface IOrder {
+    id: string;
+    accountId: string;
+    receiverName: string;
+    receiverPhone: string;
+    street: string;
+    status: string;
+    paymentType: boolean;
+    shippingFee: number;
+    totalAmount: number;
+    transactionId?: any;
+    orderCode: string;
+    shippingCode?: any;
+    shippingCompany: string;
+    note: string;
+    createdAt: string;
+    updatedAt?: any;
 }
 export interface ICreateOrderData {
     message: string;
@@ -49,11 +68,11 @@ export interface IOrderResponse {
     total_elements: number
     total_pages: number
 }
-export interface ICart{
+export interface ICart {
     result: boolean,
-    data : Cart[]
+    data: Cart[]
 }
-export interface Cart{
+export interface Cart {
     id: string,
     book: IBook,
     type: string,
@@ -104,15 +123,15 @@ export interface OrderDetail {
     book_orders: IBookOrderDetail[]
     created_at: string
     updated_at: any,
-    address:string,
+    address: string,
     order_items: OrderItem[],
     total_amount: number
 }
-export interface OrderItem{
+export interface OrderItem {
     bookName: string,
     quantity: number,
     price: number,
-    type:string
+    type: string
 }
 
 export interface IAddress {
@@ -170,12 +189,12 @@ export interface IUpdateOrder {
     shipping_company: string
     is_paid?: boolean
 }
-export interface BaseResponse{
+export interface BaseResponse {
     result: boolean,
     reason: string,
     data: number
 }
-export interface ICalculateFee{
+export interface ICalculateFee {
     address: string,
     province: string,
     district: string,

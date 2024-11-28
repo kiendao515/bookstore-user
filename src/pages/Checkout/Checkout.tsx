@@ -77,7 +77,7 @@ const Checkout = () => {
                 if(values.paymentMethod !== "cod" && response.data != null && typeof response.data === 'string'){
                     window.location.href = response.data;
                 }else if(typeof response.data == 'object'){
-                    navigate("/order-confirmation", { state: { orderId: response.data?.id } });
+                    navigate("/order-result?orderId="+response.data.orderCode);
                 }
                 
             }

@@ -109,6 +109,7 @@ const FilterCollection: React.FC<IFilterCollectionProps> = ({ title }) => {
                     <div className="grid grid-cols-3 gap-6">
                         {newBooks.map(book => (
                             <BookCard
+                                id = {book.id}
                                 link={book.link}
                                 key={book.id}
                                 image={book.image}

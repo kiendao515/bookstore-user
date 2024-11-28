@@ -13,6 +13,8 @@ import { IFormValue, ILoginForm } from "./interface";
 import { userLoginRequest } from "@/api/auth";
 import TextInput from "@/ui/FormInput/TextInput";
 import CheckboxInput from "@/ui/FormInput/CheckBoxInput";
+import { setBookFavorite } from "@/store/duck/bookFavorite/slice";
+import { getBookFavorite } from "@/api/books";
 
 const { Text } = Typography;
 
@@ -56,7 +58,7 @@ const LoginForm = (props: ILoginForm) => {
     });
 
     const { mutate, isLoading } = useMutation(userLoginRequest, {
-        onSuccess: (data) => {
+        onSuccess:async (data) => {
             if (data.result) {
                 dispatch(setAuth({ user: data.data.user }));
                 setCookies(COOKIES.token, data.data.token);
@@ -66,6 +68,15 @@ const LoginForm = (props: ILoginForm) => {
                     icon: <i className="ri-checkbox-circle-line" />,
                 })
                 dispatch(setToggleByKey({ key: "toggleAuth", value: !toggleAuth }));
+                const favoriteData = await getBookFavorite();
+                if (favoriteData.result) {
+                    dispatch(setBookFavorite({
+                        userId: favoriteData.data.user_id,
+                        bookIds: favoriteData.data.book_ids
+                    }));
+                } else {
+                    message.warning('Failed to fetch favorite books');
+                }
                 navigate(location.pathname, { replace: true });
             } else {
                 api.open({

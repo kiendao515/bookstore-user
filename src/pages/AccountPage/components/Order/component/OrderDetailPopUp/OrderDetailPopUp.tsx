@@ -1,14 +1,14 @@
 import { Typography, Divider, List, Space, Row, Col, Spin } from "antd";
 import moment from "moment";
 import { handleOrderStatus, handleStatusBook } from "@/utils/common";
-import { useOrderDetail } from "@/api/order/queries";
+import { useOrderDetail, useOrderDetailForUser } from "@/api/order/queries";
 import IOrderDetailPopUp from "./interface";
 
 const { Text, Title } = Typography;
 
 const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
     const { id } = props;
-    const { order, isLoading } = useOrderDetail(id); // `isLoading` từ hook
+    const { order, isLoading } = useOrderDetailForUser(id); // `isLoading` từ hook
 
     return (
         <Spin spinning={isLoading} tip="Đang tải dữ liệu...">
