@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, Button, Divider, Image, InputNumber, Radio, Space, Tag, Typography, Row, Col, Spin } from "antd";
+import { Breadcrumb, Button, Divider, Image, InputNumber, Radio, Space, Tag, Typography, Row, Col, Spin, message } from "antd";
 import { HeartOutlined, ShareAltOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import MainLayout from "@/layout";
 import { useBookDetail } from "@/api/books";
 import { useNavigate, useParams } from "react-router-dom";
 import { addToCart } from "@/api/order";
-import { message } from "antd";
-import { getUser } from "@/store/duck/auth/slice";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { setToggleByKey } from "@/store/duck/togglePopUp/slice";
 import { RootState } from "@/store";
 const { Title, Text } = Typography;
+
 interface CartItem {
   id: string;
   name: string;
@@ -19,15 +18,16 @@ interface CartItem {
   quantity: number;
   price: number;
   image: string;
-  book_inventory_id: string
+  book_inventory_id: string;
 }
+
 const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [isExpanded, setIsExpanded] = useState(false);
-
   const handleExpand = () => {
     setIsExpanded((prev) => !prev);
   };
+
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
   const { book } = useBookDetail(id!);
@@ -36,7 +36,7 @@ const BookDetail = () => {
   const minPrice = Math.min(...prices);
   const maxPrice = Math.max(...prices);
   const [quantity, setQuantity] = useState<number>(1);
-  const user = useAppSelector(getUser);
+  const user = useAppSelector((state: RootState) => state.auth.user);
   const { toggleAuth } = useAppSelector((state: RootState) => state.togglePopUp);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -54,7 +54,7 @@ const BookDetail = () => {
 
   const handleAddToCart = async () => {
     if (!selectedType) {
-      message.warning("Vui lòng chọn phân loại trước khi thêm vào giỏ hàng.")
+      message.warning("Vui lòng chọn phân loại trước khi thêm vào giỏ hàng.");
       return;
     }
 
@@ -66,26 +66,26 @@ const BookDetail = () => {
       message.error("Không tìm thấy thông tin phân loại sách.");
       return;
     }
+
     if (user.id == '' && user.email == '') {
-      dispatch(setToggleByKey({ key: "toggleAuth", value: !toggleAuth }))
-    }
-    else {
+      dispatch(setToggleByKey({ key: "toggleAuth", value: !toggleAuth }));
+    } else {
       try {
         let rs = await addToCart({ book_inventory_id: selectedInventory.id, quantity: quantity, delete: false });
         if (rs.result) {
           message.success("Đã thêm vào giỏ hàng!");
         } else {
-          message.error(rs.reason)
+          message.error(rs.reason);
         }
-
       } catch (error) {
         message.error("Thêm vào giỏ hàng thất bại. Vui lòng thử lại.");
       }
     }
   };
+
   const handleBuyNow = async () => {
     if (!selectedType) {
-      message.warning("Vui lòng chọn phân loại trước khi thêm vào giỏ hàng.")
+      message.warning("Vui lòng chọn phân loại trước khi thêm vào giỏ hàng.");
       return;
     }
 
@@ -97,33 +97,59 @@ const BookDetail = () => {
       message.error("Không tìm thấy thông tin phân loại sách.");
       return;
     }
+
     if (user.id == '' && user.email == '') {
-      dispatch(setToggleByKey({ key: "toggleAuth", value: !toggleAuth }))
-    }
-    else {
+      dispatch(setToggleByKey({ key: "toggleAuth", value: !toggleAuth }));
+    } else {
       const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
       console.log(cartItems, totalPrice);
-
-      navigate("/checkout", { state: { cartItems, totalPrice } })
+      navigate("/checkout", { state: { cartItems, totalPrice } });
     }
-  }
+  };
+   // Nhóm các bản ghi theo relatedBookId
+   const groupInventories = (inventories: any) => {
+    const grouped: any = {};
+    inventories.forEach((inventory: any) => {
+      const relatedBookId = inventory.relatedBookId || inventory.id;
+
+      if (!grouped[relatedBookId]) {
+        grouped[relatedBookId] = {
+          relatedBookId,
+          type: inventory.type,
+          quantity: 0,
+          price: inventory.price,
+        };
+      }
+
+      // Cộng dồn số lượng và nhóm các bản ghi theo relatedBookId
+      grouped[relatedBookId].quantity += inventory.quantity;
+    });
+    return Object.values(grouped);
+  };
+
   useEffect(() => {
     if (book?.data) {
       setLoading(false);
-      const mappedItems = book.data.book_inventories
-        .filter((inventory: any) => inventory.quantity > 0)
-        .map((inventory: any) => ({
+
+      // Nhóm các bản ghi theo relatedBookId và tính tổng số lượng
+      const groupedInventories = groupInventories(book.data.book_inventories);
+
+      const mappedItems = groupedInventories
+        .filter((group: any) => group.quantity > 0)
+        .map((group: any) => ({
           id: book.data.id,
           name: book.data.name,
-          type: inventory.type,
-          quantity: inventory.quantity,
-          price: inventory.price || 0,
+          type: group.type,
+          quantity: group.quantity,
+          price: group.price || 0,
           image: book.data.cover_image,
-          book_inventory_id: inventory.id
+          book_inventory_id: group.relatedBookId
         }));
+
       setCartItems(mappedItems);
     }
   }, [book]); // Lắng nghe thay đổi của book
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -187,7 +213,6 @@ const BookDetail = () => {
               <Divider type="vertical" />
               <Text>15 lượt thích</Text>
             </div>
-
             {/* Giá */}
             <Title level={4} className="text-blue-600 mb-4">
               {selectedPrice
@@ -202,13 +227,13 @@ const BookDetail = () => {
                 className="ml-4"
                 onChange={(e) => handleTypeChange(e.target.value)}
               >
-                {book?.data.book_inventories.map((inventory) => (
-                  <Radio.Button key={inventory.type} value={inventory.type}>
+                {cartItems.map((inventory) => (
+                  <Radio.Button key={inventory.book_inventory_id} value={inventory.type}>
                     {inventory.type === "NEW"
-                      ? "Mới"
+                      ? `Mới (${inventory.quantity})`
                       : inventory.type === "GOOD"
-                        ? "Đẹp"
-                        : "Cũ"}
+                      ? `Đẹp (${inventory.quantity})`
+                      : `Cũ (${inventory.quantity})`}
                   </Radio.Button>
                 ))}
               </Radio.Group>
@@ -217,10 +242,7 @@ const BookDetail = () => {
             {/* Số lượng */}
             <div className="mb-6">
               <Text strong>Số lượng:</Text>
-              <InputNumber min={1}
-                defaultValue={1}
-                value={quantity}
-                onChange={(value) => setQuantity(value || 1)} className="ml-4" />
+              <InputNumber min={1} defaultValue={1} value={quantity} onChange={(value) => setQuantity(value || 1)} className="ml-4" />
             </div>
 
             {/* Nút hành động */}
@@ -230,7 +252,7 @@ const BookDetail = () => {
                 icon={<ShoppingCartOutlined />}
                 size="large"
                 className="bg-blue-600"
-                onClick={handleAddToCart} // Gọi hàm thêm vào giỏ hàng
+                onClick={handleAddToCart}
               >
                 Thêm vào giỏ hàng
               </Button>
@@ -313,7 +335,6 @@ const BookDetail = () => {
             </div>
           </Col>
         </Row>
-
         {/* Mô tả sản phẩm */}
         <Divider />
         <Row gutter={[16, 16]} className="mb-6">
@@ -333,13 +354,7 @@ const BookDetail = () => {
                 MÔ TẢ SẢN PHẨM
               </span>
               <div className="mt-4">
-                <p
-                  className={`text-justify ${!isExpanded ? 'line-clamp-2' : ''} transition-all duration-300`}
-                  dangerouslySetInnerHTML={{
-                    __html: book?.data.description
-                  }}
-                />
-
+                <p className={`text-justify ${!isExpanded ? 'line-clamp-2' : ''} transition-all duration-300`} dangerouslySetInnerHTML={{ __html: book?.data.description }} />
                 <div className="text-center mt-2">
                   <Button
                     type="link"
