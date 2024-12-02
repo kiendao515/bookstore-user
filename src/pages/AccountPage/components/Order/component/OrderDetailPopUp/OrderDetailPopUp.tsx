@@ -17,9 +17,7 @@ const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
                     width: "100%",
                     maxWidth: "900px",
                     padding: "24px",
-                    background: "#f9f9f9",
                     borderRadius: "10px",
-                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
                 }}
             >
                 {/* Header */}
@@ -65,6 +63,12 @@ const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
                                 <Text>{order?.data.order_code}</Text>
                             </Col>
                             <Col span={8}>
+                                <Text style={{ fontWeight: "500", color: "#666" }}>Mã giao vận GHTK</Text>
+                            </Col>
+                            <Col span={16} style={{ textAlign: "right" }}>
+                                <Text>{order?.data.shipping_code || "Chưa có dữ liệu"}</Text>
+                            </Col>
+                            <Col span={8}>
                                 <Text style={{ fontWeight: "500", color: "#666" }}>Ngày tạo đơn</Text>
                             </Col>
                             <Col span={16} style={{ textAlign: "right" }}>
@@ -94,9 +98,8 @@ const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
                                 <List.Item
                                     style={{
                                         borderRadius: "6px",
-                                        backgroundColor: "#fff",
                                         marginBottom: "8px",
-                                        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
+                
                                     }}
                                 >
                                     <Row align="middle" style={{ width: "100%" }}>
@@ -150,7 +153,7 @@ const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
                         </Row>
                     </>
                 ) : (
-                    <Text>Không có dữ liệu đơn hàng.</Text>
+                    <Text></Text>
                 )}
             </div>
         </Spin>

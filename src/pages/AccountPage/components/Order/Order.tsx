@@ -25,7 +25,7 @@ const Order = (props: IOrderProps) => {
 
     const columns = [
         {
-            title: "Đơn hàng",
+            title: "Mã đơn hàng",
             dataIndex: "orderCode",
             key: "orderCode",
             render: (_: any, record: any) => (
@@ -38,11 +38,33 @@ const Order = (props: IOrderProps) => {
             title: "Tình trạng",
             dataIndex: "status",
             key: "status",
-            render: (status: string) => (
-                <Tag color={status === "DONE" ? "green" : "volcano"}>
-                    {handleOrderStatus(status)}
-                </Tag>
-            ),
+            render: (status: string) => {
+                let color: string;
+                switch (status) {
+                    case "CREATED":
+                        color = "orange"; 
+                        break;
+                    case "READY_TO_PACKAGE":
+                        color = "blue"; // Chờ gói hàng
+                        break;
+                    case "READY_TO_SHIP":
+                        color = "green"; // Sẵn sàng gửi
+                        break;
+                    case "SHIPPING":
+                        color = "geekblue"; // Đang gửi
+                        break;
+                    case "DONE":
+                        color = "success"; // Thành công
+                        break;
+                    default:
+                        color = "default"; 
+                }
+                return (
+                    <Tag color={color}>
+                        {handleOrderStatus(status)}
+                    </Tag>
+                );
+            },
             align: "center",
         },
         {
@@ -100,7 +122,7 @@ const Order = (props: IOrderProps) => {
         orderCode: order.order_code,
         status: order.status,
         quantity: Array.isArray(order.order_items)
-        ? order.order_items.reduce((total: number, item: any) => total + item.quantity, 0) : 0,
+            ? order.order_items.reduce((total: number, item: any) => total + item.quantity, 0) : 0,
         totalAmount: order.total_amount,
         createdAt: order.created_at,
         id: order.id,
@@ -109,6 +131,7 @@ const Order = (props: IOrderProps) => {
     return (
         <>
             <div>
+                <Text style={{ color: "#888888" }}>[ Đơn hàng ]</Text>
                 <div style={{ marginTop: 30, paddingBottom: 200 }}>
                     <Table
                         dataSource={dataSource}

@@ -1,87 +1,84 @@
-// import { IFavoriteBookProps } from "./interface";
-// import { useEffect, useMemo, useState } from "react";
-// import { IReqParams } from "@/api/bookStore";
-// import { useBookFavorite, useBooks } from "@/api/books";
-// import BookCard from "@/ui/user/BookCard";
+import { useEffect, useState, useMemo } from "react";
+import { List, Row, Col, Card, Typography, Spin } from "antd";
+import { IReqParams, useBookFavorite, useBooks } from "@/api/books";
+import BookCard from "@/ui/BookCard";
 
-// const FavoriteBook = (props: IFavoriteBookProps) => {
-//     const { } = props;
-//     const { bookFavorite } = useBookFavorite()
-//     const [bookParams, setBookParams] = useState<IReqParams>({
-//         page: 0,
-//         size: 12,
-//     })
-//     const [isMobile, setIsMobile] = useState(window.innerWidth < 1280);
+const { Text } = Typography;
 
-//     useEffect(() => {
-//         const handleResize = () => {
-//             setIsMobile(window.innerWidth < 1280);
-//         };
-//         window.addEventListener('resize', handleResize);
-//         return () => window.removeEventListener('resize', handleResize);
-//     }, []);
+const FavoriteBook = () => {
+    const { bookFavorite, isLoading: isFavoriteLoading } = useBookFavorite();
+    const [bookParams, setBookParams] = useState<IReqParams>({
+        page: 0,
+        size: 12,
+        created_at:"",
+        updated_at:""
+    });
 
-//     const { books } = useBooks({ ...bookParams, book_search_ids: bookFavorite?.data?.book_ids.map(book => book).join(',') || null });
+    const { books, isLoading: isBooksLoading } = useBooks({
+        ...bookParams,
+        book_search_ids: bookFavorite?.data?.book_ids?.join(",") || null,
+    });
 
-//     const newBooks = useMemo(() => {
-//         return books?.data?.map(book => {
-//             const { minPrice, type } = (book?.book_realities?.length > 0
-//                 ? book.book_realities.reduce((acc, reality) => {
-//                     if (reality.price != null && reality.price < acc.minPrice) {
-//                         return { minPrice: reality.price, type: reality.type };
-//                     }
-//                     return acc;
-//                 }, { minPrice: Number.MAX_VALUE, type: "OLD" })
-//                 : { minPrice: 0, type: "OLD" });
+    const newBooks = useMemo(() => {
+        return books?.data?.map(book => {
+            const validInventories = book?.book_inventories?.filter(inventory => inventory.price > 0) || [];
+            const { minPrice, type } = validInventories.length > 0
+                ? validInventories.reduce((acc, inventory) => {
+                    if (inventory.price < acc.minPrice) {
+                        return { minPrice: inventory.price, type: inventory.type };
+                    }
+                    return acc;
+                }, { minPrice: Number.MAX_VALUE, type: "UNKNOWN" }) 
+                : { minPrice: 0, type: "UNKNOWN" }; 
 
-//             return {
-//                 link: `/book-detail/${book?.id}`,
-//                 name: book?.name,
-//                 price: minPrice,
-//                 type: type,
-//                 authorId: book?.author?.id,
-//                 quantity: book?.book_realities?.length,
-//                 description: book?.description || '',
-//                 author: book?.author?.name || '',
-//                 image: book?.cover_image?.link || '',
-//                 id: book?.id
-//             };
-//         }) || [];
-//     }, [books]);
+            return {
+                link: `/book-detail/${book?.id}`,
+                name: book?.name,
+                price: minPrice,
+                type: type,
+                quantity: book?.number_of_books,
+                description: book?.description || '',
+                author: book?.author_name || '',
+                image: book?.cover_image || '',
+                id: book?.id,
+                soldCount: book?.sold_quantity
+            };
+        }) || [];
+    }, [books]);
+    
 
-//     return (
-//         <div>
-//             {
-//                 !isMobile && (
-//                     <text className="title text-[#888888]">[ sách yêu thích ]</text>
-//                 )
-//             }
-//             <div className="grid grid-cols-2 mt-[30px] pb-[200px] gap-x-[20px]">
-//                 {
-//                     newBooks?.map((book, index) => {
-//                         return (
-//                             <div key={index} className="flex justify-center">
-//                                 <BookCard
-//                                     link={book.link}
-//                                     author={book.author}
-//                                     description={book.description}
-//                                     image={book.image}
-//                                     type={book.type}
-//                                     name={book.name}
-//                                     price={book.price}
-//                                     quantity={book.quantity}
-//                                     authorId={book.authorId}
-//                                     id={book.id}
-//                                 />
-//                             </div>
-//                         );
-//                     })
-//                 }
+    if (isFavoriteLoading || isBooksLoading) {
+        return (
+            <div style={{ textAlign: "center", padding: "50px 0" }}>
+                <Spin tip="Đang tải sách yêu thích..." size="large" />
+            </div>
+        );
+    }
 
-//             </div>
-//         </div>
+    return (
+        <div style={{  margin: "auto" }}>
+            <Text style={{ color: "#888888" }}>[ Sách yêu thích ]</Text>
+            <Row style={{marginTop: 20}} gutter={[16, 16]}>
+                {
+                    newBooks?.map(book => {
+                        return (
+                            <BookCard
+                                id = {book.id}
+                                link={book.link}
+                                key={book.id}
+                                image={book.image}
+                                title={book.name}
+                                author={book.author}
+                                price={book.price}
+                                soldCount={book.soldCount}
+                            />
 
-//     )
-// }
+                        )
+                    })
+                }
+            </Row>
+        </div>
+    );
+};
 
-// export default FavoriteBook;
+export default FavoriteBook;

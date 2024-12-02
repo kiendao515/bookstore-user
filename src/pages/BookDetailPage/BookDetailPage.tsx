@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Breadcrumb, Button, Divider, Image, InputNumber, Radio, Space, Tag, Typography, Row, Col } from "antd";
+import { Breadcrumb, Button, Divider, Image, InputNumber, Radio, Space, Tag, Typography, Row, Col, Spin } from "antd";
 import { HeartOutlined, ShareAltOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import MainLayout from "@/layout";
@@ -41,7 +41,7 @@ const BookDetail = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState<CartItem[]>([]); // State giỏ hàng
-
+  const [loading, setLoading] = useState(true);
   const handleTypeChange = (type: string) => {
     setSelectedType(type);
 
@@ -102,13 +102,14 @@ const BookDetail = () => {
     }
     else {
       const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-      console.log(cartItems,totalPrice);
-      
+      console.log(cartItems, totalPrice);
+
       navigate("/checkout", { state: { cartItems, totalPrice } })
     }
   }
   useEffect(() => {
     if (book?.data) {
+      setLoading(false);
       const mappedItems = book.data.book_inventories
         .filter((inventory: any) => inventory.quantity > 0)
         .map((inventory: any) => ({
@@ -123,6 +124,13 @@ const BookDetail = () => {
       setCartItems(mappedItems);
     }
   }, [book]); // Lắng nghe thay đổi của book
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Spin size="large" />
+      </div>
+    );
+  }
   return (
     <MainLayout>
       <div className="mx-auto p-6">
@@ -326,11 +334,11 @@ const BookDetail = () => {
               </span>
               <div className="mt-4">
                 <p
-                  className={`text-justify ${!isExpanded ? "line-clamp-2" : ""
-                    } transition-all duration-300`}
-                >
-                  Nội dung chi tiết về Chữ Nghĩa Truyện Kiều là công trình nghiên cứu nghiêm túc về văn bản học, bao gồm các thao tác sưu tầm, tập hợp, đối chiếu tư liệu, khảo chứng và chú giải các từ ngữ, điển tích; khảo sát ngữ nghĩa của từng từ, từng cụm từ và đặt trong phong cách Nguyễn Du - văn cảnh Truyện Kiều sao cho khoa học, chính xác nhất. Nội dung chi tiết về Chữ Nghĩa Truyện Kiều là công trình nghiên cứu nghiêm túc về văn bản học, bao gồm các thao tác sưu tầm, tập hợp, đối chiếu tư liệu, khảo chứng và chú giải các từ ngữ, điển tích. Đây là nghiên cứu trọng tâm dành cho người yêu thích văn học cổ điển.
-                </p>
+                  className={`text-justify ${!isExpanded ? 'line-clamp-2' : ''} transition-all duration-300`}
+                  dangerouslySetInnerHTML={{
+                    __html: book?.data.description
+                  }}
+                />
 
                 <div className="text-center mt-2">
                   <Button

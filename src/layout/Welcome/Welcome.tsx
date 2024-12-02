@@ -1,6 +1,6 @@
 
 import { SearchOutlined } from '@ant-design/icons';
-import { Input } from 'antd';
+import { Carousel, Input } from 'antd';
 import React from 'react';
 
 const WelcomeSection: React.FC = () => {
@@ -13,10 +13,17 @@ const WelcomeSection: React.FC = () => {
                     className="w-1/4"
                 />
             </div>
-            <div className="w-full">
-                {/* Replace the src with your actual image path */}
-                <img src="assets/icons/Welcome picture.svg" alt="Books" className="w-full h-auto" />
-            </div>
+            <Carousel autoplay dotPosition="bottom" className="w-full mb-2">
+                <div>
+                    <img src="./assets/images/1.png" alt="Book 1" className="w-full h-auto rounded-lg shadow-lg" />
+                </div>
+                <div>
+                    <img src="./assets/images/4.png" alt="Book 2" className="w-full h-auto rounded-lg shadow-lg" />
+                </div>
+                <div>
+                    <img src="https://via.placeholder.com/1500x500?text=Book+3" alt="Book 3" className="w-full h-auto rounded-lg shadow-lg" />
+                </div>
+            </Carousel>
         </section>
     );
 };

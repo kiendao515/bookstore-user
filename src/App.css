@@ -1,3 +1,19 @@
+@font-face {
+  font-family: 'Roboto Serif';
+  src: url('/assets/fonts/RobotoSerif_28pt_SemiCondensed-Italic.woff2') format('woff2');
+  font-style: italic;
+  font-weight: normal;
+}
+
+/* Áp dụng font cho toàn bộ trang */
+body {
+  font-family: 'Roboto Serif', sans-serif;
+}
+
+/* Đảm bảo font của các component Ant Design cũng sẽ sử dụng font này */
+.ant-typography, .ant-btn, .ant-card, .ant-input, .ant-select, .ant-modal, .ant-table, .ant-tabs {
+  font-family: 'Roboto Serif', sans-serif !important;
+}
 #root {
   max-width: 1280px;
   margin: 0 auto;

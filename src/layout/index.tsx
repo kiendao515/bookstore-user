@@ -33,13 +33,14 @@ const MainLayout = (props: IMainLayoutProps) => {
 
     return (
         <div>
-            <div className="flex flex-col w-full">
-                <Header/>
-                <div className="mx-[100px]">
-                    {children}
-                </div>
-                <Footer />
-            </div>
+            <div className="flex flex-col min-h-screen">
+    <Header />
+    <div className="flex-grow mx-[100px]">
+        {children}
+    </div>
+    <Footer />
+</div>
+
             {
                 toggleFindBook &&
                 <div>

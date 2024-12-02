@@ -8,6 +8,7 @@ import ShippingAddress from "./components/ShippingAddress/ShippingAddress";
 import { useSearchParams } from "react-router-dom";
 import MenuBarMobile from "./components/MenuBarMobile/MenuBarMobile";
 import MainLayout from "@/layout";
+import FavoriteBook from "./components/FavoriteBook/FavoriteBook";
 
 const AccountPage = () => {
     const [searchParams] = useSearchParams()
@@ -59,11 +60,11 @@ const AccountPage = () => {
                             <ChangePassword />
                         </div>
                     }
-                    {/* {index == 4 &&
+                    {index == 4 &&
                         <div className={`col-span-3`}>
                             <FavoriteBook />
                         </div>
-                    } */}
+                    }
                     {index == 5 &&
                         <div className={`col-span-3`}>
                             <Order />
