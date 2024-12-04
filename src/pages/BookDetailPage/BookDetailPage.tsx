@@ -106,8 +106,8 @@ const BookDetail = () => {
       navigate("/checkout", { state: { cartItems, totalPrice } });
     }
   };
-   // Nhóm các bản ghi theo relatedBookId
-   const groupInventories = (inventories: any) => {
+  // Nhóm các bản ghi theo relatedBookId
+  const groupInventories = (inventories: any) => {
     const grouped: any = {};
     inventories.forEach((inventory: any) => {
       const relatedBookId = inventory.relatedBookId || inventory.id;
@@ -232,8 +232,8 @@ const BookDetail = () => {
                     {inventory.type === "NEW"
                       ? `Mới (${inventory.quantity})`
                       : inventory.type === "GOOD"
-                      ? `Đẹp (${inventory.quantity})`
-                      : `Cũ (${inventory.quantity})`}
+                        ? `Đẹp (${inventory.quantity})`
+                        : `Cũ (${inventory.quantity})`}
                   </Radio.Button>
                 ))}
               </Radio.Group>
@@ -325,11 +325,15 @@ const BookDetail = () => {
                     <Text className="text-gray-500">Tag:</Text>
                   </Col>
                   <Col span={18}>
-                    <Tag className="bg-[#91D5FF] cursor-pointer">Sách sưu tầm</Tag>
-                    <Tag className="bg-[#91D5FF] cursor-pointer">Nguyễn An dịch</Tag>
-                    <Tag className="bg-[#91D5FF] cursor-pointer">Giải Nobel</Tag>
-                    <Tag className="bg-[#91D5FF] cursor-pointer">Tố Hữu đề bạt</Tag>
+                    {
+                      book?.data?.tags?.map((t, index) => (
+                        <Tag key={index} className="bg-[#91D5FF] cursor-pointer">
+                          {t}  {/* Hiển thị giá trị của từng tag */}
+                        </Tag>
+                      ))
+                    }
                   </Col>
+
                 </Row>
               </div>
             </div>
