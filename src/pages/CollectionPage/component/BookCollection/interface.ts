@@ -1,3 +1,0 @@
-interface IBookCollectionProps {
-    title?: string;  
-}

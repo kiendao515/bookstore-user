@@ -59,11 +59,14 @@ const AppHeader = (props: IHeaderProps) => {
                     <Menu.Item key="2" onClick={() => navigate("/category")}>
                         Thể loại
                     </Menu.Item>
-                    <Menu.Item key="3" onClick={() => navigate("/collections")}>
+                    <Menu.Item key="3" onClick={() => navigate("/collection")}>
                         Bộ sưu tập
                     </Menu.Item>
-                    <Menu.Item key="4" onClick={() => navigate("/box")}>
-                        Nhà bán
+                    <Menu.Item key="4">
+                        Liên hệ ký gửi
+                    </Menu.Item>
+                    <Menu.Item key="5">
+                        Nhận tìm sách
                     </Menu.Item>
                 </Menu>
             </div>

@@ -12,6 +12,8 @@ import ViewCart from "@/pages/Cart";
 import Checkout from "@/pages/Checkout";
 import AccountPage from "@/pages/AccountPage/AccountPage";
 import OrderResult from "@/pages/OrderResult";
+import CategoryPage from "@/pages/CategoryPage";
+import BookPage from "@/pages/BookPage";
 
 
 export enum RouterPath {
@@ -26,6 +28,7 @@ export enum UserRouterPath {
     category = '/category',
     otherBook = '/other-book',
     bookStore = '/book-store',
+    book = '/book',
     login = '/login',
     bookDetail = '/book-detail/:id',
     confirmRegistrationPage = "/confirm-registration",
@@ -58,11 +61,11 @@ export const router = createBrowserRouter([
     },
     {
         path: UserRouterPath.category,
-        element: <CollectionPage />,
+        element: <CategoryPage />,
     },
     {
-        path: UserRouterPath.category,
-        element: <CollectionPage />,
+        path: UserRouterPath.book,
+        element: <BookPage />,
     },
     {
         path: UserRouterPath.introduction,
@@ -112,11 +115,11 @@ export const router = createBrowserRouter([
         element: <Checkout />
     },
     {
-        path : UserRouterPath.orderResult,
-        element: <OrderResult/>
+        path: UserRouterPath.orderResult,
+        element: <OrderResult />
     },
     {
         path: UserRouterPath.intro,
-        element: <IntroductionPage/>
+        element: <IntroductionPage />
     }
 ]);

@@ -1,49 +1,49 @@
 import MainLayout from "@/layout";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { useCollections } from "@/api/collections/queries";
 import { useBooks } from "@/api/books";
 import { IFilterValue } from "@/ui/FilterBar/interface";
 import BookCollection from "@/ui/BookCollection";
 import { IReqParams } from "@/ui/BookCollection/interface";
+import { useCategories } from "@/api/category";
 
-const CollectionPage = () => {
+const CategoryPage = () => {
     const [searchParams] = useSearchParams();
-    const [collectionId, setCollectionId] = useState<string | null>(searchParams.get("id"))
-    const { collections } = useCollections({ sort_by: "numOfBooks", order_by: "DESC", show_quantity: 1 });
+    const [categoryId, setCategoryId] = useState<string | null>(searchParams.get("id"))
+    const { categories } = useCategories({ sort_by: "numOfBooks", order_by: "DESC" });
     const filterValues = useMemo(() => {
         const result: IFilterValue[] = []
-        collections?.data.map((collection) => {
+        categories?.data.map((category) => {
             result.push({
-                id: collection.id,
-                label: collection.name,
-                quantity: collection.quantity
+                id: category.id,
+                label: category.name,
+                quantity: category.num_of_books
             })
         })
         return result;
-    }, [collections]);
+    }, [categories]);
 
     useEffect(() => {
         if (searchParams.get("id")) {
-            setCollectionId(searchParams.get("id"))
+            setCategoryId(searchParams.get("id"))
         } else {
             if (filterValues.length > 0) {
-                setCollectionId(filterValues[0].id)
+                setCategoryId(filterValues[0].id)
             }
         }
-    }, [searchParams.get("id"), collections])
+    }, [searchParams.get("id"), categories])
 
     const [bookParams, setBookParams] = useState<IReqParams>({
         page: parseInt(searchParams.get("page") || "0"),
         size: 12,
-        ...(collectionId && { collection_id: collectionId })
+        ...(categoryId && { collection_id: categoryId })
     });
 
     useEffect(() => {
-        if (collectionId) {
-            setBookParams(prev => ({ ...prev, collection_id: collectionId }))
+        if (categoryId) {
+            setBookParams(prev => ({ ...prev, category_id: categoryId }))
         }
-    }, [collectionId])
+    }, [categoryId])
 
     useEffect(() => {
         const page = searchParams.get("page");
@@ -91,7 +91,7 @@ const CollectionPage = () => {
                     setBookParams={setBookParams}
                     bookParams={bookParams}
                     books={newBooks}
-                    searchField="collection_id"
+                    searchField="category_id"
                     totalElements={books?.total_elements || 0}
                 />
             </div>
@@ -99,4 +99,4 @@ const CollectionPage = () => {
     )
 }
 
-export default CollectionPage;
+export default CategoryPage;

@@ -2,11 +2,14 @@ import { IReqParams, useBooks } from "@/api/books";
 import BookCard from "@/ui/BookCard";
 import { RightOutlined } from "@ant-design/icons";
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 
 const BookCollection = (props: IBookCollectionProps) => {
-    const { title } = props;
-    const [bookParams, setBookParams] = useState<IReqParams>({
+    const { title, extendUrl } = props;
+    const navigate = useNavigate()
+
+    const [bookParams] = useState<IReqParams>({
         page: 0,
         size: 8,
         created_at: "",
@@ -47,9 +50,9 @@ const BookCollection = (props: IBookCollectionProps) => {
         <div className="p-8">
             <section className="flex items-center justify-between bg-gray-100 p-4 mt-[100px] mb-[64px]">
                 <h2 className="text-lg font-semibold text-blue-600">{title}</h2>
-                <a href="#more" className="flex items-center text-blue-600 hover:text-blue-800">
+                <div onClick={() => navigate(extendUrl)} className="flex items-center text-blue-600 hover:text-blue-800 cursor-pointer" >
                     Xem thêm <RightOutlined className="ml-1" />
-                </a>
+                </div>
             </section>
             <div className="grid grid-cols-4 gap-[25px]">
                 {

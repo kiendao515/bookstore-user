@@ -1,9 +1,12 @@
 import { Card } from "antd";
+import { useNavigate } from "react-router-dom";
 const { Meta } = Card;
 const CollectionCard = (props: ICollectionCardProps) => {
-    const { title, imageLink } = props;
+    const { title, imageLink, link } = props;
+    const navigate = useNavigate();
     return (
         <Card
+            onClick={() => navigate(link || "")}
             hoverable
             style={{ width: 300, height: 400 }}
             cover={

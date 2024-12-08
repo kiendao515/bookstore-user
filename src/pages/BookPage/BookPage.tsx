@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-// import Collection from "@/ui/user/ItemCollection";
 import { IReqParams, useBooks } from "@/api/books";
 import { useSearchParams } from "react-router-dom";
 import MainLayout from "@/layout";
-import BookCollection from "../HomePage/components/BookCollection";
+import { IFilterValue } from "@/ui/FilterBar/interface";
+import { useCommonEntityDetail, usePersonDetail } from "@/api/bookmetadata/queries";
+import BookCollection from "@/ui/BookCollection";
 const BookPage = () => {
     const [searchParams] = useSearchParams();
     const [bookParams, setBookParams] = useState<IReqParams>({
@@ -25,70 +26,83 @@ const BookPage = () => {
         }
         )
     }, [searchParams])
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 1280);
+
 
     useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth < 1280);
-        };
-        window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
-    }, []);
+        const page = searchParams.get("page");
+        if (page) {
+            setBookParams(prevParams => ({
+                ...prevParams,
+                page: Number(page)
+            }));
+        }
+
+    }, [searchParams.get("page")])
+    const { person: author } = usePersonDetail(searchParams.get("authorId") || undefined);
+    const { commonEntity: tag } = useCommonEntityDetail(searchParams.get("tagId") || undefined);
+    const filterValues = useMemo(() => {
+        const result: IFilterValue[] = []
+        if (author) {
+            result.push({
+                id: author?.data?.id || '',
+                label: author?.data?.name || '',
+                quantity: author?.data?.num_of_books
+            })
+        }
+        if (tag) {
+            result.push({
+                id: tag?.data?.id || '',
+                label: tag?.data?.name || '',
+                quantity: tag?.data?.num_of_books
+            })
+        }
+        return result;
+    }, [author, tag])
+
+    const searchField = useMemo(() => {
+        if (author) return "author_id";
+        if (tag) return "tag_id";
+    }, [bookParams])
+
 
 
     const { books } = useBooks({ ...bookParams });
+
     const newBooks = useMemo(() => {
         return books?.data?.map(book => {
-            const { minPrice, type } = (book?.book_inventories?.length > 0
-                ? book.book_inventories.reduce((acc, reality) => {
-                    if (reality.price != null && reality.price < acc.minPrice) {
-                        return { minPrice: reality.price, type: reality.type };
-                    }
-                    return acc;
-                }, { minPrice: Number.MAX_VALUE, type: "OLD" })
-                : { minPrice: 0, type: "OLD" });
+            let bookInventories = book?.book_inventories || [];
+
+            let bookInventory = bookInventories
+                .filter(bookInventory => bookInventory.quantity > 0)
+                .reduce((min, current) => current.price < min.price ? current : min, { price: Number.MAX_VALUE, type: '', quantity: 0 });
 
             return {
                 link: `/book-detail/${book?.id}`,
                 name: book?.name,
-                price: minPrice,
-                type: type,
-                authorId: book?.author?.id,
-                quantity: book?.book_inventories?.length,
+                price: bookInventory.price != Number.MAX_VALUE ? bookInventory.price : 0,
+                type: bookInventory.type || '',
+                authorName: book?.author_name,
+                quantity: bookInventory.quantity,
                 description: book?.description || '',
-                author: book?.author?.name || '',
                 image: book?.cover_image || '',
                 id: book?.id,
+                soldCount: book.sold_quantity || 0
             };
         }) || [];
     }, [books]);
 
+
     return (
         <MainLayout>
-            <div>
-                {
-                    searchParams.get("search") == "1" && isMobile && (
-                        <div className="h-[50px] mobile-regular border-b-[1px] border-[#8C8C8C] border-solid flex items-center z-20 bg-layout">
-                            <text className="text-[#8C8C8C] mobile-regular" >kết quả tìm kiếm cho: <text className="italic">"{searchParams.get("name")}"</text></text>
-                        </div>
-                    )
-                }
+            <div className="pb-[144px] pt-[48px] w-full">
                 <BookCollection
-                    title="collections"
-                    books={newBooks}
-                    havePagination={true}
+                    filterValues={filterValues}
                     setBookParams={setBookParams}
                     bookParams={bookParams}
-                    filterValues={filterValues}
-                    hasTitle={false}
-                    hasFilter={searchParams.get("search") == "1" ? false : true}
-                    firstIndex={books?.total_elements != 0 ? (books?.page ?? 0) * (books?.size ?? 0) + 1 : 0}
-                    lastIndex={((books?.page ?? 0) + 1) * (books?.size ?? 0) < (books?.total_elements ?? 0) ? ((books?.page ?? 0) + 1) * (books?.size ?? 0) : (books?.total_elements ?? 0)}
-                    totalElement={books?.total_elements ?? 0}
-                    currentPage={books?.page ?? 0}
-                    totalPage={books?.total_pages ?? 0}
-                    isSearch={searchParams.get("search") == "1" ? true : false}
-                    searchText={searchParams.get("name") || ''}
+                    books={newBooks}
+                    searchField={searchField}
+                    totalElements={books?.total_elements || 0}
+                    showFilter={filterValues.length > 0}
                 />
             </div>
         </MainLayout>

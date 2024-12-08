@@ -1,3 +1,0 @@
-interface IFilterBarProps {
-    titles? : string[]
-}

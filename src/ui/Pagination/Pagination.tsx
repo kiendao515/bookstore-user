@@ -2,9 +2,9 @@ import { Pagination as AntPagination } from "antd";
 import React, { useState } from "react";
 
 interface IPaginationProps {
-  total: number; 
+  total: number;
   pageSize: number;
-  current?: number; 
+  current?: number;
   onChange?: (page: number, pageSize: number) => void;
 }
 
@@ -21,12 +21,12 @@ const Pagination: React.FC<IPaginationProps> = ({ total, pageSize, current = 1, 
   return (
     <div style={{ display: "flex", justifyContent: "center", marginTop: "20px" }}>
       <AntPagination
-        total={500}
+        total={total}
         pageSize={pageSize}
         current={currentPage}
         onChange={handlePageChange}
         showSizeChanger={false} // Ẩn thay đổi kích thước trang
-        showQuickJumper 
+        showQuickJumper
       />
     </div>
   );

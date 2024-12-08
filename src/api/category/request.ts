@@ -1,6 +1,6 @@
 import { request } from '../axios';
 import { IBaseResponse } from '../interface';
-import { ICategories, ICategory, ICategoryRes, ICreateCategory, IReqParams, IUpdateCategory } from './types';
+import { ICategories, ICategoryRes, ICreateCategory, IReqParams, IUpdateCategory } from './types';
 
 export const getCategories = async (params: IReqParams): Promise<ICategories> => {
   const { data } = await request({

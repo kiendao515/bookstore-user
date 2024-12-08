@@ -29,6 +29,7 @@ export interface IBook {
 export interface IBookReality {
   id: string
   book_id: string;
+  quantity: number;
   price: number
   location: string
   type: string
@@ -96,8 +97,8 @@ export interface IReqParams {
   author_id?: string | null;
   store_id?: string | null;
   reload?: number;
-  created_at: string;
-  updated_at : string
+  created_at?: string;
+  updated_at?: string
 }
 
 export interface ICreateBook {

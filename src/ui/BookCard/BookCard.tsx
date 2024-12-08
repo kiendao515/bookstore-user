@@ -5,15 +5,14 @@ import { RootState } from "@/store";
 import { getUser } from "@/store/duck/auth/slice";
 import { setBookFavorite } from "@/store/duck/bookFavorite/slice";
 import { setToggleByKey } from "@/store/duck/togglePopUp/slice";
-import { HeartOutlined, HeartTwoTone } from "@ant-design/icons";
+import { HeartTwoTone } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { useMutation } from "react-query";
 import { useSelector } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 const BookCard: React.FC<BookCardProps> = ({ id, image, title, author, price, soldCount, link }) => {
-    const { toggleCart, toggleAuth } = useAppSelector((state: RootState) => state.togglePopUp)
-    const navigate = useNavigate();
+    const { toggleAuth } = useAppSelector((state: RootState) => state.togglePopUp)
     const dispatch = useAppDispatch();
     const user = useAppSelector(getUser);
     const { toggleAuthPopup } = useAuthToggle();

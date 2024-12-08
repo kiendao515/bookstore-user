@@ -11,17 +11,17 @@ export const request = axios.create({
 
 const handleError = async (error: any) => {
 
-  // if (error.response?.status === 401 || error.response?.status === 403) {
-  //   removeCookies(COOKIES.user);
-  //   removeCookies(COOKIES.token);
-  //   localStorage.clear();
-  //   if (window.location.pathname.includes('/admin')) {
-  //     window.location.href = '/admin/login';
-  //   } else {
-  //     window.location.href = '/';
-  //   }
-  //   toast.success("Vui lòng đăng nhập lại hệ thống");
-  // }
+  if (error.response?.status === 401 || error.response?.status === 403) {
+    removeCookies(COOKIES.user);
+    removeCookies(COOKIES.token);
+    localStorage.clear();
+    if (window.location.pathname.includes('/admin')) {
+      window.location.href = '/admin/login';
+    } else {
+      window.location.href = '/';
+    }
+    toast.success("Vui lòng đăng nhập lại hệ thống");
+  }
 
   const message = error?.message;
   if (!!message && error.config.method?.toUpperCase() !== 'GET') {

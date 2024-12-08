@@ -7,13 +7,13 @@ export interface ICategory {
   updated_at: string;
 }
 
-export interface ICategoryRes{
-  success: boolean,
+export interface ICategoryRes {
+  result: boolean,
   data: ICategory
 }
 
 export interface ICategories {
-  success: boolean;
+  result: boolean;
   data: ICategory[];
   page: number;
   size: number;
@@ -22,6 +22,8 @@ export interface ICategories {
 }
 
 export interface IReqParams {
+  sort_by?: string;
+  order_by?: string;
   page?: number;
   size?: number;
   reload?: number;
