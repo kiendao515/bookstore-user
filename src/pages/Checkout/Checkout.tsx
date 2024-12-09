@@ -8,12 +8,18 @@ import { useAppSelector } from "@/hooks/useRedux";
 import { calculateFee, createNewOrder, ICreateOrderRes } from "@/api/order";
 import { useLocation, useNavigate } from "react-router-dom";
 import { handleStatusBook } from "@/utils/common";
+import { useShippingAddressDetail, useShippingAddresses } from "@/api/shipment";
+import PopUp from "@/ui/PopUp/PopUp";
+import ShippingAddressPopUp from "./components/ShippingAddressPopUp/ShippingAddressPopUp";
+import TextInput from "@/ui/FormInput/TextInput";
+import SelectInput from "@/ui/FormInput/SelectInput";
 
 const { Title, Text } = Typography;
 
 const Checkout = () => {
     const formMethod = useForm();
     const { watch, setValue, handleSubmit } = formMethod;
+    const [selectedId, setSelectedId] = useState<string>();
     const { provinces } = useProvinces();
     const { districts } = useDistricts(watch("province_code") || "");
     const { wards } = useWards(watch("district_code") || "");
@@ -22,9 +28,11 @@ const Checkout = () => {
     const user = useAppSelector(getUser);
     const [fee, setFee] = useState(25000)
     const location = useLocation();
+    const [reload, setReload] = useState(0);
     const { cartItems, totalPrice } = location.state || { cartItems: [], totalPrice: 0 };
-    console.log(cartItems);
-    
+    const { shippingAddress } = useShippingAddressDetail(selectedId);
+    const [toggleAddress, setToggleAddress] = useState(false);
+    const { shippingAddresses } = useShippingAddresses({});
     const feeBody = useMemo(() => ({
         address: watch("street") || "",
         province: provinceName,
@@ -48,9 +56,87 @@ const Checkout = () => {
             fetchFee();
         }
     }, [feeBody]);
-    function isICreateOrder(obj: any): obj is ICreateOrderRes {
-        return obj && typeof obj === "object" && "result" in obj && "reason" in obj && "data" in obj;
-    }
+    useEffect(() => {
+        if (user.id != "") {
+            formMethod.reset({
+                customer_email: user.email
+            })
+        }
+        if (shippingAddresses?.success) {
+            if (shippingAddresses.data.length == 0) {
+                return;
+            }
+
+            let shippingAddress = shippingAddresses?.data?.find((item) => item.default == true);
+            if (!shippingAddress) {
+                shippingAddress = shippingAddresses?.data[0];
+            }
+            formMethod.reset({
+                customer_email: user.email || "",
+                customer_name: shippingAddress?.full_name || "",
+                customer_phone: shippingAddress?.phone_number || "",
+                province_code: shippingAddress?.province.code || "",
+                district_code: shippingAddress?.district.code || "",
+                ward_code: shippingAddress?.ward.code || "",
+                street: shippingAddress?.street || "",
+            })
+        }
+
+    }, [shippingAddresses]);
+
+    useEffect(() => {
+        if (user.id != "") {
+            formMethod.reset({
+                customer_email: user.email
+            })
+        }
+        if (shippingAddress?.data) {
+            formMethod.reset({
+                customer_email: user.email || "",
+                customer_name: shippingAddress?.data?.full_name || "",
+                customer_phone: shippingAddress?.data?.phone_number || "",
+                province_code: shippingAddress?.data?.province.code || "",
+                district_code: shippingAddress?.data?.district.code || "",
+                ward_code: shippingAddress?.data?.ward.code || "",
+                street: shippingAddress?.data?.street || "",
+            })
+            return;
+        }
+    }, [shippingAddress])
+
+    useEffect(() => {
+        if (shippingAddress?.data) {
+            formMethod.reset({
+                customer_email: user.email || "",
+                customer_name: shippingAddress?.data?.full_name || "",
+                customer_phone: shippingAddress?.data?.phone_number || "",
+                province_code: shippingAddress?.data?.province?.code || "",
+                district_code: shippingAddress?.data?.district?.code || "",
+                ward_code: shippingAddress?.data?.ward?.code || "",
+                street: shippingAddress?.data?.street || "",
+            })
+            return;
+        }
+        if (shippingAddresses?.success) {
+            if (shippingAddresses.data.length == 0) {
+                return;
+            }
+
+            let shippingAddress = shippingAddresses?.data?.find((item) => item.default == true);
+            if (!shippingAddress) {
+                shippingAddress = shippingAddresses?.data[0];
+            }
+            formMethod.reset({
+                customer_email: user.email || "",
+                customer_name: shippingAddress?.full_name || "",
+                customer_phone: shippingAddress?.phone_number || "",
+                province_code: shippingAddress?.province.code || "",
+                district_code: shippingAddress?.district.code || "",
+                ward_code: shippingAddress?.ward.code || "",
+                street: shippingAddress?.street || "",
+            })
+        }
+    }, [provinces, districts, wards]);
 
     const handleCheckout = async (values: any) => {
         console.log(values);
@@ -72,14 +158,16 @@ const Checkout = () => {
 
         try {
             const response = await createNewOrder(orderPayload);
-            if(response.result){
+            if (response.result) {
                 message.success("Đặt hàng thành công!");
-                if(values.paymentMethod !== "cod" && response.data != null && typeof response.data === 'string'){
+                if (values.paymentMethod !== "cod" && response.data != null && typeof response.data === 'string') {
                     window.location.href = response.data;
-                }else if(typeof response.data == 'object'){
-                    navigate("/order-result?orderId="+response.data.orderCode);
+                } else if (typeof response.data == 'object') {
+                    navigate("/order-result?orderId=" + response.data.orderCode);
                 }
-                
+
+            }else{
+                message.error(response?.reason)
             }
         } catch (error) {
             console.error("Failed to create order:", error);
@@ -96,20 +184,21 @@ const Checkout = () => {
                                 <Title level={4} style={{ marginBottom: "20px" }}>
                                     Thông tin khách hàng
                                 </Title>
-                                <Form.Item
-                                    label="Họ và tên"
-                                    name="customerName"
-                                    rules={[{ required: true, message: "Vui lòng nhập tên người nhận" }]}
-                                >
-                                    <Input placeholder="Họ và tên" />
-                                </Form.Item>
-                                <Form.Item
+                                <TextInput
+                                    name="customer_name"
+                                    label="Họ và Tên"
+                                    placeholder="Tên khách hàng"
+                                    control={formMethod.control}
+                                    errors={formMethod.formState.errors.full_name}
+                                />
+
+                                <TextInput
+                                    name="customer_phone"
                                     label="Số điện thoại"
-                                    name="phone"
-                                    rules={[{ required: true, message: "Vui lòng nhập số điện thoại" }]}
-                                >
-                                    <Input addonBefore="+84" type="number" placeholder="Số điện thoại" />
-                                </Form.Item>
+                                    placeholder="Số điện thoại"
+                                    control={formMethod.control}
+                                    errors={formMethod.formState.errors.phone_number}
+                                />
                                 <Form.Item
                                     label="Email"
                                     name="email"
@@ -117,71 +206,61 @@ const Checkout = () => {
                                 >
                                     <Input value={user.email} defaultValue={user.email} disabled />
                                 </Form.Item>
-                                <Form.Item
+                                <SelectInput
+                                    name="province_code"
                                     label="Tỉnh/Thành phố"
-                                    name="province"
-                                    rules={[{ required: true, message: "Vui lòng chọn tỉnh/thành phố" }]}
-                                >
-                                    <Select
-                                        placeholder="Chọn tỉnh/thành phố"
-                                        options={provinces?.data?.map((province: any) => ({
-                                            value: province.code,
-                                            label: province.full_name,
-                                        }))}
-                                        onChange={(value, option) => {
-                                            setProvinceName(option?.label);
-                                            setValue("province_code", value);
-                                            setValue("district_code", "");
-                                            setValue("ward_code", "");
-                                        }}
-                                    />
-                                </Form.Item>
-                                <Form.Item
+                                    placeholder="Chọn tỉnh/thành phố"
+                                    control={formMethod.control}
+                                    options={(provinces?.data || []).map((province) => ({
+                                        value: province.code,
+                                        label: province.full_name,
+                                    }))}
+                                    errors={formMethod.formState.errors.province_code}
+                                />
+
+                                <SelectInput
+                                    name="district_code"
                                     label="Quận/Huyện"
-                                    name="district"
-                                    rules={[{ required: true, message: "Vui lòng chọn quận/huyện" }]}
-                                >
-                                    <Select
-                                        placeholder="Chọn quận/huyện"
-                                        options={districts?.data?.map((district: any) => ({
-                                            value: district.code,
-                                            label: district.full_name,
-                                        }))}
-                                        onChange={(value, option) => {
-                                            setDistrictName(option?.label);
-                                            setValue("district_code", value);
-                                            setValue("ward_code", "");
-                                        }}
-                                        disabled={!watch("province_code")}
-                                    />
-                                </Form.Item>
-                                <Form.Item
+                                    placeholder="Chọn quận/huyện"
+                                    control={formMethod.control}
+                                    options={(districts?.data || []).map((district) => ({
+                                        value: district.code,
+                                        label: district.full_name,
+                                    }))}
+                                    errors={formMethod.formState.errors.district_code}
+                                />
+
+                                <SelectInput
+                                    name="ward_code"
                                     label="Xã/Phường"
-                                    name="ward"
-                                    rules={[{ required: true, message: "Vui lòng chọn xã/phường" }]}
-                                >
-                                    <Select
-                                        placeholder="Chọn xã/phường"
-                                        options={wards?.data?.map((ward: any) => ({
-                                            value: ward.code,
-                                            label: ward.full_name,
-                                        }))}
-                                        onChange={(value, option) => {
-                                            setValue("ward_code", value);
-                                        }}
-                                        disabled={!watch("district_code")}
-                                    />
-                                </Form.Item>
-                                <Form.Item
-                                    label="Địa chỉ cụ thể"
+                                    placeholder="Chọn xã/phường"
+                                    control={formMethod.control}
+                                    options={(wards?.data || []).map((ward) => ({
+                                        value: ward.code,
+                                        label: ward.full_name,
+                                    }))}
+                                    errors={formMethod.formState.errors.ward_code}
+                                />
+
+                                <TextInput
                                     name="street"
-                                    rules={[{ required: true, message: "Vui lòng nhập địa chỉ cụ thể" }]}
-                                >
-                                    <Input placeholder="Số nhà, tên đường" />
-                                </Form.Item>
+                                    label="Số nhà, tên đường"
+                                    placeholder="Số nhà, tên đường"
+                                    control={formMethod.control}
+                                />
                                 <Form.Item label="Ghi chú giao hàng" name="note">
                                     <Input.TextArea rows={3} placeholder="Ghi chú giao hàng (nếu có)" />
                                 </Form.Item>
+                                {
+                                    user.id != "" && (
+                                        <div className='mb-[5px] mt-[5px] w-full'>
+                                            <button type='button' className="text-black bg-[#DFDFDF] hover:bg-[#9BC3FF] w-full xl:w-fit h-[42px] px-[5px]" onClick={() => setToggleAddress(!toggleAddress)}>
+                                                chọn địa chỉ khác
+                                            </button>
+                                        </div>
+                                    )
+
+                                }
                             </Card>
                         </Col>
 
@@ -266,6 +345,21 @@ const Checkout = () => {
                         </Col>
                     </Row>
                 </Form>
+                {
+                    toggleAddress && (
+                        <div>
+                            <PopUp toggle={toggleAddress} setToggle={() => setToggleAddress(!toggleAddress)}>
+                                <ShippingAddressPopUp
+                                    reload={reload}
+                                    setSelectedId={setSelectedId}
+                                    toggleAddress={toggleAddress}
+                                    setToggleAddress={setToggleAddress}
+                                />
+                            </PopUp>
+                        </div>
+
+                    )
+                }
             </div>
         </MainLayout>
 

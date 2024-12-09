@@ -1,5 +1,6 @@
 import { request } from "../axios";
 import { IBaseResponse } from "../interface";
+import { IShipmentRes } from "../shipment";
 import { BaseResponse, IAddressRes, ICalculateFee, ICreateCart, ICreateOrder, ICreateOrderRes, IFullAddressRes, IOrderResponse, IReqParams, IUpdateOrder, OrderDetailRes, RetryPayment } from "./types";
 
 export const createNewOrder = async (body: ICreateOrder): Promise<ICreateOrderRes> => {
