@@ -83,8 +83,10 @@ const FilterCollection: React.FC<IFilterCollectionProps> = ({ title }) => {
                 setBookParams={setBookParams}
                 bookParams={bookParams}
                 books={newBooks}
+                hasFilter ={true}
+                hasHeader={false}
                 searchField="category_id"
-                totalElements={books?.total_elements || 0}
+                totalElement={books?.total_elements || 0}
             />
         </div>
     );

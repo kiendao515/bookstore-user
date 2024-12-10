@@ -17,7 +17,7 @@ const Collection = (props: ICollectionProps) => {
         return collections?.data?.map(collection => ({
             link: `/collection?id=${collection?.id}`,
             name: collection?.name,
-            image: collection?.image?.link
+            image: collection?.image
         })) || [];
     }, [collections]);
 

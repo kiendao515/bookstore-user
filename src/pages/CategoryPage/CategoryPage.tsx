@@ -92,7 +92,7 @@ const CategoryPage = () => {
                     bookParams={bookParams}
                     books={newBooks}
                     searchField="category_id"
-                    totalElements={books?.total_elements || 0}
+                    totalElement={books?.total_elements || 0}
                 />
             </div>
         </MainLayout>

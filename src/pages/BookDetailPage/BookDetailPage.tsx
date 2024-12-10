@@ -9,6 +9,7 @@ import { addToCart } from "@/api/order";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { setToggleByKey } from "@/store/duck/togglePopUp/slice";
 import { RootState } from "@/store";
+import BookRelative from "./component/BookRelative/BookRelative";
 const { Title, Text } = Typography;
 
 interface CartItem {
@@ -372,6 +373,9 @@ const BookDetail = () => {
             </div>
           </Col>
         </Row>
+        <div className="xl:mt-[90px] mt-[30px]">
+            <BookRelative categoryId={book?.data?.category?.id || ""} currentBookId={book?.data?.id || ""} />
+        </div>
       </div>
     </MainLayout>
   );

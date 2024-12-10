@@ -1,24 +1,48 @@
+import React from 'react';
 import { IReqParams } from "@/api/books";
 import { IFilterBarProps } from "./interface";
+import { List, Typography, Card } from 'antd';
+
+const { Text } = Typography;
 
 const FilterBar = (props: IFilterBarProps) => {
     const { filterValues = [], isPage = false, setBookParams, bookParams, searchField = "category_id" } = props;
+
     return (
-        <div className={`flex flex-col gap-[2px] w-full ${isPage ? "sticky top-[110px]" : ""}`}>
-            {
-                filterValues.map(filterData => {
-                    let isSelected = filterData.id === bookParams?.[`${searchField}`];
+        <div className={`w-full ${isPage ? "sticky top-[110px]" : ""}`}>
+            <List
+                size="small"
+                bordered
+                dataSource={filterValues}
+                renderItem={(filterData) => {
+                    const isSelected = filterData.id === bookParams?.[`${searchField}`];
                     return (
-                        <div className={`hover:cursor-pointer ${isSelected ? "bg-neon" : ""} w-fit hover:bg-[#9BC3FF]`} onClick={() => {
-                            setBookParams((prev: IReqParams) => ({ page: 0, size: prev.size, [`${searchField}`]: filterData.id }))
-                        }}>
-                            <text className="hover:bg-[#9BC3FF] text-[18px]">{`${filterData?.label} (${filterData?.quantity || 0})`}</text>
-                        </div>
-                    )
-                })
-            }
-        </div >
-    )
+                        <List.Item
+                            onClick={() => setBookParams((prev: IReqParams) => ({ 
+                                page: 0, 
+                                size: prev.size, 
+                                [`${searchField}`]: filterData.id 
+                            }))}
+                            style={{ 
+                                backgroundColor: isSelected ? '#E6F7FF' : '#fff', 
+                                cursor: 'pointer',
+                                transition: 'all 0.3s',
+                            }}
+                            className={`hover:bg-[#bae7ff] ${isSelected ? 'ant-list-item-selected' : ''}`}
+                        >
+                            <Text 
+                                strong={isSelected} 
+                                className="text-[16px]"
+                                style={{ color: isSelected ? '#1890ff' : 'inherit' }}
+                            >
+                                {`${filterData?.label} (${filterData?.quantity || 0})`}
+                            </Text>
+                        </List.Item>
+                    );
+                }}
+            />
+        </div>
+    );
 }
 
 export default FilterBar;
