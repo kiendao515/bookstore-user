@@ -65,9 +65,9 @@ const AppHeader = (props: IHeaderProps) => {
                     <Menu.Item key="4">
                         Liên hệ ký gửi
                     </Menu.Item>
-                    <Menu.Item key="5">
+                    {/* <Menu.Item key="5">
                         Nhận tìm sách
-                    </Menu.Item>
+                    </Menu.Item> */}
                 </Menu>
             </div>
 

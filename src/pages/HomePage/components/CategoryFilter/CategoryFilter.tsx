@@ -1,39 +1,16 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { RightOutlined } from '@ant-design/icons';
-import { IReqParams, useBooks } from '@/api/books';
-import { useCategories } from '@/api/category';
-import { IFilterValue } from '@/ui/FilterBar/interface';
+import { useEffect, useMemo, useState } from "react";
+import { useCategories } from "@/api/category";
+import { useSearchParams } from "react-router-dom";
+import { IReqParams, useBooks } from "@/api/books";
+import { IFilterValue } from "@/ui/FilterBar/interface";
+import BookCollection from "@/ui/BookCollection";
 
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import BookCollection from '@/ui/BookCollection';
-
-interface IFilterCollectionProps {
-    title: string;
-}
-
-const FilterCollection: React.FC<IFilterCollectionProps> = ({ title }) => {
+const CategoryFilter = () => {
     const [searchParams] = useSearchParams();
-    const { categories } = useCategories({ sort_by: "numOfBooks", order_by: "DESC" });
-    const navigate = useNavigate();
-
-
-    const filterValues = useMemo(() => {
-        const result: IFilterValue[] = []
-        categories?.data.map((category) => {
-            result.push({
-                id: category.id,
-                label: category.name,
-                quantity: category.num_of_books
-            })
-        })
-        return result;
-    }, [categories]);
-
-
     const [bookParams, setBookParams] = useState<IReqParams>({
         page: parseInt(searchParams.get("page") || "0"),
-        size: 12,
-    });
+        size: 36
+    })
 
     useEffect(() => {
         const page = searchParams.get("page");
@@ -47,6 +24,20 @@ const FilterCollection: React.FC<IFilterCollectionProps> = ({ title }) => {
     }, [searchParams.get("page")])
 
     const { books } = useBooks({ ...bookParams });
+
+    const { categories } = useCategories({ sort_by: "numOfBooks", order_by: "DESC" });
+    const filterValues = useMemo(() => {
+        const result: IFilterValue[] = []
+        categories?.data?.map((category) => {
+            result.push({
+                id: category.id,
+                label: category.name,
+                quantity: category.num_of_books
+            })
+
+        })
+        return result;
+    }, [categories])
 
     const newBooks = useMemo(() => {
         return books?.data?.map(book => {
@@ -70,36 +61,26 @@ const FilterCollection: React.FC<IFilterCollectionProps> = ({ title }) => {
             };
         }) || [];
     }, [books]);
-
     return (
-        <div className="p-8">
-            <section className="flex items-center justify-between bg-gray-100 p-4 mb-[64px]">
-                <h2 className="text-lg font-semibold text-blue-600">{title}</h2>
-                <div onClick={() => navigate("/category?page=0")} className="flex items-center text-blue-600 hover:text-blue-800 cursor-pointer">
-                    Xem thêm <RightOutlined className="ml-1" />
-                </div>
-            </section>
+        <div>
             <BookCollection
-                filterValues={filterValues}
+                title="thể loại"
+                books={newBooks}
                 setBookParams={setBookParams}
                 bookParams={bookParams}
-                books={newBooks}
-                hasFilter ={true}
-                searchField="category_id"
-                totalElement={books?.total_elements || 0}
-                title="thể loại"
                 havePagination={true}
+                filterValues={filterValues}
                 hasTitle={true}
                 hasHeader={true}
                 firstIndex={books?.total_elements != 0 ? (books?.page ?? 0) * (books?.size ?? 0) + 1 : 0}
                 lastIndex={((books?.page ?? 0) + 1) * (books?.size ?? 0) < (books?.total_elements ?? 0) ? ((books?.page ?? 0) + 1) * (books?.size ?? 0) : (books?.total_elements ?? 0)}
-                totalElements={books?.total_elements ?? 0}
+                totalElement={books?.total_elements ?? 0}
                 currentPage={books?.page ?? 0}
                 totalPage={books?.total_pages ?? 0}
-                isIndividualPage={false}
+                hasFilter={true}
             />
         </div>
-    );
+    )
 };
 
-export default FilterCollection;
+export default CategoryFilter;

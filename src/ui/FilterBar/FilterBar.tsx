@@ -9,7 +9,7 @@ const FilterBar = (props: IFilterBarProps) => {
     const { filterValues = [], isPage = false, setBookParams, bookParams, searchField = "category_id" } = props;
 
     return (
-        <div className={`w-full ${isPage ? "sticky top-[110px]" : ""}`}>
+        <div className={`w-full`}>
             <List
                 size="small"
                 bordered

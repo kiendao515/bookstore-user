@@ -1,8 +1,8 @@
 import MainLayout from "@/layout";
 import BookCollection from "./components/BookCollection";
 import Collection from "@/ui/Collection";
-import FilterCollection from "./components/FilterCollection";
 import WelcomeSection from "@/layout/Welcome/Welcome";
+import CategoryFilter from "./components/CategoryFilter";
 
 const HomePage = () => {
     return (
@@ -18,8 +18,11 @@ const HomePage = () => {
                     <Collection title="Bộ sưu tập" />
                 </div>
                 <div className="py-3">
-                    <FilterCollection title="Thể loại" />
+                    <CategoryFilter/>
                 </div>
+                {/* <div className="py-3">
+                    <FilterCollection title="Thể loại" />
+                </div> */}
             </div>
         </MainLayout>
     )

@@ -58,6 +58,7 @@ const CollectionPage = () => {
 
 
     const { books } = useBooks({ ...bookParams });
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 1280);
 
     const newBooks = useMemo(() => {
         return books?.data?.map(book => {
@@ -87,12 +88,22 @@ const CollectionPage = () => {
         <MainLayout>
             <div className="pb-[144px] pt-[48px]">
                 <BookCollection
-                    filterValues={filterValues}
-                    setBookParams={setBookParams}
-                    bookParams={bookParams}
-                    books={newBooks}
+                    title="collections"
                     searchField="collection_id"
-                    totalElements={books?.total_elements || 0}
+                    books={newBooks}
+                    havePagination={true}
+                    setBookParams={setBookParams}
+                    filterValues={filterValues}
+                    hasTitle={false}
+                    hasHeader={!isMobile}
+                    firstIndex={books?.size != 0 && books?.size ? (books?.page ?? 0) * (books?.size ?? 0) + 1 : 0}
+                    lastIndex={((books?.page ?? 0) + 1) * (books?.size ?? 0) < (books?.total_elements ?? 0) ? ((books?.page ?? 0) + 1) * (books?.size ?? 0) : (books?.total_elements ?? 0)}
+                    totalElement={books?.total_elements ?? 0}
+                    currentPage={books?.page ?? 0}
+                    totalPage={books?.total_pages ?? 0}
+                    bookParams={bookParams}
+                    isIndividualPage={false}
+                    hasFilter={!isMobile}
                 />
             </div>
         </MainLayout>
