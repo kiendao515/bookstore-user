@@ -23,8 +23,6 @@ const Checkout = () => {
     const { provinces } = useProvinces();
     const { districts } = useDistricts(watch("province_code") || "");
     const { wards } = useWards(watch("district_code") || "");
-    const [provinceName, setProvinceName] = useState("");
-    const [districtName, setDistrictName] = useState("");
     const user = useAppSelector(getUser);
     const [fee, setFee] = useState(25000)
     const location = useLocation();
@@ -33,29 +31,8 @@ const Checkout = () => {
     const { shippingAddress } = useShippingAddressDetail(selectedId);
     const [toggleAddress, setToggleAddress] = useState(false);
     const { shippingAddresses } = useShippingAddresses({});
-    const feeBody = useMemo(() => ({
-        address: watch("street") || "",
-        province: provinceName,
-        district: districtName,
-        weight: 2000,
-        value: totalPrice,
-    }), [districtName]);
     const navigate = useNavigate()
 
-    useEffect(() => {
-        const fetchFee = async () => {
-            try {
-                const rs = await calculateFee(feeBody);
-                setFee(rs.data);
-            } catch (error) {
-                console.error("Failed to fetch fee:", error);
-            }
-        };
-
-        if (feeBody.province && feeBody.district) {
-            fetchFee();
-        }
-    }, [feeBody]);
     useEffect(() => {
         if (user.id != "") {
             formMethod.reset({
@@ -67,10 +44,23 @@ const Checkout = () => {
                 return;
             }
 
-            let shippingAddress = shippingAddresses?.data?.find((item) => item.default == true);
-            if (!shippingAddress) {
-                shippingAddress = shippingAddresses?.data[0];
-            }
+            let shippingAddress = shippingAddresses?.data?.find((item) => item.default == true) || shippingAddresses?.data[0];
+            const fetchFee = async () => {
+                try {
+                    const rs = await calculateFee({
+                        address: watch("street") || "",
+                        province: shippingAddress?.province?.full_name,
+                        district: shippingAddress?.district?.full_name,
+                        weight: 2000,
+                        value: totalPrice,
+                    });
+                    setFee(rs.data);
+                } catch (error) {
+                    console.error("Failed to fetch fee:", error);
+                }
+            };
+            fetchFee();
+
             formMethod.reset({
                 customer_email: user.email || "",
                 customer_name: shippingAddress?.full_name || "",
@@ -91,6 +81,7 @@ const Checkout = () => {
             })
         }
         if (shippingAddress?.data) {
+            console.log(shippingAddress);
             formMethod.reset({
                 customer_email: user.email || "",
                 customer_name: shippingAddress?.data?.full_name || "",
@@ -100,8 +91,23 @@ const Checkout = () => {
                 ward_code: shippingAddress?.data?.ward.code || "",
                 street: shippingAddress?.data?.street || "",
             })
+            const fetchFee = async () => {
+                try {
+                    const rs = await calculateFee({
+                        address: watch("street") || "",
+                        province: shippingAddress?.data.province?.full_name,
+                        district: shippingAddress?.data.district?.full_name,
+                        weight: 2000,
+                        value: totalPrice,
+                    });
+                    setFee(rs.data);
+                } catch (error) {
+                    console.error("Failed to fetch fee:", error);
+                }
+            };
+            fetchFee();
             return;
-        }
+        }    
     }, [shippingAddress])
 
     useEffect(() => {
@@ -141,8 +147,8 @@ const Checkout = () => {
     const handleCheckout = async (values: any) => {
         console.log(values);
         const orderPayload = {
-            customer_name: values.customerName,
-            customer_phone: values.phone,
+            customer_name: watch('customer_name'),
+            customer_phone: watch('customer_phone'),
             email: user.email,
             order_items: cartItems.map((item: any) => ({
                 book_inventory_id: item.book_inventory_id,
@@ -153,7 +159,7 @@ const Checkout = () => {
             province_code: watch("province_code"),
             district_code: watch("district_code"),
             ward_code: watch("ward_code"),
-            street: values.street,
+            street: watch('street'),
         };
 
         try {
@@ -166,7 +172,7 @@ const Checkout = () => {
                     navigate("/order-result?orderId=" + response.data.orderCode);
                 }
 
-            }else{
+            } else {
                 message.error(response?.reason)
             }
         } catch (error) {
