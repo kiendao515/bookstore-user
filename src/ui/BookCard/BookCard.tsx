@@ -6,26 +6,20 @@ import { getUser } from "@/store/duck/auth/slice";
 import { setBookFavorite } from "@/store/duck/bookFavorite/slice";
 import { setToggleByKey } from "@/store/duck/togglePopUp/slice";
 import { HeartTwoTone } from "@ant-design/icons";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useMutation } from "react-query";
 import { useSelector } from "react-redux";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const BookCard: React.FC<BookCardProps> = ({ id, image, title, author, price, soldCount, link }) => {
     const { toggleAuth } = useAppSelector((state: RootState) => state.togglePopUp)
+    const navigate = useNavigate()
     const dispatch = useAppDispatch();
     const user = useAppSelector(getUser);
     const { toggleAuthPopup } = useAuthToggle();
     const { bookIds = [] } = useSelector((state: RootState) => state.bookFavorite);
     const [redHeart, setRedHeart] = useState(false);
-    useEffect(() => {
-        if (bookIds.includes(id)) {
-            setRedHeart(true);
-        } else {
-            setRedHeart(false);
-        }
 
-    }, [bookIds])
 
     const { mutate } = useMutation(updateBookFavorite, {
         onSuccess: async (data) => {
@@ -61,51 +55,50 @@ const BookCard: React.FC<BookCardProps> = ({ id, image, title, author, price, so
         }
     };
     return (
-        <div className="max-w-xs rounded-lg border border-gray-200 p-4 shadow-sm">
-            {/* Book Image */}
-            <Link to={link}>
+        <div className={`flex flex-col w-full relative lg:p-[20px] p-[10px] rounded-[5px] border border-[#D9D9D9] shadow-sm`}>
+            <div
+                onClick={() => navigate(link)}
+                className={`group relative hover:cursor-pointer flex items-center w-full h-0 pb-[100%] overflow-hidden justify-center`}
+            >
                 <img
                     src={image}
                     alt={title}
-                    className="w-full h-64 object-cover rounded-md mb-4"
+                    className="w-full h-full object-cover absolute top-0 left-0"
                 />
-            </Link>
-
-            {/* Title, Author, and Like Icon */}
-            <div className="flex justify-between items-start">
-                <div className="flex-1">
-                    <Link to={link}>
-                        <h3 className="text-md font-medium line-clamp-1" title={title}>
-                            {title}
-                        </h3>
-                    </Link>
-                    <p className="text-sm text-gray-600 line-clamp-1" title={author}>
-                        {author}
-                    </p>
-                </div>
-                <HeartTwoTone twoToneColor={redHeart ? "#eb2f96" : "#d9d9d9"} onClick={handleFavoriteButtonClick}
-                    onMouseEnter={() => setRedHeart(true)}
-                    onMouseLeave={() => {
-                        if (!bookIds.includes(id)) {
-                            setRedHeart(false);
-                        }
-                    }} />
             </div>
 
-            {/* Price */}
-            <p className="text-lg font-semibold text-black mt-2">
-                {price.toLocaleString()} đ
-            </p>
+            {/* Title, Author, and Like Icon */}
+            <div className="flex flex-col lg:pt-[10px] pt-[5px]">
+                <div className="flex justify-between items-center gap-[5px]">
+                    <div className="mobile-regular lg:text-regular  tracking-normal font-normal hover:cursor-pointer italic" onClick={() => navigate(link)}>{title}</div>
+                    <div className="w-fit h-full flex items-center justify-end">
+                        <HeartTwoTone
+                            className="mr-[2px] hover:cursor-pointer w-[20px] h-[20px]"
+                            twoToneColor={redHeart ? "#eb2f96" : "#d9d9d9"}
+                            onClick={handleFavoriteButtonClick}
+                            onMouseEnter={() => setRedHeart(true)}
+                            onMouseLeave={() => {
+                                if (!bookIds.includes(id)) {
+                                    setRedHeart(false);
+                                }
+                            }}
+                        />
+                    </div>
+                </div>
+                <div className="w-fit text-[#A8A8A8] mobile-regular hover:cursor-pointer font-normal">{author}</div>
 
-            {/* Sold Count and Order Button */}
-            <div className="flex items-center justify-between mt-4">
-                {/* Sold Count */}
-                <span className="text-sm text-gray-500">Đã bán {soldCount}</span>
+                <p className="mobile-regular font-semibold lg:mt-2">
+                    {price.toLocaleString()} đ
+                </p>
+                <div className="flex lg:flex-row flex-col items-center justify-between mt-[5px] lg:mt-[10px]">
+                    <div className="flex justify-start w-full">
+                        <span className="text-[16px] leading-[21px] lg:mobile-regular text-gray-500">Đã bán <text className="font-semibold text-black">{soldCount}</text></span>
+                    </div>
 
-                {/* Order Button */}
-                <button className="bg-blue-600 text-white text-sm font-medium py-1 px-4 rounded">
-                    Đặt hàng
-                </button>
+                    <button className="bg-[#1890FF] text-white text-sm h-[30px] lg:h-[30px] w-full lg:w-[114px] lg:mt-[0px] mt-[5px]">
+                        Đặt hàng
+                    </button>
+                </div>
             </div>
         </div>
     );

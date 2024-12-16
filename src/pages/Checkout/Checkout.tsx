@@ -107,7 +107,7 @@ const Checkout = () => {
             };
             fetchFee();
             return;
-        }    
+        }
     }, [shippingAddress])
 
     useEffect(() => {
@@ -182,10 +182,10 @@ const Checkout = () => {
     };
     return (
         <MainLayout>
-            <div style={{ padding: "20px" }}>
+            <div style={{ paddingTop: "20px" }}>
                 <Form layout="vertical" onFinish={handleCheckout}>
                     <Row gutter={24}>
-                        <Col xs={24} lg={14}>
+                        <Col xs={23} lg={14}>
                             <Card bordered style={{ marginBottom: "20px" }}>
                                 <Title level={4} style={{ marginBottom: "20px" }}>
                                     Thông tin khách hàng
@@ -269,8 +269,7 @@ const Checkout = () => {
                                 }
                             </Card>
                         </Col>
-
-                        <Col xs={24} lg={10}>
+                        <Col xs={23} lg={10}>
                             <Card bordered>
                                 <Title level={4} style={{ marginBottom: "20px" }}>
                                     Thông tin đơn hàng

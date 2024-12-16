@@ -5,6 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { IBookRelativeProps } from "./interface";
 import { IReqParams, useBooks } from "@/api/books";
 import BookCollection from "@/ui/BookCollection";
+import { ArrowRightOutlined } from "@ant-design/icons";
 
 const BookRelative = (props: IBookRelativeProps) => {
     const { categoryId, currentBookId } = props
@@ -115,15 +116,17 @@ const BookRelative = (props: IBookRelativeProps) => {
 
     return (
         <div>
+            <section className="flex items-center justify-between bg-gray-100 py-[10px] px-[10px] lg:px-[20px]  rounded-[5px]">
+                <h2 className="lg:mobile-regular text-[15px] leading-[21px] font-semibold text-blue-600">{"Có thể bạn quan tâm"}</h2>
+                <div onClick={() => navigate(`/category?id=${categoryId}&page=0`)} className="flex text-[15px] leading-[21px] lg:mobile-regular items-center text-blue-600 hover:text-blue-800 cursor-pointer" >
+                    Xem thêm <ArrowRightOutlined className="ml-1" />
+                </div>
+            </section>
             <BookCollection
-                extendUrl={`/category?id=${categoryId}&page=0`}
                 books={newBooks}
-                title="Có thể bạn quan tâm"
+                bookParams={bookParams}
                 setBookParams={setBookParams}
-                havePagination={false}
-                hasFilter={false}
-                hasTitle={true}
-                hasHeader={true}
+                showFilter={false}
             />
             {
                 isMobile && (

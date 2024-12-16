@@ -24,10 +24,15 @@ interface CartItem {
 
 const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const [isExpanded, setIsExpanded] = useState(false);
-  const handleExpand = () => {
-    setIsExpanded((prev) => !prev);
-  };
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
@@ -160,7 +165,7 @@ const BookDetail = () => {
   }
   return (
     <MainLayout>
-      <div className="mx-auto p-6">
+      <div className="mx-auto pt-[10px]">
         <Breadcrumb className="mb-6">
           <BreadcrumbItem>
             <a href="/">Trang chủ</a>
@@ -198,8 +203,12 @@ const BookDetail = () => {
               ))}
             </Space>
           </Col>
-          <Col span={1}></Col>
-          <Col span={13}>
+          {
+            !isMobile && (
+              <Col span={1}></Col>
+            )
+          }
+          <Col span={15}>
             {/* Tiêu đề */}
             <div className="flex justify-between items-center">
               <Title level={3}>{book?.data.name}</Title>
@@ -247,7 +256,7 @@ const BookDetail = () => {
             </div>
 
             {/* Nút hành động */}
-            <Space size="large">
+            <div className="flex lg:flex-row flex-col gap-[20px]">
               <Button
                 type="primary"
                 icon={<ShoppingCartOutlined />}
@@ -258,7 +267,7 @@ const BookDetail = () => {
                 Thêm vào giỏ hàng
               </Button>
               <Button size="large" onClick={handleBuyNow}>Mua ngay</Button>
-            </Space>
+            </div>
           </Col>
         </Row>
         <Divider />
@@ -359,22 +368,13 @@ const BookDetail = () => {
                 MÔ TẢ SẢN PHẨM
               </span>
               <div className="mt-4">
-                <p className={`text-justify ${!isExpanded ? 'line-clamp-2' : ''} transition-all duration-300`} dangerouslySetInnerHTML={{ __html: book?.data.description }} />
-                <div className="text-center mt-2">
-                  <Button
-                    type="link"
-                    onClick={handleExpand}
-                    className="text-blue-600 font-medium"
-                  >
-                    {isExpanded ? "Thu gọn" : "Xem thêm"}
-                  </Button>
-                </div>
+                <p className={`text-justify transition-all duration-300`} dangerouslySetInnerHTML={{ __html: book?.data.description }} />
               </div>
             </div>
           </Col>
         </Row>
         <div className="xl:mt-[90px] mt-[30px]">
-            <BookRelative categoryId={book?.data?.category?.id || ""} currentBookId={book?.data?.id || ""} />
+          <BookRelative categoryId={book?.data?.category?.id || ""} currentBookId={book?.data?.id || ""} />
         </div>
       </div>
     </MainLayout>

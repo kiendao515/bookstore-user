@@ -86,23 +86,14 @@ const CategoryPage = () => {
 
     return (
         <MainLayout>
-            <div className="pb-[144px] pt-[48px]">
+            <div className="lg:pb-[144px] pb-[40px] lg:pt-[30px] pt-[10px]">
                 <BookCollection
-                    title="collections"
                     books={newBooks}
-                    bookParams={bookParams}
-                    havePagination={true}
                     setBookParams={setBookParams}
+                    bookParams={bookParams}
                     filterValues={filterValues}
-                    hasTitle={false}
-                    hasHeader={!isMobile}
-                    firstIndex={books?.size != 0 && books?.size ? (books?.page ?? 0) * (books?.size ?? 0) + 1 : 0}
-                    lastIndex={((books?.page ?? 0) + 1) * (books?.size ?? 0) < (books?.total_elements ?? 0) ? ((books?.page ?? 0) + 1) * (books?.size ?? 0) : (books?.total_elements ?? 0)}
-                    totalElement={books?.total_elements ?? 0}
-                    currentPage={books?.page ?? 0}
-                    totalPage={books?.total_pages ?? 0}
-                    isIndividualPage={false}
-                    hasFilter={!isMobile}
+                    totalElements={books?.total_elements}
+                    showFilter={true}
                 />
             </div>
         </MainLayout>

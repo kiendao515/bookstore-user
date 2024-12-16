@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { useCategories } from "@/api/category";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { IReqParams, useBooks } from "@/api/books";
 import { IFilterValue } from "@/ui/FilterBar/interface";
 import BookCollection from "@/ui/BookCollection";
+import { ArrowRightOutlined } from "@ant-design/icons";
 
 const CategoryFilter = () => {
     const [searchParams] = useSearchParams();
@@ -11,6 +12,7 @@ const CategoryFilter = () => {
         page: parseInt(searchParams.get("page") || "0"),
         size: 36
     })
+    const navigate = useNavigate()
 
     useEffect(() => {
         const page = searchParams.get("page");
@@ -62,23 +64,25 @@ const CategoryFilter = () => {
         }) || [];
     }, [books]);
     return (
-        <div>
-            <BookCollection
-                title="thể loại"
-                books={newBooks}
-                setBookParams={setBookParams}
-                bookParams={bookParams}
-                havePagination={true}
-                filterValues={filterValues}
-                hasTitle={true}
-                hasHeader={true}
-                firstIndex={books?.total_elements != 0 ? (books?.page ?? 0) * (books?.size ?? 0) + 1 : 0}
-                lastIndex={((books?.page ?? 0) + 1) * (books?.size ?? 0) < (books?.total_elements ?? 0) ? ((books?.page ?? 0) + 1) * (books?.size ?? 0) : (books?.total_elements ?? 0)}
-                totalElement={books?.total_elements ?? 0}
-                currentPage={books?.page ?? 0}
-                totalPage={books?.total_pages ?? 0}
-                hasFilter={true}
-            />
+        <div className="w-full">
+            <section className="flex items-center justify-between bg-gray-100 py-[10px] px-[10px] lg:px-[20px]  rounded-[5px]">
+                <h2 className="lg:mobile-regular text-[15px] leading-[21px] font-semibold text-blue-600">{"Thể loại"}</h2>
+                <div onClick={() => navigate("/collections?page=0")} className="flex text-[15px] leading-[21px] lg:mobile-regular items-center text-blue-600 hover:text-blue-800 cursor-pointer" >
+                    Xem thêm <ArrowRightOutlined className="ml-1" />
+                </div>
+            </section>
+
+            <div className="mt-[20px] lg:mt-[40px]">
+                <BookCollection
+                    books={newBooks}
+                    setBookParams={setBookParams}
+                    bookParams={bookParams}
+                    filterValues={filterValues}
+                    totalElements={books?.total_elements}
+                    showFilter={true}
+                />
+
+            </div>
         </div>
     )
 };

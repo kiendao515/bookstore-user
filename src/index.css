@@ -1,3 +1,23 @@
+@font-face {
+    font-family: 'myCustomFont';
+    src: url('/assets/fonts/RobotoSerif_28pt_SemiCondensed-Regular.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'myCustomFont';
+    src: url('/assets/fonts/RobotoSerif_28pt_SemiCondensed-Italic.woff2') format('woff2');
+    font-weight: normal;
+    font-style: italic;
+    /* This is for italic */
+}
+
+
+
+
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -11,5 +31,12 @@
     .no-scrollbar {
         -ms-overflow-style: none;  /* IE and Edge */
         scrollbar-width: none;  /* Firefox */
+    }
+}
+
+
+@layer base {
+    body {
+        @apply font-custom mobile-regular font-normal lining-nums;
     }
 }

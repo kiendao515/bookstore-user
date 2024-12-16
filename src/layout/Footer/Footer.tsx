@@ -10,13 +10,12 @@ const AppFooter = (props: IFooterProps) => {
             style={{
                 backgroundColor: "#004aad",
                 color: "#fff",
-                padding: "40px 100px",
                 textAlign: "center",
             }}
         >
             <Row gutter={[16, 16]} justify="space-between">
                 {/* Cột 1 */}
-                <Col xs={24} md={6}>
+                <Col xs={24} md={8}>
                     <Title level={5} style={{ color: "#fff", marginBottom: "16px" }}>
                         Về chúng tôi
                     </Title>
@@ -26,8 +25,26 @@ const AppFooter = (props: IFooterProps) => {
                         <li><Link href="/offers" style={{ color: "#fff" }}>Thông báo - Ưu đãi</Link></li>
                     </ul>
                 </Col>
+                <Col xs={24} md={8}>
+                    <Title level={5} style={{ color: "#fff", marginBottom: "16px" }}>
+                        Thông tin liên hệ
+                    </Title>
+                    <ul style={{ listStyle: "none", padding: 0, margin: 0, lineHeight: "2" }}>
+                        <li>
+                            <Text style={{ color: "#fff" }}>
+                                Địa chỉ: Ngách 21 - Ngõ 238 Âu Cơ, Quảng An, Tây Hồ, Hà Nội, Việt Nam
+                            </Text>
+                        </li>
+                        <li>
+                            <PhoneOutlined /> <Text style={{ color: "#fff" }}>+84 98 220 36 56</Text>
+                        </li>
+                        <li>
+                            <MailOutlined /> <Text style={{ color: "#fff" }}>hieusachhop@gmail.com</Text>
+                        </li>
+                    </ul>
+                </Col>
                 {/* Cột 2 */}
-                <Col xs={24} md={6}>
+                <Col xs={24} md={8}>
                     <Title level={5} style={{ color: "#fff", marginBottom: "16px" }}>
                         Trợ giúp
                     </Title>
@@ -38,7 +55,7 @@ const AppFooter = (props: IFooterProps) => {
                     </ul>
                 </Col>
                 {/* Cột 3 */}
-                <Col xs={24} md={6}>
+                {/* <Col xs={24} md={6}>
                     <Title level={5} style={{ color: "#fff", marginBottom: "16px" }}>
                         Mạng xã hội
                     </Title>
@@ -59,26 +76,8 @@ const AppFooter = (props: IFooterProps) => {
                             </Link>
                         </li>
                     </ul>
-                </Col>
+                </Col> */}
                 {/* Cột 4 */}
-                <Col xs={24} md={6}>
-                    <Title level={5} style={{ color: "#fff", marginBottom: "16px" }}>
-                        Thông tin liên hệ
-                    </Title>
-                    <ul style={{ listStyle: "none", padding: 0, margin: 0, lineHeight: "2" }}>
-                        <li>
-                            <Text style={{ color: "#fff" }}>
-                                Địa chỉ: Ngách 21 - Ngõ 238 Âu Cơ, Quảng An, Tây Hồ, Hà Nội, Việt Nam
-                            </Text>
-                        </li>
-                        <li>
-                            <PhoneOutlined /> <Text style={{ color: "#fff" }}>+84 98 220 36 56</Text>
-                        </li>
-                        <li>
-                            <MailOutlined /> <Text style={{ color: "#fff" }}>hieusachhop@gmail.com</Text>
-                        </li>
-                    </ul>
-                </Col>
             </Row>
             <div style={{ marginTop: "24px", borderTop: "1px solid #fff", paddingTop: "10px" }}>
                 <Text style={{ color: "#fff" }}>Copyright 2024. All Rights Reserved</Text>

@@ -94,7 +94,7 @@ const BookPage = () => {
 
     return (
         <MainLayout>
-            <div className="pb-[144px] pt-[48px] w-full">
+            <div className="pb-[50px] lg:pb-[144px] w-full">
                 <BookCollection
                     filterValues={filterValues}
                     setBookParams={setBookParams}

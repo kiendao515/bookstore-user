@@ -1,6 +1,6 @@
 import { IReqParams, useBooks } from "@/api/books";
 import BookCard from "@/ui/BookCard";
-import { RightOutlined } from "@ant-design/icons";
+import { ArrowRightOutlined } from "@ant-design/icons";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -47,19 +47,19 @@ const BookCollection = (props: IBookCollectionProps) => {
     }, [books]);
 
     return (
-        <div className="p-8">
-            <section className="flex items-center justify-between bg-gray-100 p-4 mt-[100px] mb-[64px]">
-                <h2 className="text-lg font-semibold text-blue-600">{title}</h2>
-                <div onClick={() => navigate(extendUrl)} className="flex items-center text-blue-600 hover:text-blue-800 cursor-pointer" >
-                    Xem thêm <RightOutlined className="ml-1" />
+        <div className="w-full">
+            <section className="flex items-center justify-between bg-gray-100 py-[10px] px-[10px] lg:px-[20px]  rounded-[5px]">
+                <h2 className="lg:mobile-regular text-[15px] leading-[21px] font-semibold text-blue-600">{title}</h2>
+                <div onClick={() => navigate(extendUrl)} className="flex text-[15px] leading-[21px] lg:mobile-regular items-center text-blue-600 hover:text-blue-800 cursor-pointer" >
+                    Xem thêm <ArrowRightOutlined className="ml-1" />
                 </div>
             </section>
-            <div className="grid grid-cols-4 gap-[25px]">
+            <div className="grid lg:grid-cols-4 grid-cols-2 lg:gap-y-[24px] gap-y-[10px] 2xl:gap-x-[24px] xl:gap-x-[10px] gap-[12px] mt-[20px] lg:mt-[40px]">
                 {
                     newBooks?.map(book => {
                         return (
                             <BookCard
-                                id = {book.id}
+                                id={book.id}
                                 link={book.link}
                                 key={book.id}
                                 image={book.image}
@@ -73,7 +73,7 @@ const BookCollection = (props: IBookCollectionProps) => {
                     })
                 }
             </div>
-        </div>
+        </div >
     )
 };
 

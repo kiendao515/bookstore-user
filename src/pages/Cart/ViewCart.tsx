@@ -41,30 +41,30 @@ const ViewCart = () => {
                 name: item.book.name,
                 type: item.type,
                 quantity: item.quantity,
-                price: item.price || 0, 
+                price: item.price || 0,
                 image: item.book.coverImage,
                 book_inventory_id: item.book_inventory_id
             }));
             setCartItems(mappedItems);
         }
     }, [data]);
-    const incrementQuantity = async(id: string) => {
-        let updateCart = await saveCart({book_inventory_id:id, quantity: 1,delete: false})
-        if(updateCart.result){
+    const incrementQuantity = async (id: string) => {
+        let updateCart = await saveCart({ book_inventory_id: id, quantity: 1, delete: false })
+        if (updateCart.result) {
             message.success("Lưu giỏ hàng thành công!")
             setCartItems((prevItems) =>
                 prevItems.map((item) =>
                     item.book_inventory_id === id ? { ...item, quantity: item.quantity + 1 } : item
                 )
             );
-        }else{
+        } else {
             message.warning(updateCart.reason)
         }
     };
 
-    const decrementQuantity = async(id: string) => {
-        let updateCart = await saveCart({book_inventory_id:id, quantity: -1,delete: false})
-        if(updateCart.result){
+    const decrementQuantity = async (id: string) => {
+        let updateCart = await saveCart({ book_inventory_id: id, quantity: -1, delete: false })
+        if (updateCart.result) {
             message.success("Lưu giỏ hàng thành công!")
             setCartItems((prevItems) =>
                 prevItems.map((item) =>
@@ -73,24 +73,24 @@ const ViewCart = () => {
                         : item
                 )
             );
-        }else{
+        } else {
             message.warning(updateCart.reason)
         }
     };
 
-    const handleRemoveItem = async(id: string) => {
-        let updateCart = await saveCart({book_inventory_id:id, quantity: -1,delete: true})
-        if(updateCart.result){
+    const handleRemoveItem = async (id: string) => {
+        let updateCart = await saveCart({ book_inventory_id: id, quantity: -1, delete: true })
+        if (updateCart.result) {
             message.success("Lưu giỏ hàng thành công!")
             setCartItems((prevItems) => prevItems.filter((item) => item.book_inventory_id !== id));
-        }else{
+        } else {
             message.warning(updateCart.reason)
         }
     };
 
-    useEffect(()=>{
-        console.log("change",cartItems);
-    },[cartItems])
+    useEffect(() => {
+        console.log("change", cartItems);
+    }, [cartItems])
 
     const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -161,7 +161,7 @@ const ViewCart = () => {
 
     return (
         <MainLayout>
-            <div style={{ padding: "20px" }}>
+            <div style={{ paddingTop: "20px" }}>
                 <Table
                     dataSource={cartItems}
                     columns={columns}
@@ -190,7 +190,7 @@ const ViewCart = () => {
                         <Button
                             type="primary"
                             style={{ marginLeft: 20 }}
-                            onClick={() => navigate("/checkout",{ state: { cartItems, totalPrice }})}
+                            onClick={() => navigate("/checkout", { state: { cartItems, totalPrice } })}
                         >
                             Thanh toán
                         </Button>

@@ -3,10 +3,9 @@ import Footer from "./Footer";
 import Header from "./Header";
 import FindBook from "@/pages/FindBook";
 import CartPopUp from "@/pages/CartPopUp";
-import WelcomeSection from "./Welcome/Welcome";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { RootState } from "@/store";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { setToggleByKey } from "@/store/duck/togglePopUp/slice";
 import AuthPopUp from "@/pages/AuthPopUp";
@@ -15,6 +14,7 @@ import { Modal } from "antd";
 const MainLayout = (props: IMainLayoutProps) => {
     const { children } = props;
     let [searchParams] = useSearchParams();
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
     const token = searchParams.get("token");
     const isResetPwd = searchParams.get("is_reset_pwd");
     const isConfirmSuccess = searchParams.get("is_confirm_success");
@@ -31,11 +31,20 @@ const MainLayout = (props: IMainLayoutProps) => {
         }
     }, [isResetPwd, isConfirmSuccess, isChangePwdSuccess]);
 
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 1024);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     return (
         <div>
-            <div className="flex flex-col min-h-screen">
+            <div className="flex flex-col min-h-screen w-full">
                 <Header />
-                <div className="flex-grow mx-[100px]">
+                <div className="h-[70px]"></div>
+                <div className="flex-grow 2xl:w-[1500px] 2xl:mx-[auto] xl:w-[1149px] xl:mx-auto lg:mx-[50px] mx-[19px]">
                     {children}
                 </div>
                 <Footer />

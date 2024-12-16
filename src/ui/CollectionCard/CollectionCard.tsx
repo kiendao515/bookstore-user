@@ -1,47 +1,24 @@
-import { Card } from "antd";
 import { useNavigate } from "react-router-dom";
-
-const { Meta } = Card;
-
 const CollectionCard = (props: ICollectionCardProps) => {
     const { title, imageLink, link } = props;
     const navigate = useNavigate();
 
     return (
-        <Card
-            onClick={() => navigate(link || "")}
-            hoverable
-            style={{
-                width: 300,
-                borderRadius: "8px",
-                border: "1px solid #f0f0f0",
-                boxShadow: "none",
-                overflow: "hidden",
-                cursor: "pointer",
-            }}
-            cover={
+        <div className={`flex flex-col w-full relative lg:p-[20px] p-[10px] rounded-[5px] border border-[#D9D9D9] shadow-sm`}>
+            <div
+                onClick={() => navigate(link || "")}
+                className={`group relative hover:cursor-pointer flex items-center w-full h-0 pb-[100%] overflow-hidden justify-center`}
+            >
                 <img
                     src={imageLink}
                     alt={title}
-                    style={{
-                        width: "100%",
-                        height: 280,
-                        objectFit: "cover",
-                    }}
+                    className="w-full h-full object-cover absolute top-0 left-0"
                 />
-            }
-        >
-            <Meta
-                title={title}
-                style={{
-                    textAlign: "center",
-                    fontSize: "16px",
-                    fontWeight: "500",
-                    color: "#000",
-                    marginTop: "8px",
-                }}
-            />
-        </Card>
+            </div>
+            <div className="flex justify-center lg:pt-[20px] pt-[10px]">
+                <div className="mobile-regular lg:text-regular tracking-normal font-normal hover:cursor-pointer" onClick={() => navigate(link || "")}>{title}</div>
+            </div>
+        </div>
     );
 };
 
