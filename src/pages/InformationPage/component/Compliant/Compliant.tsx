@@ -23,7 +23,7 @@ const Compliant = (props: ICompliantProps) => {
         <div className="w-full xl:w-[576px]">
             {
                 !isMobile && (
-                    <text className="title text-[#888888]">[ khiếu nại ]</text>
+                    <text className="mobile-title text-[#888888]">[ khiếu nại ]</text>
                 )
             }
             <div className="w-full xl:w-[576px] mt-[22px]" dangerouslySetInnerHTML={{ __html: getContent(contents, ContentKeyEnum.COMPLAINT) }} />

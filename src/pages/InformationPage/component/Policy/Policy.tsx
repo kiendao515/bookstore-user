@@ -17,8 +17,8 @@ const Policy = (props: IPolicyProps) => {
         <div className="w-full xl:w-[666px]">
             <div className="w-full xl:w-[666px]">
                 <div className="flex gap-[10px] items-center w-full xl:w-[666px] border-b-[1px] border-black border-solid">
-                    <div>
-                        <text className="text-[24px] leading-[28px] text-[#888888]" onClick={() => setTogglePolicy(!togglePolicy)}>[ chính sách mua hàng ]</text>
+                    <div className="w-full">
+                        <text className="mobile-title text-[#888888]" onClick={() => setTogglePolicy(!togglePolicy)}>[ chính sách mua hàng ]</text>
                     </div>
                     {
                         toggleBuyingPolicy && (
@@ -45,7 +45,7 @@ const Policy = (props: IPolicyProps) => {
             <div className="w-full xl:w-[666px] mt-[25px]">
                 <div className="flex gap-[10px] items-center w-full xl:w-[666px]  border-b-[1px] border-black border-solid">
                     <div className="w-full">
-                        <text className="text-[24px] leading-[28px] text-[#888888]" onClick={() => setTogglePolicy(!togglePolicy)}>[ chính sách bảo mật ]</text>
+                        <text className="mobile-title  text-[#888888]" onClick={() => setTogglePolicy(!togglePolicy)}>[ chính sách bảo mật ]</text>
                     </div>
                     {
                         togglePolicy && (

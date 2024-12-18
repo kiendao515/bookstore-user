@@ -15,9 +15,9 @@ const ShippingAddress = (props: IShippingAddressProps) => {
     const [reload, setReload] = useState(0);
     const { shippingAddresses } = useShippingAddresses({ reload });
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1280);
-    const handleDelete = async(id:string)=>{
+    const handleDelete = async (id: string) => {
         let rs = await deleteShipment(id);
-        if(rs.result){
+        if (rs.result) {
             message.success("Xóa thành công!")
         }
     }
@@ -35,9 +35,7 @@ const ShippingAddress = (props: IShippingAddressProps) => {
             <div>
                 {!isMobile ? (
                     <Row justify="space-between" align="middle">
-                        <Text style={{ color: "#888888", fontSize: "16px" }}>
-                            [ địa chỉ nhận hàng ]
-                        </Text>
+                        <Text className="mobile-title" style={{ color: "#888888" }}>[ Địa chỉ nhận hàng ]</Text>
                         <Button
                             type="default"
                             icon={<NarrowIcon />}

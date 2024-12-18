@@ -1,5 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { IMenuBarProps } from "./interface";
+import { List, Typography } from "antd";
+
+const { Text } = Typography;
 
 const MenuBar = (props: IMenuBarProps) => {
     const { index, setIndex } = props;
@@ -19,22 +22,36 @@ const MenuBar = (props: IMenuBarProps) => {
         },
     ]
     return (
-        <div className="sticky top-[130px]">
-            <div className={"flex flex-col gap-[2px] w-full mt-[30px]"}>
-                {
-                    menus.map(menuItem => {
-                        return (
-                            <div className={`hover:cursor-pointer w-fit ${index == menuItem.index ? "bg-neon" : "hover:bg-[#9BC3FF]"}`} onClick={() => {
+        <div className="border border-gray-300 rounded-[5px] ">
+            <List
+                size="small"
+                dataSource={menus}
+                renderItem={(menuItem) => {
+                    return (
+                        <List.Item
+                            onClick={() => {
                                 navigate("/introduction?index=" + menuItem.index)
                                 setIndex(menuItem.index)
-                            }}>
-                                <text className="text-[18px]">{menuItem.title}</text>
-                            </div>
-
-                        )
-                    })
-                }
-            </div >
+                            }}
+                            style={{
+                                backgroundColor: menuItem.index == index ? '#E6F7FF' : '#fff',
+                                cursor: 'pointer',
+                                transition: 'all 0.3s',
+                                borderRadius: '5px',
+                            }}
+                            className={`hover:bg-[#bae7ff] ${menuItem.index == index ? 'ant-list-item-selected' : ''}`}
+                        >
+                            <Text
+                                strong={menuItem.index == index}
+                                className="text-[16px]"
+                                style={{ color: menuItem.index == index ? '#1890ff' : 'inherit' }}
+                            >
+                                {menuItem.title}
+                            </Text>
+                        </List.Item>
+                    );
+                }}
+            />
 
         </div>
     )

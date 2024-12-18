@@ -5,8 +5,8 @@ import MenuBar from "./component/MenuBar/MenuBar";
 import Introduction from "./component/Introduction/Introduction";
 import Policy from "./component/Policy/Policy";
 import Compliant from "./component/Compliant/Compliant";
-import MenuBarMobile from "./component/MenuBarMobile/MenuBarMobile";
 import MainLayout from "@/layout";
+import MenuBarMobile from "./component/MenuBarMobile/MenuBarMobile";
 
 const IntroductionPage = () => {
     const [searchParams] = useSearchParams()
@@ -37,30 +37,23 @@ const IntroductionPage = () => {
     return (
         <MainLayout>
             <div>
-                {/* {
-                    isMobile && (
-                        <div className="h-[45px] mobile-regular border-b-[1px] border-[#8C8C8C] border-solid flex items-center sticky top-[50px] z-20 bg-layout">
-                            <text className="text-[#8C8C8C] mobile-regular" >[ {title} ]</text>
-                        </div>
-                    )
-                } */}
                 {
                     isMobile && (
                         <MenuBarMobile index={index} setIndex={setIndex} />
                     )
                 }
 
-                <div className="grid grid-cols-2 xl:grid-cols-4 pb-[220px] mt-[40px]">
+                <div className="grid grid-cols-2 xl:grid-cols-4 pb-[220px] lg:mt-[70px] mt-[30px] gap-[50px]">
                     {
                         !isMobile && (
-                            <div className="col-span-1 ">
+                            <div className="col-span-1">
                                 <MenuBar index={index} setIndex={setIndex} />
                             </div>
 
                         )
                     }
                     {index == 1 &&
-                        <div className={`col-span-2`}>
+                        <div className={`col-span-3`}>
                             <Introduction />
                         </div>
                     }

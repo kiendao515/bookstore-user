@@ -57,7 +57,7 @@ const FavoriteBook = () => {
 
     return (
         <div style={{  margin: "auto" }}>
-            <Text style={{ color: "#888888" }}>[ Sách yêu thích ]</Text>
+            <Text className="mobile-title" style={{ color: "#888888" }}>[ Sách yêu thích ]</Text>
             <Row style={{marginTop: 20}} gutter={[16, 16]}>
                 {
                     newBooks?.map(book => {

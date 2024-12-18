@@ -1,10 +1,11 @@
-import { Menu } from "antd";
 import { useNavigate } from "react-router-dom";
 import { IMenuBarMobileProps } from "./interface";
 import { COOKIES, removeCookies } from "@/utils/cookies";
 import { useDispatch } from "react-redux";
 import { setLogout } from "@/store/duck/auth/slice";
 import toast from "react-hot-toast";
+import { Typography } from "antd";
+const { Text } = Typography;
 
 const MenuBarMobile = (props: IMenuBarMobileProps) => {
     const { index, setIndex } = props;
@@ -12,48 +13,60 @@ const MenuBarMobile = (props: IMenuBarMobileProps) => {
     const dispatch = useDispatch();
 
     const menus = [
-        { title: "Thông tin cá nhân", key: "1" },
-        { title: "Địa chỉ nhận hàng", key: "2" },
-        { title: "Đổi mật khẩu", key: "3" },
-        { title: "Sách yêu thích", key: "4" },
-        { title: "Đơn hàng", key: "5" },
+        { title: "Thông tin cá nhân", key: 1 },
+        { title: "Địa chỉ nhận hàng", key: 2 },
+        { title: "Đổi mật khẩu", key: 3 },
+        { title: "Sách yêu thích", key: 4 },
+        { title: "Đơn hàng", key: 5 },
     ];
 
-    const handleMenuClick = ({ key }: { key: string }) => {
-        if (key === "logout") {
+    const handleMenuClick = ({ key }: { key: number }) => {
+        if (key === 6) {
             removeCookies(COOKIES.user);
             removeCookies(COOKIES.token);
             dispatch(setLogout());
             toast.success("Đăng xuất thành công");
             navigate("/");
         } else {
-            setIndex(parseInt(key, 10));
+            setIndex(key);
             navigate(`/account?index=${key}`);
         }
     };
 
     return (
-        <Menu
-            mode="horizontal"
-            selectedKeys={[index.toString()]}
-            onClick={handleMenuClick}
+        <div
+            className="border border-x-0 border-gray-300 overflow-x-auto whitespace-nowrap no-scrollbar"
             style={{
-                borderBottom: "1px solid #8C8C8C",
-                overflowX: "auto",
-                whiteSpace: "nowrap",
-                backgroundColor: "var(--bg-layout-color)",
+                display: "flex",
             }}
-            className="z-20"
         >
             {menus.map((menuItem) => (
-                <Menu.Item key={menuItem.key} style={{ fontSize: "18px" }}>
-                    {menuItem.title}
-                </Menu.Item>
+                <div
+                    key={menuItem.key}
+                    onClick={() => handleMenuClick({ key: menuItem.key })}
+                    style={{
+                        backgroundColor: menuItem.key === index ? '#E6F7FF' : '#fff',
+                        cursor: 'pointer',
+                        transition: 'all 0.3s',
+                        padding: '10px 5px',
+                        textAlign: 'center',
+                        margin: '0', // Add spacing between items
+                        whiteSpace: 'nowrap',
+                        width: '100%',
+                    }}
+                    className={`hover:bg-[#bae7ff] ${menuItem.key === index ? 'ant-list-item-selected' : ''}`}
+                >
+                    <Text
+                        strong={menuItem.key === index}
+                        className="text-[16px]"
+                        style={{ color: menuItem.key === index ? '#1890ff' : 'inherit' }}
+                    >
+                        {menuItem.title}
+                    </Text>
+                </div>
             ))}
-            <Menu.Item key="logout" style={{ fontSize: "18px" }}>
-                Đăng xuất
-            </Menu.Item>
-        </Menu>
+
+        </div>
     );
 };
 

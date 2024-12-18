@@ -27,17 +27,10 @@ const AccountPage = () => {
             <div>
                 {
                     isMobile && (
-                        <div className="h-[50px] mobile-regular border-b-[1px] border-[#8C8C8C] border-solid flex items-center z-20 bg-layout">
-                            <text className="text-[#8C8C8C] mobile-regular" >[ tài khoản của tôi ]</text>
-                        </div>
-                    )
-                }
-                {
-                    isMobile && (
                         <MenuBarMobile index={index} setIndex={setIndex} />
                     )
                 }
-                <div className="grid grid-cols-1 xl:grid-cols-4 pb-[50px] xl:pb-[220px] mt-[10px] xl:mt-[40px]">
+                <div className="grid grid-cols-1 xl:grid-cols-4 pb-[50px] xl:pb-[220px] mt-[10px] xl:mt-[40px] gap-[50px]">
                     {
                         !isMobile && (
                             <div className="col-span-1 ">

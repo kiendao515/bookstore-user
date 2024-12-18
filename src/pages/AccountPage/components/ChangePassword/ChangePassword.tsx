@@ -69,7 +69,7 @@ const ChangePassword = (props: IChangePasswordProps) => {
     return (
         <div>
             {!isMobile && (
-                <Text style={{ color: "#888888" }}>[ đổi mật khẩu ]</Text>
+                <Text className="mobile-title" style={{ color: "#888888" }}>[ đổi mật khẩu ]</Text>
             )}
             <Form
                 layout="vertical"

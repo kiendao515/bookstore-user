@@ -22,7 +22,7 @@ const Introduction = (props: IIntroductionProps) => {
         <div className="w-full xl:w-[576px]">
             {
                 !isMobile && (
-                    <text className="title text-[#888888]">[ Hộp tự giới thiệu ]</text>
+                    <text className="mobile-title text-[#888888]">[ Hộp tự giới thiệu ]</text>
                 )
             }
             <div className="w-fullxl:w-[576px] mt-[22px] mobile-regular" dangerouslySetInnerHTML={{ __html: getContent(contents, ContentKeyEnum.INTRODUCTION) }} />

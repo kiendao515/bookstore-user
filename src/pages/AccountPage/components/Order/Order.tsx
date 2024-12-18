@@ -4,7 +4,7 @@ import { handleOrderStatus } from "@/utils/common";
 import OrderDetailPopUp from "./component/OrderDetailPopUp/OrderDetailPopUp";
 import { useOrders } from "@/api/order/queries";
 import moment from "moment";
-import { Modal, Table, Typography, Button, Image, Space, Tag } from "antd";
+import { Modal, Table, Typography, Button, Image, Space, Tag, List, Card } from "antd";
 
 const { Text } = Typography;
 
@@ -23,6 +23,31 @@ const Order = (props: IOrderProps) => {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
+    const handleColor = (status: string) => {
+        let color: string;
+        switch (status) {
+            case "CREATED":
+                color = "orange";
+                break;
+            case "READY_TO_PACKAGE":
+                color = "blue"; // Chờ gói hàng
+                break;
+            case "READY_TO_SHIP":
+                color = "green"; // Sẵn sàng gửi
+                break;
+            case "SHIPPING":
+                color = "geekblue"; // Đang gửi
+                break;
+            case "DONE":
+                color = "success"; // Thành công
+                break;
+            default:
+                color = "default";
+        }
+        return color;
+
+    }
+
     const columns = [
         {
             title: "Mã đơn hàng",
@@ -39,28 +64,8 @@ const Order = (props: IOrderProps) => {
             dataIndex: "status",
             key: "status",
             render: (status: string) => {
-                let color: string;
-                switch (status) {
-                    case "CREATED":
-                        color = "orange"; 
-                        break;
-                    case "READY_TO_PACKAGE":
-                        color = "blue"; // Chờ gói hàng
-                        break;
-                    case "READY_TO_SHIP":
-                        color = "green"; // Sẵn sàng gửi
-                        break;
-                    case "SHIPPING":
-                        color = "geekblue"; // Đang gửi
-                        break;
-                    case "DONE":
-                        color = "success"; // Thành công
-                        break;
-                    default:
-                        color = "default"; 
-                }
                 return (
-                    <Tag color={color}>
+                    <Tag color={handleColor(status)}>
                         {handleOrderStatus(status)}
                     </Tag>
                 );
@@ -104,7 +109,7 @@ const Order = (props: IOrderProps) => {
             render: (_: any, record: any) => (
                 <Button
                     type="link"
-                    style={{ color: "#007bff" }}
+                    style={{ backgroundColor: "#007bff", color: "#fff" }}
                     onClick={() => {
                         setToggleDetail(true);
                         setSelectedId(record.id);
@@ -130,19 +135,81 @@ const Order = (props: IOrderProps) => {
 
     return (
         <>
-            <div>
-                <Text style={{ color: "#888888" }}>[ Đơn hàng ]</Text>
-                <div style={{ marginTop: 30, paddingBottom: 200 }}>
-                    <Table
-                        dataSource={dataSource}
-                        columns={columns}
-                        pagination={false}
-                        rowKey="key"
-                        bordered
-                        style={{ background: "#fff" }}
-                    />
-                </div>
-            </div>
+            {
+                isMobile && (
+                    <div>
+                        <div style={{ marginTop: 30, paddingBottom: 200 }}>
+                            <List
+                                dataSource={dataSource}
+                                renderItem={(order) => (
+                                    <Card
+                                        key={order.key}
+                                        style={{
+                                            marginBottom: 16,
+                                            border: "1px solid #f0f0f0",
+                                            borderRadius: "8px",
+                                            padding: "16px",
+                                        }}
+                                    >
+                                        <div style={{ marginBottom: 8 }}>
+                                            <Text strong>Mã đơn hàng:</Text> {order.orderCode}
+                                        </div>
+                                        <div style={{ marginBottom: 8 }}>
+                                            <Text strong>Tình trạng:</Text>{" "}
+                                            <Tag color={handleColor(order.status)}>
+                                                {handleOrderStatus(order.status)}
+                                            </Tag>
+                                        </div>
+                                        <div style={{ marginBottom: 8 }}>
+                                            <Text strong>Số lượng:</Text> {order.quantity} quyển
+                                        </div>
+                                        <div style={{ marginBottom: 8 }}>
+                                            <Text strong>Tổng tiền:</Text>{" "}
+                                            <Text style={{ fontWeight: "bold" }}>
+                                                {order.totalAmount
+                                                    ? `${order.totalAmount.toLocaleString()}đ`
+                                                    : "Chưa thanh toán"}
+                                            </Text>
+                                        </div>
+                                        <div style={{ marginBottom: 8 }}>
+                                            <Text strong>Ngày tạo:</Text>{" "}
+                                            {moment(order.createdAt).format("DD/MM/YYYY")}
+                                        </div>
+                                        <Button
+                                            type="link"
+                                            style={{ backgroundColor: "#007bff", color: "#fff" }}
+                                            onClick={() => {
+                                                setToggleDetail(true);
+                                                setSelectedId(order.id);
+                                            }}
+                                        >
+                                            Chi tiết
+                                        </Button>
+                                    </Card>
+                                )}
+                            />
+                        </div>
+                    </div>
+                )
+            }
+            {
+                !isMobile && (
+                    <div>
+                        <Text className="mobile-title" style={{ color: "#888888" }}>[ Đơn hàng ]</Text>
+                        <div style={{ marginTop: 30, paddingBottom: 200 }}>
+                            <Table
+                                dataSource={dataSource}
+                                columns={columns}
+                                pagination={false}
+                                rowKey="key"
+                                bordered
+                                style={{ background: "#fff" }}
+                            />
+                        </div>
+                    </div>
+
+                )
+            }
             <Modal
                 open={toggleDetail}
                 onCancel={() => setToggleDetail(false)}

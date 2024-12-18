@@ -1,5 +1,4 @@
 import { Form, Button, Typography, notification } from "antd";
-import NarrowIcon from "@/icons/NarrowIcon";
 import { IFormValue, IUserInfoProps } from "./interface";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
@@ -92,7 +91,7 @@ const UserInfo = (props: IUserInfoProps) => {
 
     return (
         <div style={{ width: "100%" }}>
-            {!isMobile && <Text style={{ color: "#888888" }}>[ Thông tin cá nhân ]</Text>}
+            {!isMobile && <Text className="mobile-title" style={{ color: "#888888" }}>[ Thông tin cá nhân ]</Text>}
             <Form
                 layout="vertical"
                 onFinish={formMethod.handleSubmit(onHandleSubmit)}
@@ -142,7 +141,7 @@ const UserInfo = (props: IUserInfoProps) => {
                     htmlType="submit"
                     loading={isLoading}
                     style={{
-                        marginTop: isMobile ? 38 : 70,
+                        marginTop: 20,
                         width: isMobile ? "100%" : 92,
                         height: isMobile ? 35 : 30,
                     }}
