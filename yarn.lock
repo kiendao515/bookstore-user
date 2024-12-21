@@ -2166,6 +2166,11 @@ chalk@^4.0.0, chalk@^4.0.2:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
+chatbot-antd@^0.6.0:
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/chatbot-antd/-/chatbot-antd-0.6.0.tgz#70f921b7e81f3d3f5380c4b2a4cf81a4b85dc2e2"
+  integrity sha512-vMYLRgY1x8UCdetARiNV+eA/NfG5yxieDvPo1xJX322A5DSq9+FEPF78ui0CN1BRKlSjM//IEb27Rv4LrXk/Xg==
+
 chokidar@^3.5.3:
   version "3.6.0"
   resolved "https://registry.npmjs.org/chokidar/-/chokidar-3.6.0.tgz"

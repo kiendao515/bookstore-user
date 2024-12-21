@@ -1,6 +1,6 @@
-import { request } from '../axios';
+import { request, requestPython } from '../axios';
 import { IBaseResponse } from '../interface';
-import { ICreateUser, IReqParams, IUpdateUser, IUserDetailRes, IUserRes } from './types';
+import { BookRecommendation, ICreateUser, IReqParams, IUpdateUser, IUserDetailRes, IUserRes } from './types';
 
 export const getUsers = async (params: IReqParams): Promise<IUserRes> => {
   const { data } = await request({
@@ -44,3 +44,14 @@ export const deleteUser = async (id: String): Promise<IBaseResponse> => {
   });
   return data;
 };
+
+export const sendChatMessage = async (message: string): Promise<BookRecommendation> => {
+  const {data} = await requestPython({
+    url:'/api/v1/books/search-book/',
+    method: 'POST',
+    data: {
+      description:message
+    }
+  })
+  return data;
+}

@@ -1,13 +1,16 @@
 import axios, { AxiosResponse } from 'axios';
 
 import { capitalizeFirstLetter } from '@/utils/common';
-import { API_URL } from '@/utils/constant';
+import { API_URL, PYTHON_SERVICE_URL } from '@/utils/constant';
 import { COOKIES, getCookies, removeCookies } from '@/utils/cookies';
 import toast from 'react-hot-toast';
 
 export const request = axios.create({
   baseURL: API_URL,
 });
+export const requestPython = axios.create({
+  baseURL: PYTHON_SERVICE_URL
+})
 
 const handleError = async (error: any) => {
 

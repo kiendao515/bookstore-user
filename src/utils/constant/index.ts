@@ -1,6 +1,7 @@
 export * from './appConfig';
 export const __prod__ = process.env.NODE_ENV !== 'development';
 export const API_URL = import.meta.env.VITE_API_BE;
+export const PYTHON_SERVICE_URL = import.meta.env.VITE_API_PYTHON_SERVICE;
 export const NFT_API_URL = 'https://external-dev.bitkubnft.net/api/';
 export const BITKUB_ACCOUNT_URL = 'https://accounts.bitkubnext.com';
 export const CLIENT_ID = '627cc14526dbae6bc42fa82b';

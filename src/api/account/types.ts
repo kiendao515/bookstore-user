@@ -1,3 +1,5 @@
+import { IBook } from "../books";
+
 export interface IUser {
   id: string;
   full_name: string;
@@ -50,4 +52,10 @@ export interface IUpdateUser {
   date_of_birth: string;
   note: string;
   enabled: number;
+}
+
+export interface BookRecommendation {
+  status: boolean;
+  message: string;
+  books : IBook[]
 }
