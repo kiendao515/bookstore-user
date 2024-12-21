@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Breadcrumb, Button, Divider, Image, InputNumber, Radio, Space, Tag, Typography, Row, Col, Spin, message } from "antd";
 import { HeartOutlined, ShareAltOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { setToggleByKey } from "@/store/duck/togglePopUp/slice";
 import { RootState } from "@/store";
 import BookRelative from "./component/BookRelative/BookRelative";
+import TemporaryOut from "@/ui/TemporaryOut/TemporaryOut";
 const { Title, Text } = Typography;
 
 interface CartItem {
@@ -133,6 +134,11 @@ const BookDetail = () => {
     return Object.values(grouped);
   };
 
+  const availableBookCount = useMemo(() => {
+    return book?.data.book_inventories.reduce((acc, inventory) => acc + inventory.quantity, 0) || 0;
+  }, [book])
+  console.log("available", availableBookCount)
+
   useEffect(() => {
     if (book?.data) {
       setLoading(false);
@@ -163,6 +169,7 @@ const BookDetail = () => {
       </div>
     );
   }
+
   return (
     <MainLayout>
       <div className="mx-auto pt-[10px]">
@@ -187,19 +194,30 @@ const BookDetail = () => {
             />
             <Space className="mt-4" size={12}>
               {book?.data.content_image?.map((_, index) => (
-                <Image
-                  key={index}
-                  width={64}
-                  height={64}
-                  src={book?.data.content_image[index]}
-                  alt={`Thumbnail ${index + 1}`}
-                  className="cursor-pointer"
-                  preview={true}
-                  style={{
-                    border: index === 0 ? "2px solid #1890ff" : "1px solid #ddd",
-                    borderRadius: 4,
-                  }}
-                />
+                <div>
+                  {
+                    availableBookCount == 0 &&
+                    <div className="mr-[20px]">
+                      <div className="absolute right-[10px] top-0 z-10 p-[10px]">
+                        <TemporaryOut isMobile={isMobile} />
+                      </div>
+                    </div>
+                  }
+                  <Image
+                    key={index}
+                    width={64}
+                    height={64}
+                    src={book?.data.content_image[index]}
+                    alt={`Thumbnail ${index + 1}`}
+                    className="cursor-pointer"
+                    preview={true}
+                    style={{
+                      border: index === 0 ? "2px solid #1890ff" : "1px solid #ddd",
+                      borderRadius: 4,
+                    }}
+                  />
+
+                </div>
               ))}
             </Space>
           </Col>
@@ -231,43 +249,49 @@ const BookDetail = () => {
             </Title>
 
             {/* Phân loại */}
-            <div className="mb-4">
-              <Text strong>Phân loại:</Text>
-              <Radio.Group
-                className="ml-4"
-                onChange={(e) => handleTypeChange(e.target.value)}
-              >
-                {cartItems.map((inventory) => (
-                  <Radio.Button key={inventory.book_inventory_id} value={inventory.type}>
-                    {inventory.type === "NEW"
-                      ? `Mới (${inventory.quantity})`
-                      : inventory.type === "GOOD"
-                        ? `Đẹp (${inventory.quantity})`
-                        : `Cũ (${inventory.quantity})`}
-                  </Radio.Button>
-                ))}
-              </Radio.Group>
-            </div>
+            {
+              availableBookCount > 0 && (
+                <>
+                  <div className="mb-4">
+                    <Text strong>Phân loại:</Text>
+                    <Radio.Group
+                      className="ml-4"
+                      onChange={(e) => handleTypeChange(e.target.value)}
+                    >
+                      {cartItems.map((inventory) => (
+                        <Radio.Button key={inventory.book_inventory_id} value={inventory.type}>
+                          {inventory.type === "NEW"
+                            ? `Mới (${inventory.quantity})`
+                            : inventory.type === "GOOD"
+                              ? `Đẹp (${inventory.quantity})`
+                              : `Cũ (${inventory.quantity})`}
+                        </Radio.Button>
+                      ))}
+                    </Radio.Group>
+                  </div>
 
-            {/* Số lượng */}
-            <div className="mb-6">
-              <Text strong>Số lượng:</Text>
-              <InputNumber min={1} defaultValue={1} value={quantity} onChange={(value) => setQuantity(value || 1)} className="ml-4" />
-            </div>
+                  {/* Số lượng */}
+                  <div className="mb-6">
+                    <Text strong>Số lượng:</Text>
+                    <InputNumber min={1} defaultValue={1} value={quantity} onChange={(value) => setQuantity(value || 1)} className="ml-4" />
+                  </div>
 
-            {/* Nút hành động */}
-            <div className="flex lg:flex-row flex-col gap-[20px]">
-              <Button
-                type="primary"
-                icon={<ShoppingCartOutlined />}
-                size="large"
-                className="bg-blue-600"
-                onClick={handleAddToCart}
-              >
-                Thêm vào giỏ hàng
-              </Button>
-              <Button size="large" onClick={handleBuyNow}>Mua ngay</Button>
-            </div>
+                  {/* Nút hành động */}
+                  <div className="flex lg:flex-row flex-col gap-[20px]">
+                    <Button
+                      type="primary"
+                      icon={<ShoppingCartOutlined />}
+                      size="large"
+                      className="bg-blue-600"
+                      onClick={handleAddToCart}
+                    >
+                      Thêm vào giỏ hàng
+                    </Button>
+                    <Button size="large" onClick={handleBuyNow}>Mua ngay</Button>
+                  </div>
+                </>
+              )
+            }
           </Col>
         </Row>
         <Divider />

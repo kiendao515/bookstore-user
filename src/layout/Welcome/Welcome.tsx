@@ -7,12 +7,12 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 interface IFormValue {
-    book_name?: string;
+    book_name: string;
 }
 
 const WelcomeSection: React.FC = () => {
     const schema = yup.object().shape({
-        book_name: yup.string().optional(),
+        book_name: yup.string().required("Vui lòng nhập tên sách"),
     });
     const navigate = useNavigate();
     const formMethod = useForm<IFormValue>({
@@ -34,18 +34,24 @@ const WelcomeSection: React.FC = () => {
                         name="book_name"
                         control={formMethod.control}
                         render={({ field }) => (
-                            <Input
-                                {...field}
-                                placeholder="Nhập tên sách"
-                                prefix={
-                                    <SearchOutlined
-                                        className="cursor-pointer text-blue-500"
-                                        onClick={() => formMethod.handleSubmit(onHandleSubmit)()}
-                                    />
-                                }
-                                className="w-2/3 lg:w-1/2 p-2 border border-gray-300 rounded-lg"
-                                onPressEnter={formMethod.handleSubmit(onHandleSubmit)}
-                            />
+                            <div className='w-2/3 lg:w-1/2 '>
+                                <Input
+                                    {...field}
+                                    placeholder="Nhập tên sách"
+                                    suffix={
+                                        <SearchOutlined
+                                            type='submit'
+                                            className="cursor-pointer text-blue-500 w-[23px] h-[23px]"
+                                            onClick={() => formMethod.handleSubmit(onHandleSubmit)()}
+                                        />
+                                    }
+                                    className="p-2 border border-gray-300 rounded-lg"
+                                    onPressEnter={formMethod.handleSubmit(onHandleSubmit)}
+                                />
+                                {formMethod.formState.errors.book_name && (<p className='text-red-600 italic text-[14px]'>{formMethod.formState.errors.book_name.message}</p>)}
+
+
+                            </div>
                         )}
                     />
                 </form>

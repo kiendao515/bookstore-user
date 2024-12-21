@@ -20,6 +20,7 @@ const UserInfo = (props: IUserInfoProps) => {
     const [reload, setReload] = useState(0);
     const { user } = useUserProfile(reload);
 
+    console.log("user", user);
     const schema = yup.object().shape({
         full_name: yup.string().trim().required("Vui lòng nhập họ tên").max(100),
         date_of_birth: yup.date().required("Vui lòng nhập ngày sinh").max(new Date()),

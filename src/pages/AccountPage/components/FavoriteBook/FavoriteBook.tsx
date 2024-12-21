@@ -1,5 +1,5 @@
-import { useEffect, useState, useMemo } from "react";
-import { List, Row, Col, Card, Typography, Spin } from "antd";
+import { useState, useMemo } from "react";
+import { Typography, Spin } from "antd";
 import { IReqParams, useBookFavorite, useBooks } from "@/api/books";
 import BookCard from "@/ui/BookCard";
 
@@ -10,8 +10,8 @@ const FavoriteBook = () => {
     const [bookParams, setBookParams] = useState<IReqParams>({
         page: 0,
         size: 12,
-        created_at:"",
-        updated_at:""
+        created_at: "",
+        updated_at: ""
     });
 
     const { books, isLoading: isBooksLoading } = useBooks({
@@ -21,31 +21,27 @@ const FavoriteBook = () => {
 
     const newBooks = useMemo(() => {
         return books?.data?.map(book => {
-            const validInventories = book?.book_inventories?.filter(inventory => inventory.price > 0) || [];
-            const { minPrice, type } = validInventories.length > 0
-                ? validInventories.reduce((acc, inventory) => {
-                    if (inventory.price < acc.minPrice) {
-                        return { minPrice: inventory.price, type: inventory.type };
-                    }
-                    return acc;
-                }, { minPrice: Number.MAX_VALUE, type: "UNKNOWN" }) 
-                : { minPrice: 0, type: "UNKNOWN" }; 
+            let bookInventories = book?.book_inventories || [];
+
+            let bookInventory = bookInventories
+                .filter(bookInventory => bookInventory.quantity > 0)
+                .reduce((min, current) => current.price < min.price ? current : min, { price: Number.MAX_VALUE, type: '', quantity: 0 });
 
             return {
                 link: `/book-detail/${book?.id}`,
                 name: book?.name,
-                price: minPrice,
-                type: type,
-                quantity: book?.number_of_books,
+                price: bookInventory.price != Number.MAX_VALUE ? bookInventory.price : 0,
+                type: bookInventory.type || '',
+                authorName: book?.author_name,
+                quantity: bookInventory.quantity,
                 description: book?.description || '',
-                author: book?.author_name || '',
                 image: book?.cover_image || '',
                 id: book?.id,
-                soldCount: book?.sold_quantity
+                soldCount: book.sold_quantity || 0,
             };
         }) || [];
     }, [books]);
-    
+
 
     if (isFavoriteLoading || isBooksLoading) {
         return (
@@ -56,27 +52,28 @@ const FavoriteBook = () => {
     }
 
     return (
-        <div style={{  margin: "auto" }}>
+        <div style={{ margin: "auto" }}>
             <Text className="mobile-title" style={{ color: "#888888" }}>[ Sách yêu thích ]</Text>
-            <Row style={{marginTop: 20}} gutter={[16, 16]}>
+            <div className="grid lg:grid-cols-3 grid-cols-2 lg:gap-y-[24px] gap-y-[10px] 2xl:gap-x-[24px] xl:gap-x-[10px] gap-[12px] mt-[20px] lg:mt-[40px]">
                 {
                     newBooks?.map(book => {
                         return (
                             <BookCard
-                                id = {book.id}
+                                id={book.id}
                                 link={book.link}
                                 key={book.id}
                                 image={book.image}
                                 title={book.name}
-                                author={book.author}
+                                author={book.authorName}
                                 price={book.price}
                                 soldCount={book.soldCount}
+                                quantity={book.quantity}
                             />
 
                         )
                     })
                 }
-            </Row>
+            </div>
         </div>
     );
 };

@@ -90,12 +90,12 @@ export interface IBooks {
 export interface IReqParams {
   page?: number;
   size?: number;
-  name?: string | null;
+  q?: string | null;
   category_id?: string | null;
   collection_id?: string| null;
   book_search_ids?: string | null;
-  author_id?: string | null;
   store_id?: string | null;
+  author_name?: string | null;
   reload?: number;
   created_at?: string;
   updated_at?: string
@@ -213,7 +213,7 @@ export interface IBookSettingResponse {
 }
 
 export interface IBookFavorite {
-  user_id: string
+  account_id: string
   book_ids: string[]
 }
 

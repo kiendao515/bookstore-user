@@ -3,25 +3,25 @@ import { IReqParams, useBooks } from "@/api/books";
 import { useSearchParams } from "react-router-dom";
 import MainLayout from "@/layout";
 import { IFilterValue } from "@/ui/FilterBar/interface";
-import { useCommonEntityDetail, usePersonDetail } from "@/api/bookmetadata/queries";
+import { useCommonEntityDetail } from "@/api/bookmetadata/queries";
 import BookCollection from "@/ui/BookCollection";
 const BookPage = () => {
     const [searchParams] = useSearchParams();
     const [bookParams, setBookParams] = useState<IReqParams>({
-        page: 0,
+        page: parseInt(searchParams.get("page") || "0"),
         size: 36,
         ...(searchParams.get("storeId") && { store_id: searchParams.get("storeId") }),
-        ...(searchParams.get("name") && { name: searchParams.get("name") }),
-        ...(searchParams.get("authorId") && { author_id: searchParams.get("authorId") }),
+        ...(searchParams.get("name") && { q: searchParams.get("name") }),
+        ...(searchParams.get("authorName") && { author_name: searchParams.get("authorName") }),
         ...(searchParams.get("tagId") && { tag_id: searchParams.get("tagId") }),
     })
     useEffect(() => {
         setBookParams({
-            page: 0,
+            page: parseInt(searchParams.get("page") || "0"),
             size: 36,
             ...(searchParams.get("storeId") && { store_id: searchParams.get("storeId") }),
             ...(searchParams.get("name") && { name: searchParams.get("name") }),
-            ...(searchParams.get("authorId") && { author_id: searchParams.get("authorId") }),
+            ...(searchParams.get("authorName") && { author_name: searchParams.get("authorName") }),
             ...(searchParams.get("tagId") && { tag_id: searchParams.get("tagId") }),
         }
         )
@@ -38,17 +38,9 @@ const BookPage = () => {
         }
 
     }, [searchParams.get("page")])
-    const { person: author } = usePersonDetail(searchParams.get("authorId") || undefined);
     const { commonEntity: tag } = useCommonEntityDetail(searchParams.get("tagId") || undefined);
     const filterValues = useMemo(() => {
         const result: IFilterValue[] = []
-        if (author) {
-            result.push({
-                id: author?.data?.id || '',
-                label: author?.data?.name || '',
-                quantity: author?.data?.num_of_books
-            })
-        }
         if (tag) {
             result.push({
                 id: tag?.data?.id || '',
@@ -57,10 +49,9 @@ const BookPage = () => {
             })
         }
         return result;
-    }, [author, tag])
+    }, [tag])
 
     const searchField = useMemo(() => {
-        if (author) return "author_id";
         if (tag) return "tag_id";
     }, [bookParams])
 
@@ -86,7 +77,7 @@ const BookPage = () => {
                 description: book?.description || '',
                 image: book?.cover_image || '',
                 id: book?.id,
-                soldCount: book.sold_quantity || 0
+                soldCount: book.sold_quantity || 0,
             };
         }) || [];
     }, [books]);

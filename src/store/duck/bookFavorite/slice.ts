@@ -2,19 +2,19 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 // Define the type for the state
 interface BookFavoriteState {
-    userId: string;
+    accountId: string;
     bookIds: string[];
 }
 
 // Define the initial state using the type
 const initialState: BookFavoriteState = {
-    userId: "",
+    accountId: "",
     bookIds: [],
 };
 
 // Define the type for the payload of setBookFavorite action
 interface SetBookFavoritePayload {
-    userId: string;
+    accountId: string;
     bookIds: string[];
 }
 
@@ -24,7 +24,7 @@ const userSlice = createSlice({
     initialState,
     reducers: {
         setBookFavorite: (state, action: PayloadAction<SetBookFavoritePayload>) => {
-            state.userId = action.payload.userId;
+            state.accountId = action.payload.accountId;
             state.bookIds = action.payload.bookIds;
         }
     },

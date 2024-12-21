@@ -71,7 +71,7 @@ const LoginForm = (props: ILoginForm) => {
                 const favoriteData = await getBookFavorite();
                 if (favoriteData.result) {
                     dispatch(setBookFavorite({
-                        userId: favoriteData.data.user_id,
+                        userId: favoriteData.data.account_id,
                         bookIds: favoriteData.data.book_ids
                     }));
                 } else {

@@ -67,6 +67,7 @@ const BookCollection = (props: IBookCollectionProps) => {
                                 author={book.author}
                                 price={book.price}
                                 soldCount={book.soldCount}
+                                quantity={book.quantity}
                             />
 
                         )
