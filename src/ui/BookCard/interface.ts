@@ -11,4 +11,5 @@ interface BookCardProps {
     quantity?: number;
     description?: string;
     authorName?: string;
+    book: any
 }

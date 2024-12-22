@@ -20,7 +20,7 @@ const BookPage = () => {
             page: parseInt(searchParams.get("page") || "0"),
             size: 36,
             ...(searchParams.get("storeId") && { store_id: searchParams.get("storeId") }),
-            ...(searchParams.get("name") && { name: searchParams.get("name") }),
+            ...(searchParams.get("name") && { q: searchParams.get("name") }),
             ...(searchParams.get("authorName") && { author_name: searchParams.get("authorName") }),
             ...(searchParams.get("tagId") && { tag_id: searchParams.get("tagId") }),
         }

@@ -35,6 +35,7 @@ const BookCollection = (props: IBookCollectionProps) => {
                 name: book?.name,
                 price: minPrice,
                 type: type,
+                bookInventory: book?.book_inventories,
                 // authorId: book?.author?.id,
                 quantity: book?.number_of_books,
                 description: book?.description || '',
@@ -59,6 +60,7 @@ const BookCollection = (props: IBookCollectionProps) => {
                     newBooks?.map(book => {
                         return (
                             <BookCard
+                                book={book.bookInventory}
                                 id={book.id}
                                 link={book.link}
                                 key={book.id}

@@ -239,15 +239,22 @@ const BookDetail = () => {
             <div className="flex items-center text-sm text-gray-500 mb-4">
               <Text>{book?.data.sold_quantity} đã bán</Text>
               <Divider type="vertical" />
-              <Text>15 lượt thích</Text>
+              <Text>{book?.data.loved_quantity} thích</Text>
             </div>
             {/* Giá */}
             <Title level={4} className="text-blue-600 mb-4">
               {selectedPrice
                 ? `đ ${selectedPrice.toLocaleString()}`
-                : `đ ${minPrice.toLocaleString()} - ${maxPrice.toLocaleString()}`}
-            </Title>
+                : minPrice === maxPrice
+                  ? `đ ${minPrice.toLocaleString()}`
+                  : `đ ${minPrice.toLocaleString()} - ${maxPrice.toLocaleString()}`}
 
+            </Title>
+            {availableBookCount <= 0 && (
+              <Typography.Text type="danger" style={{ marginTop: '5px',fontSize:'20px', display: 'block' }}>
+                Tình trạng : Sách tạm thời hết hàng
+              </Typography.Text>
+            )}
             {/* Phân loại */}
             {
               availableBookCount > 0 && (

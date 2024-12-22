@@ -11,8 +11,10 @@ import { useMutation } from "react-query";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import TemporaryOut from "../TemporaryOut/TemporaryOut";
+import { message } from "antd";
+import { addToCart } from "@/api/order";
 
-const BookCard: React.FC<BookCardProps> = ({ id, image, title, author, price, soldCount, link, quantity = 0 }) => {
+const BookCard: React.FC<BookCardProps> = ({ book,id, image, title, author, price, soldCount, link, quantity = 0 }) => {
     const { toggleAuth } = useAppSelector((state: RootState) => state.togglePopUp)
     const navigate = useNavigate()
     const dispatch = useAppDispatch();
@@ -74,6 +76,24 @@ const BookCard: React.FC<BookCardProps> = ({ id, image, title, author, price, so
             mutate(id);
         }
     };
+    const handleAddToCart = async () => {
+        if (user.id == '' && user.email == '') {
+            dispatch(setToggleByKey({ key: "toggleAuth", value: !toggleAuth }));
+        } else {
+            try {
+                let rs = await addToCart({ book_inventory_id: book[0].id, quantity: 1, delete: false });
+                if (rs.result) {
+                    message.success("Đã thêm vào giỏ hàng!");
+                } else {
+                    message.error(rs.reason);
+                }
+            } catch (error) {
+                console.log(error);
+                
+                message.error("Thêm vào giỏ hàng thất bại. Vui lòng thử lại.");
+            }
+        }
+    };
     return (
         <div className={`flex flex-col w-full relative lg:p-[20px] p-[10px] rounded-[5px] border border-[#D9D9D9] shadow-sm`}>
             <div
@@ -125,7 +145,7 @@ const BookCard: React.FC<BookCardProps> = ({ id, image, title, author, price, so
                     {
                         quantity > 0 && (
 
-                            <button className="bg-[#1890FF] text-white text-sm h-[30px] lg:h-[30px] w-full lg:w-[114px] lg:mt-[0px] mt-[5px]">
+                            <button onClick={handleAddToCart} className="bg-[#1890FF] text-white text-sm h-[30px] lg:h-[30px] w-full lg:w-[114px] lg:mt-[0px] mt-[5px]">
                                 Đặt hàng
                             </button>
                         )

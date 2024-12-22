@@ -23,7 +23,8 @@ export interface IBook {
   book_store: IBookStore
   created_at: string
   updated_at: string,
-  sold_quantity: number
+  sold_quantity: number,
+  loved_quantity:number
 }
 
 export interface IBookReality {
