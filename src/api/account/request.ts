@@ -47,7 +47,7 @@ export const deleteUser = async (id: String): Promise<IBaseResponse> => {
 
 export const sendChatMessage = async (message: string): Promise<BookRecommendation> => {
   const {data} = await requestPython({
-    url:'/api/v1/books/search-book/',
+    url:'/py/v1/books/search-book/',
     method: 'POST',
     data: {
       description:message
