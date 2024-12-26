@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Table, Button, InputNumber, Card, Typography, Space, message } from "antd";
+import { useState, useEffect } from "react";
+import { Table, Button, Card, Typography, Space, message } from "antd";
 import { useNavigate } from "react-router-dom";
 import { handleStatusBook } from "@/utils/common";
 import { AMOUNT_FREE_SHIP } from "@/utils/constant";
@@ -8,6 +8,7 @@ import { useCart } from "@/api/order/queries";
 import { saveCart } from "@/api/order";
 
 const { Text } = Typography;
+
 interface CartItem {
     id: string;
     name: string;
@@ -15,26 +16,22 @@ interface CartItem {
     quantity: number;
     price: number;
     image: string;
-    book_inventory_id: string
+    book_inventory_id: string;
 }
+
 const ViewCart = () => {
     const navigate = useNavigate();
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
     const { data } = useCart();
-
+    const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
     useEffect(() => {
-        const handleResize = () => {
-            setIsMobile(window.innerWidth < 768);
-        };
+        const handleResize = () => setIsMobile(window.innerWidth < 768);
         window.addEventListener("resize", handleResize);
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    // Fake data giỏ hàng
-    const [cartItems, setCartItems] = useState<CartItem[]>([]); // State giỏ hàng
     useEffect(() => {
-        // Chuyển đổi dữ liệu từ API thành dữ liệu phù hợp với bảng
         if (data?.data) {
             const mappedItems: CartItem[] = data.data.map((item: any) => ({
                 id: item.id,
@@ -43,29 +40,30 @@ const ViewCart = () => {
                 quantity: item.quantity,
                 price: item.price || 0,
                 image: item.book.coverImage,
-                book_inventory_id: item.book_inventory_id
+                book_inventory_id: item.book_inventory_id,
             }));
             setCartItems(mappedItems);
         }
     }, [data]);
+
     const incrementQuantity = async (id: string) => {
-        let updateCart = await saveCart({ book_inventory_id: id, quantity: 1, delete: false })
+        const updateCart = await saveCart({ book_inventory_id: id, quantity: 1, delete: false });
         if (updateCart.result) {
-            message.success("Lưu giỏ hàng thành công!")
+            message.success("Lưu giỏ hàng thành công!");
             setCartItems((prevItems) =>
                 prevItems.map((item) =>
                     item.book_inventory_id === id ? { ...item, quantity: item.quantity + 1 } : item
                 )
             );
         } else {
-            message.warning(updateCart.reason)
+            message.warning(updateCart.reason);
         }
     };
 
     const decrementQuantity = async (id: string) => {
-        let updateCart = await saveCart({ book_inventory_id: id, quantity: -1, delete: false })
+        const updateCart = await saveCart({ book_inventory_id: id, quantity: -1, delete: false });
         if (updateCart.result) {
-            message.success("Lưu giỏ hàng thành công!")
+            message.success("Lưu giỏ hàng thành công!");
             setCartItems((prevItems) =>
                 prevItems.map((item) =>
                     item.book_inventory_id === id && item.quantity > 1
@@ -74,23 +72,19 @@ const ViewCart = () => {
                 )
             );
         } else {
-            message.warning(updateCart.reason)
+            message.warning(updateCart.reason);
         }
     };
 
     const handleRemoveItem = async (id: string) => {
-        let updateCart = await saveCart({ book_inventory_id: id, quantity: -1, delete: true })
+        const updateCart = await saveCart({ book_inventory_id: id, quantity: -1, delete: true });
         if (updateCart.result) {
-            message.success("Lưu giỏ hàng thành công!")
+            message.success("Lưu giỏ hàng thành công!");
             setCartItems((prevItems) => prevItems.filter((item) => item.book_inventory_id !== id));
         } else {
-            message.warning(updateCart.reason)
+            message.warning(updateCart.reason);
         }
     };
-
-    useEffect(() => {
-        console.log("change", cartItems);
-    }, [cartItems])
 
     const totalPrice = cartItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
@@ -125,22 +119,19 @@ const ViewCart = () => {
             render: (quantity: number, record: any) => (
                 <Space>
                     <Button
-                        onClick={() => {
-                            decrementQuantity(record.book_inventory_id)
-                        }}
+                        onClick={() => decrementQuantity(record.book_inventory_id)}
                         size="small"
                         disabled={quantity <= 1}
                     >
                         -
                     </Button>
-                    <InputNumber value={quantity} readOnly style={{ width: 30 }} />
+                    <div style={{ width: 20 }} className="text-center" >{quantity}</div>
                     <Button onClick={() => incrementQuantity(record.book_inventory_id)} size="small">
                         +
                     </Button>
                 </Space>
             ),
         },
-
         {
             title: "Thành tiền",
             key: "total",
@@ -161,41 +152,104 @@ const ViewCart = () => {
 
     return (
         <MainLayout>
-            <div style={{ paddingTop: "20px" }}>
-                <Table
-                    dataSource={cartItems}
-                    columns={columns}
-                    rowKey={(record) => record.id}
-                    pagination={false}
-                />
-                <Card
-                    style={{ marginTop: 20 }}
-                    bodyStyle={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                    }}
-                >
-                    <div>
-                        {AMOUNT_FREE_SHIP - totalPrice > 0 && (
-                            <Text type="secondary">
-                                Mua thêm{" "}
-                                <Text strong>{(AMOUNT_FREE_SHIP - totalPrice).toLocaleString()} đ</Text>{" "}
-                                để được freeship.
-                            </Text>
-                        )}
-                    </div>
-                    <div>
-                        <Text strong>Tổng thanh toán: {totalPrice.toLocaleString()} đ</Text>
-                        <Button
-                            type="primary"
-                            style={{ marginLeft: 20 }}
-                            onClick={() => navigate("/checkout", { state: { cartItems, totalPrice } })}
+            <div style={{ paddingTop: "20px", paddingBottom: "20px", width: "100%" }}>
+                {!isMobile ? (
+                    <Table
+                        dataSource={cartItems}
+                        columns={columns}
+                        rowKey={(record) => record.id}
+                        pagination={false}
+                    />
+                ) : (
+                    cartItems.map((item) => (
+                        <div key={item.id} style={{ marginBottom: 10, display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%", border: "1px solid #ccc", padding: 10 }}>
+                            <Space>
+                                <img
+                                    src={item.image}
+                                    alt={item.name}
+                                    style={{ height: 50, marginRight: 10 }}
+                                />
+                                <div>
+                                    <Text strong>{item.name}</Text>
+                                    <div>
+                                        <Text type="secondary">Đơn giá: {item.price.toLocaleString()} đ</Text>
+                                    </div>
+                                    <div>
+                                        <Text type="secondary">Số lượng: {item.quantity}</Text>
+                                    </div>
+                                </div>
+                            </Space>
+                            <Button danger onClick={() => handleRemoveItem(item.book_inventory_id)}>
+                                Xóa
+                            </Button>
+                        </div>
+                    ))
+                )}
+                {
+                    isMobile && (
+                        <div
+                            style={{ marginTop: 20, padding: "20px", paddingTop: "10px", border: "1px solid #ccc", width: "100%" }}
                         >
-                            Thanh toán
-                        </Button>
-                    </div>
-                </Card>
+                            <div className="flex justify-center">
+                                {AMOUNT_FREE_SHIP - totalPrice > 0 && (
+                                    <Text type="secondary">
+                                        Mua thêm{" "}
+                                        <Text strong>{(AMOUNT_FREE_SHIP - totalPrice).toLocaleString()} đ</Text>{" "}
+                                        để được freeship.
+                                    </Text>
+                                )}
+                            </div>
+                            <div className="mt-[10px]">
+                                <div className="flex justify-between text-[15px]">
+                                    <div>Tổng thanh toán: </div>
+
+                                    <div>{totalPrice.toLocaleString()} đ</div>
+                                </div>
+                                <Button
+                                    type="primary"
+                                    style={{ width: "100%", marginTop: "10px" }}
+                                    onClick={() => navigate("/checkout", { state: { cartItems, totalPrice } })}
+                                >
+                                    Thanh toán
+                                </Button>
+                            </div>
+                        </div>
+
+                    )
+                }
+                {
+                    !isMobile && (
+                        <Card
+                            style={{ marginTop: 20 }}
+                            bodyStyle={{
+                                width: "100%",
+                                display: "flex",
+                                justifyContent: "space-between",
+                                alignItems: "center",
+                            }}
+                        >
+                            <div>
+                                {AMOUNT_FREE_SHIP - totalPrice > 0 && (
+                                    <Text type="secondary">
+                                        Mua thêm{" "}
+                                        <Text strong>{(AMOUNT_FREE_SHIP - totalPrice).toLocaleString()} đ</Text>{" "}
+                                        để được freeship.
+                                    </Text>
+                                )}
+                            </div>
+                            <div>
+                                <Text strong>Tổng thanh toán: {totalPrice.toLocaleString()} đ</Text>
+                                <Button
+                                    type="primary"
+                                    style={{ marginLeft: 20 }}
+                                    onClick={() => navigate("/checkout", { state: { cartItems, totalPrice } })}
+                                >
+                                    Thanh toán
+                                </Button>
+                            </div>
+                        </Card>
+                    )
+                }
             </div>
         </MainLayout>
     );

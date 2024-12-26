@@ -18,22 +18,27 @@ const AppHeader = (props: IHeaderProps) => {
     return (
         <div className="fixed top-0 w-full z-[50]">
             <div
-                className="w-full flex justify-center"
+                className="flex  justify-between 2xl:w-[1500px] 2xl:mx-[auto] xl:w-[1149px] xl:mx-auto lg:mx-[50px] mx-[19px]"
                 style={{ backgroundColor: "#fff", boxShadow: "0 2px 0px rgba(0, 0, 0, 0.1)" }}
             >
                 <Header
-                    className="2xl:w-[1500px]"
                     style={{
                         display: "flex",
-                        justifyContent: "space-between",
                         alignItems: "center",
                         padding: "0",
                         backgroundColor: "#fff",
-                        borderBottom: "0px"
+                        borderBottom: "0px",
+
                     }}
                 >
                     {/* Logo Section */}
-                    <div style={{ display: "flex", alignItems: "center" }}>
+                    <div style={{
+                        display: "flex",
+                        alignItems: "center",
+                        whiteSpace: "normal", // Ensure text wraps to the next line
+                        overflow: "visible",  // Ensure full visibility of content
+                        textOverflow: "unset",
+                    }}>
                         <div
                             style={{
                                 width: "50px",
@@ -42,6 +47,7 @@ const AppHeader = (props: IHeaderProps) => {
                                 alignItems: "center",
                                 justifyContent: "center",
                                 cursor: "pointer",
+                                marginRight: "20px"
                             }}
                         >
                             <img
@@ -52,47 +58,40 @@ const AppHeader = (props: IHeaderProps) => {
                             />
                         </div>
                         {/* Navigation */}
-                        <Menu mode="horizontal" style={{ borderBottom: "none" }}>
-                            <Menu.Item key="1" onClick={() => navigate("/introduction")}>
-                                <span className={`${location.pathname?.includes("/introduction") ? "text-[#1677ff] font-[600]" : ""}`}>Giới thiệu</span>
-                            </Menu.Item>
-                            <Menu.Item key="2" onClick={() => navigate("/category")}>
-                                <span className={`${location.pathname?.includes("/category") ? "text-[#1677ff] font-[600]" : ""}`}>Thể loại</span>
-                            </Menu.Item>
-                            <Menu.Item key="3" onClick={() => navigate("/collection")}>
-                                <span className={`${location.pathname?.includes("/collection") ? "text-[#1677ff] font-[600]" : ""}`}>Bộ sưu tập</span>
-                            </Menu.Item>
-                            <Menu.Item key="4" onClick={() => navigate("/book-consignment")}>
-                                Liên hệ ký gửi
-                            </Menu.Item>
-                            {/* <Menu.Item key="5">
-                        Nhận tìm sách
-                    </Menu.Item> */}
-                        </Menu>
+                        <div className="flex gap-[20px]">
+                            <div key="1" onClick={() => navigate("/introduction")} className="hover:cursor-pointer text-[15px]">
+                                <span className={`${location.pathname?.includes("/introduction") ? "text-[#1677ff]" : ""}`}>Giới thiệu</span>
+                            </div>
+                            <div key="2" onClick={() => navigate("/category")} className="hover:cursor-pointer text-[15px]">
+                                <span className={`${location.pathname?.includes("/category") ? "text-[#1677ff]" : ""}`}>Thể loại</span>
+                            </div>
+                            <div key="3" onClick={() => navigate("/collection")} className="hover:cursor-pointer text-[15px]">
+                                <span className={`${location.pathname?.includes("/collection") ? "text-[#1677ff]" : ""}`}>Bộ sưu tập</span>
+                            </div>
+                        </div>
                     </div>
 
-                    {/* User Action Section */}
-                    <div className="flex gap-[10px]">
-                        <HeartOutlined style={{ fontSize: "20px", color: "#1677ff" }} />
-                        <ShoppingCartOutlined
-                            style={{ fontSize: "20px", color: "#1677ff" }}
-                            onClick={() => navigate("/cart")}
-                        />
-                        {user.id === "" ? (
-                            <UserOutlined
-                                style={{ fontSize: "20px", color: "#1677ff" }}
-                                onClick={() =>
-                                    dispatch(setToggleByKey({ key: "toggleAuth", value: !toggleAuth }))
-                                }
-                            />
-                        ) : (
-                            <UserOutlined
-                                style={{ fontSize: "20px", color: "#1677ff" }}
-                                onClick={() => navigate("/account")}
-                            />
-                        )}
-                    </div>
                 </Header>
+                <div className="flex gap-[10px] items-center">
+                    <HeartOutlined style={{ fontSize: "20px", color: "#1677ff" }} />
+                    <ShoppingCartOutlined
+                        style={{ fontSize: "20px", color: "#1677ff" }}
+                        onClick={() => navigate("/cart")}
+                    />
+                    {user.id === "" ? (
+                        <UserOutlined
+                            style={{ fontSize: "20px", color: "#1677ff" }}
+                            onClick={() =>
+                                dispatch(setToggleByKey({ key: "toggleAuth", value: !toggleAuth }))
+                            }
+                        />
+                    ) : (
+                        <UserOutlined
+                            style={{ fontSize: "20px", color: "#1677ff" }}
+                            onClick={() => navigate("/account")}
+                        />
+                    )}
+                </div>
             </div>
         </div>
     )

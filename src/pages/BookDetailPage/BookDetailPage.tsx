@@ -284,12 +284,12 @@ const BookDetail = () => {
                   </div>
 
                   {/* Nút hành động */}
-                  <div className="flex lg:flex-row flex-col gap-[20px]">
+                  <div className="flex lg:flex-row flex-col gap-[20px] w-full">
                     <Button
                       type="primary"
                       icon={<ShoppingCartOutlined />}
                       size="large"
-                      className="bg-blue-600"
+                      className="bg-blue-600 flex justify-center"
                       onClick={handleAddToCart}
                     >
                       Thêm vào giỏ hàng

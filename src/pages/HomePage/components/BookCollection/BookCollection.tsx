@@ -36,10 +36,9 @@ const BookCollection = (props: IBookCollectionProps) => {
                 price: minPrice,
                 type: type,
                 bookInventory: book?.book_inventories,
-                // authorId: book?.author?.id,
                 quantity: book?.number_of_books,
                 description: book?.description || '',
-                author: book?.author_name || '',
+                authorName: book?.author_name || '',
                 image: book?.cover_image || '',
                 id: book?.id,
                 soldCount: book?.sold_quantity
@@ -66,7 +65,7 @@ const BookCollection = (props: IBookCollectionProps) => {
                                 key={book.id}
                                 image={book.image}
                                 title={book.name}
-                                author={book.author}
+                                author={book.authorName}
                                 price={book.price}
                                 soldCount={book.soldCount}
                                 quantity={book.quantity}

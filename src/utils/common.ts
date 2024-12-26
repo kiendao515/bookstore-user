@@ -178,6 +178,7 @@ export const handleStatusBook = (status: string) => {
 }
 
 export const getContent = (contents: IWebContent[], key: string) => {
+  console.log("contents", contents)
   let contentArr = contents.filter((content) => content.key == key)
   if(contentArr.length == 0) return "";
   let content = contentArr[0];

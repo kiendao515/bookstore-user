@@ -64,6 +64,7 @@ const App = () => {
                   position: "fixed",
                   right: "10px",
                   top: "40%",
+                  zIndex: 9999,
                 }}
               >
                 <Button type="primary" onClick={() => setModalOpen(!modalOpen)}>

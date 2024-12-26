@@ -50,23 +50,29 @@ const FilterCollection: React.FC<IFilterCollectionProps> = ({ title }) => {
 
     const newBooks = useMemo(() => {
         return books?.data?.map(book => {
-            let bookInventories = book?.book_inventories || [];
+            const validInventories = book?.book_inventories?.filter(inventory => inventory.price > 0) || [];
 
-            let bookInventory = bookInventories
-                .filter(bookInventory => bookInventory.quantity > 0)
-                .reduce((min, current) => current.price < min.price ? current : min, { price: Number.MAX_VALUE, type: '', quantity: 0 });
-
+            // Find the minimum price and its type
+            const { minPrice, type } = validInventories.length > 0
+                ? validInventories.reduce((acc, inventory) => {
+                    if (inventory.price < acc.minPrice) {
+                        return { minPrice: inventory.price, type: inventory.type };
+                    }
+                    return acc;
+                }, { minPrice: Number.MAX_VALUE, type: "UNKNOWN" }) // Default type if none is found
+                : { minPrice: 0, type: "UNKNOWN" }; // Default values if no valid inventory exists  
             return {
                 link: `/book-detail/${book?.id}`,
                 name: book?.name,
-                price: bookInventory.price != Number.MAX_VALUE ? bookInventory.price : 0,
-                type: bookInventory.type || '',
-                authorName: book?.author_name,
-                quantity: bookInventory.quantity,
+                price: minPrice,
+                type: type,
+                bookInventory: book?.book_inventories,
+                quantity: book?.number_of_books,
                 description: book?.description || '',
+                authorName: book?.author_name || '',
                 image: book?.cover_image || '',
                 id: book?.id,
-                soldCount: book.sold_quantity || 0
+                soldCount: book?.sold_quantity
             };
         }) || [];
     }, [books]);
@@ -80,23 +86,12 @@ const FilterCollection: React.FC<IFilterCollectionProps> = ({ title }) => {
                 </div>
             </section>
             <BookCollection
-                filterValues={filterValues}
+                books={newBooks}
                 setBookParams={setBookParams}
                 bookParams={bookParams}
-                books={newBooks}
-                hasFilter ={true}
-                searchField="category_id"
-                totalElement={books?.total_elements || 0}
-                title="thể loại"
-                havePagination={true}
-                hasTitle={true}
-                hasHeader={true}
-                firstIndex={books?.total_elements != 0 ? (books?.page ?? 0) * (books?.size ?? 0) + 1 : 0}
-                lastIndex={((books?.page ?? 0) + 1) * (books?.size ?? 0) < (books?.total_elements ?? 0) ? ((books?.page ?? 0) + 1) * (books?.size ?? 0) : (books?.total_elements ?? 0)}
-                totalElements={books?.total_elements ?? 0}
-                currentPage={books?.page ?? 0}
-                totalPage={books?.total_pages ?? 0}
-                isIndividualPage={false}
+                filterValues={filterValues}
+                totalElements={books?.total_elements}
+                showFilter={true}
             />
         </div>
     );

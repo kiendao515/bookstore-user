@@ -7,8 +7,7 @@ import { useSearchParams } from "react-router-dom";
 const BookCollection = (props: IBookCollectionProps) => {
   const { filterValues = [], setBookParams, bookParams, books = [], searchField = "", totalElements = 0, showFilter = true } = props;
   const [searchParams, setSearchParams] = useSearchParams();
-  console.log(books);
-  
+
   return (
     <div>
       <div className="grid relative grid-cols-1 lg:grid-cols-4 lg:gap-5 col-span-1 mt-[20px] lg:mt-[40px]">
@@ -24,7 +23,7 @@ const BookCollection = (props: IBookCollectionProps) => {
             books?.map(book => {
               return (
                 <BookCard
-                  book = {book}
+                  book={book.bookInventory || []}
                   id={book.id}
                   link={book.link}
                   key={book.id}

@@ -1,3 +1,4 @@
+import { IBookReality } from "@/api/books";
 import { IFilterValue } from "../FilterBar/interface";
 
 export interface IBookCollectionProps {
@@ -29,6 +30,7 @@ export interface IBook {
     price: number;
     type: string;
     authorName: string;
+    bookInventory: IBookReality[];
     quantity: number;
     description: string;
     image: string;

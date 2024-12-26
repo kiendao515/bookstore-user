@@ -61,23 +61,28 @@ const CollectionPage = () => {
 
     const newBooks = useMemo(() => {
         return books?.data?.map(book => {
-            let bookInventories = book?.book_inventories || [];
+            const validInventories = book?.book_inventories?.filter(inventory => inventory.price > 0) || [];
 
-            let bookInventory = bookInventories
-                .filter(bookInventory => bookInventory.quantity > 0)
-                .reduce((min, current) => current.price < min.price ? current : min, { price: Number.MAX_VALUE, type: '', quantity: 0 });
-
+            const { minPrice, type } = validInventories.length > 0
+                ? validInventories.reduce((acc, inventory) => {
+                    if (inventory.price < acc.minPrice) {
+                        return { minPrice: inventory.price, type: inventory.type };
+                    }
+                    return acc;
+                }, { minPrice: Number.MAX_VALUE, type: "UNKNOWN" }) // Default type if none is found
+                : { minPrice: 0, type: "UNKNOWN" }; // Default values if no valid inventory exists  
             return {
                 link: `/book-detail/${book?.id}`,
                 name: book?.name,
-                price: bookInventory.price != Number.MAX_VALUE ? bookInventory.price : 0,
-                type: bookInventory.type || '',
-                authorName: book?.author_name,
-                quantity: bookInventory.quantity,
+                price: minPrice,
+                type: type,
+                bookInventory: book?.book_inventories,
+                quantity: book?.number_of_books,
                 description: book?.description || '',
+                authorName: book?.author_name || '',
                 image: book?.cover_image || '',
                 id: book?.id,
-                soldCount: book.sold_quantity || 0
+                soldCount: book?.sold_quantity
             };
         }) || [];
     }, [books]);
