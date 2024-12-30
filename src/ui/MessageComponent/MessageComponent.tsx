@@ -1,6 +1,4 @@
 import { sendChatMessage } from "@/api/account";
-import { IBook } from "@/api/books";
-import { log } from "console";
 import React, { useEffect, useState } from "react";
 
 interface Book{
@@ -56,14 +54,14 @@ const MessageComponent: React.FC<MessageComponentProps> = ({ userMessage }) => {
     <div>
       <span>Sách bạn tìm kiếm có thể là một trong những quyển sau:</span>
       <ul>
-        {bookSuggestions?.map((book) => (
-          <li key={book.id}>
+        {bookSuggestions?.map((book,index) => (
+          <li key={book._id}>
             <a
-              href={`http://localhost:5173/book-detail/${book.id}`}
+              href={`https://hopsach.webhop.me/book-detail/${book._id}`}
               target="_blank"
               rel="noreferrer"
             >
-              {book.name}
+              {index+1}: {book.name}
             </a>
           </li>
         ))}
