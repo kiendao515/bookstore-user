@@ -77,4 +77,5 @@ export interface IUser {
   date_of_birth: string;
   phone_number: string;
   role: string;
+  point: number;
 }

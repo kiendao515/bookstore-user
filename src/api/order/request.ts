@@ -1,6 +1,5 @@
 import { request } from "../axios";
 import { IBaseResponse } from "../interface";
-import { IShipmentRes } from "../shipment";
 import { BaseResponse, IAddressRes, ICalculateFee, ICreateCart, ICreateOrder, ICreateOrderRes, IFullAddressRes, IOrderResponse, IReqParams, IUpdateOrder, OrderDetailRes, RetryPayment } from "./types";
 
 export const createNewOrder = async (body: ICreateOrder): Promise<ICreateOrderRes> => {
@@ -83,7 +82,7 @@ export const retryPayment = async (id: string): Promise<RetryPayment> => {
   return data;
 }
 
-export const addToCart = async (body:ICreateCart) => {
+export const addToCart = async (body: ICreateCart) => {
   const { data } = await request({
     url: '/api/v1/carts',
     method: 'POST',
@@ -91,7 +90,15 @@ export const addToCart = async (body:ICreateCart) => {
   });
   return data;
 };
-export const saveCart = async (body:ICreateCart) => {
+
+export const clearCart = async () => {
+  const { data } = await request({
+    url: '/api/v1/carts',
+    method: 'DELETE',
+  });
+  return data;
+};
+export const saveCart = async (body: ICreateCart) => {
   const { data } = await request({
     url: '/api/v1/carts',
     method: 'PUT',
@@ -109,7 +116,7 @@ export const getCarts = async (): Promise<IAddressRes> => {
   return data;
 };
 
-export const calculateFee = async(body : ICalculateFee): Promise<BaseResponse>=>{
+export const calculateFee = async (body: ICalculateFee): Promise<BaseResponse> => {
   const { data } = await request({
     url: '/api/v1/shipping/fee',
     method: 'POST',

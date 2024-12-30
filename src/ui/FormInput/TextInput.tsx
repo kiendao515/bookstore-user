@@ -8,7 +8,7 @@ interface TextInputProps {
   placeholder?: string;
   control: any; // Replace `any` with the specific type from react-hook-form
   errors?: FieldError;
-  type?: "text" | "password";
+  type?: "text" | "password" | "number";
   [key: string]: any; // Accept additional props dynamically
 }
 
@@ -34,7 +34,7 @@ const TextInput: React.FC<TextInputProps> = ({
           type === "password" ? (
             <Input.Password {...field} placeholder={placeholder} {...props} />
           ) : (
-            <Input {...field} placeholder={placeholder}  {...props} />
+            <Input {...field} placeholder={placeholder}  {...props} type={type} />
           )
         }
       />

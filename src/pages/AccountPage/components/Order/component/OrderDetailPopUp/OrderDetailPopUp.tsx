@@ -1,7 +1,7 @@
-import { Typography, Divider, List, Space, Row, Col, Spin } from "antd";
+import { Typography, List, Space, Row, Col, Spin } from "antd";
 import moment from "moment";
 import { handleOrderStatus, handleStatusBook } from "@/utils/common";
-import { useOrderDetail, useOrderDetailForUser } from "@/api/order/queries";
+import { useOrderDetailForUser } from "@/api/order/queries";
 import IOrderDetailPopUp from "./interface";
 
 const { Text, Title } = Typography;
@@ -28,6 +28,7 @@ const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
                         marginBottom: "24px",
                         color: "#333",
                         fontWeight: "600",
+                        fontSize: "24px",
                     }}
                 >
                     Chi tiết đơn hàng
@@ -36,7 +37,7 @@ const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
                 {order ? (
                     <>
                         {/* Shipping Information */}
-                        <Text style={{ fontWeight: "700", fontSize: "14px" }}>
+                        <Text style={{ fontWeight: "700", fontSize: "20px" }}>
                             Thông tin nhận hàng
                         </Text>
                         <Row gutter={[16, 8]} style={{ marginBottom: "16px" }}>
@@ -52,7 +53,7 @@ const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
                         </Row>
 
                         {/* Order Information */}
-                        <Text style={{ fontWeight: "700", fontSize: "14px" }}>
+                        <Text style={{ fontWeight: "700", fontSize: "20px" }}>
                             Thông tin đơn hàng
                         </Text>
                         <Row gutter={[16, 8]} style={{ marginBottom: "16px" }}>
@@ -89,7 +90,7 @@ const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
                         </Row>
 
                         {/* Book Details */}
-                        <Text style={{ fontWeight: "700", fontSize: "14px" }}>
+                        <Text style={{ fontWeight: "700", fontSize: "20px" }}>
                             Chi tiết sách
                         </Text>
                         <List
@@ -99,16 +100,16 @@ const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
                                     style={{
                                         borderRadius: "6px",
                                         marginBottom: "8px",
-                
+
                                     }}
                                 >
                                     <Row align="middle" style={{ width: "100%" }}>
                                         <Col span={10}>
                                             <Text
-                                                ellipsis={{ tooltip: book.bookName }}
+                                                ellipsis={{ tooltip: book.book_name }}
                                                 style={{ fontWeight: "500" }}
                                             >
-                                                {book.bookName}
+                                                {book.book_name}
                                             </Text>
                                         </Col>
                                         <Col span={4} style={{ textAlign: "center" }}>
@@ -126,7 +127,7 @@ const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
                         />
 
                         {/* Pricing Summary */}
-                        <Text style={{ fontWeight: "700", fontSize: "14px" }}>
+                        <Text style={{ fontWeight: "700", fontSize: "20px" }}>
                             Tổng kết
                         </Text>
                         <Row gutter={[16, 8]}>
@@ -135,6 +136,12 @@ const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
                             </Col>
                             <Col span={16} style={{ textAlign: "right" }}>
                                 <Text>{order?.data.shipping_fee.toLocaleString()}đ</Text>
+                            </Col>
+                            <Col span={8}>
+                                <Text style={{ fontWeight: "500", color: "#666" }}>Điểm giảm giá</Text>
+                            </Col>
+                            <Col span={16} style={{ textAlign: "right" }}>
+                                <Text>{order?.data.discount_point.toLocaleString()}đ</Text>
                             </Col>
                             <Col span={8}>
                                 <Text style={{ fontWeight: "600", color: "#333" }}>Tổng cộng</Text>

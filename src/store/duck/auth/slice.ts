@@ -17,6 +17,7 @@ const initialState: IAuthenticateStore = {
     role: "",
     date_of_birth: '',
     phone_number: '',
+    point: 0
   },
   isAuth: false,
 };
@@ -42,6 +43,7 @@ export const authSlice = createSlice({
           role: "",
           date_of_birth: '',
           phone_number: '',
+          point: 0
         },
         isAuth: false,
       };

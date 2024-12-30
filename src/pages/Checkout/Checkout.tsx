@@ -1,11 +1,11 @@
-import React, { useEffect, useMemo, useState } from "react";
-import { Form, Input, Button, Select, Radio, Typography, Card, Divider, Space, Row, Col, message, FormProps } from "antd";
+import { useEffect, useState } from "react";
+import { Form, Input, Button, Radio, Typography, Card, Divider, Space, Row, Col, message, FormProps } from "antd";
 import MainLayout from "@/layout";
-import { useDistricts, useFee, useProvinces, useWards } from "@/api/order/queries";
-import { Controller, useForm } from "react-hook-form";
+import { useDistricts, useProvinces, useWards } from "@/api/order/queries";
+import { useForm } from "react-hook-form";
 import { getUser } from "@/store/duck/auth/slice";
 import { useAppSelector } from "@/hooks/useRedux";
-import { calculateFee, createNewOrder, ICreateOrderRes } from "@/api/order";
+import { calculateFee, clearCart, createNewOrder } from "@/api/order";
 import { useLocation, useNavigate } from "react-router-dom";
 import { handleStatusBook } from "@/utils/common";
 import { useShippingAddressDetail, useShippingAddresses } from "@/api/shipment";
@@ -13,30 +13,118 @@ import PopUp from "@/ui/PopUp/PopUp";
 import ShippingAddressPopUp from "./components/ShippingAddressPopUp/ShippingAddressPopUp";
 import TextInput from "@/ui/FormInput/TextInput";
 import SelectInput from "@/ui/FormInput/SelectInput";
+import { useUserProfile } from "@/api/auth";
+import * as yup from "yup";
+import { IFormValue } from "./interface";
+import { yupResolver } from "@hookform/resolvers/yup";
+import RadioInput from "@/ui/FormInput/RadioInput";
 
 const { Title, Text } = Typography;
 
 const Checkout = () => {
-    const formMethod = useForm();
-    const { watch, setValue, handleSubmit } = formMethod;
     const [selectedId, setSelectedId] = useState<string>();
-    const { provinces } = useProvinces();
-    const { districts } = useDistricts(watch("province_code") || "");
-    const { wards } = useWards(watch("district_code") || "");
     const user = useAppSelector(getUser);
+    const { user: customer } = useUserProfile()
     const [fee, setFee] = useState(25000)
     const location = useLocation();
-    const [reload, setReload] = useState(0);
+    const [reload] = useState(0);
     const { cartItems, totalPrice } = location.state || { cartItems: [], totalPrice: 0 };
     const { shippingAddress } = useShippingAddressDetail(selectedId);
     const [toggleAddress, setToggleAddress] = useState(false);
     const { shippingAddresses } = useShippingAddresses({});
+    const [isLoading, setIsLoading] = useState(false)
     const navigate = useNavigate()
+    const [maxDiscount, setMaxDiscount] = useState(0)
+    const [totalAmount, setTotalAmount] = useState(0)
+
+
+    const schema = yup.object().shape({
+        customer_email: yup
+            .string()
+            .trim()
+            .required("Email là bắt buộc")
+            .email("Định dạng email không hợp lệ"),
+        customer_name: yup
+            .string()
+            .trim()
+            .required("Tên khách hàng là bắt buộc")
+            .min(2, "Tên phải có ít nhất 2 ký tự")
+            .max(100, "Tên không được vượt quá 100 ký tự"),
+        customer_phone: yup
+            .string()
+            .trim()
+            .required("Số điện thoại là bắt buộc")
+            .matches(
+                /^[0-9]{10,15}$/,
+                "Số điện thoại phải từ 10 đến 15 chữ số và chỉ bao gồm số"
+            ),
+        province_code: yup
+            .string()
+            .trim()
+            .required("Mã tỉnh/thành là bắt buộc")
+            .min(2, "Mã tỉnh/thành phải có ít nhất 2 ký tự")
+            .max(10, "Mã tỉnh/thành không được vượt quá 10 ký tự"),
+        district_code: yup
+            .string()
+            .trim()
+            .required("Mã quận/huyện là bắt buộc")
+            .min(2, "Mã quận/huyện phải có ít nhất 2 ký tự")
+            .max(10, "Mã quận/huyện không được vượt quá 10 ký tự"),
+        ward_code: yup
+            .string()
+            .trim()
+            .required("Mã phường/xã là bắt buộc")
+            .min(2, "Mã phường/xã phải có ít nhất 2 ký tự")
+            .max(10, "Mã phường/xã không được vượt quá 10 ký tự"),
+        street: yup
+            .string()
+            .trim()
+            .required("Tên đường là bắt buộc")
+            .min(5, "Tên đường phải có ít nhất 5 ký tự")
+            .max(200, "Tên đường không được vượt quá 200 ký tự"),
+        discount_point: yup
+            .number()
+            .typeError("Vui lòng nhập điểm giảm giá")
+            .optional()
+            .min(0, "Điểm giảm giá không được âm")
+            .max(maxDiscount, "Số điểm không hợp lệ - Tối đa " + maxDiscount)
+            .integer("Điểm giảm giá phải là số nguyên"),
+        payment_method: yup
+            .number()
+            .required("Phương thức thanh toán là bắt buộc")
+            .oneOf([1, 2], "Phương thức thanh toán phải là 1 hoặc 2"),
+        note: yup
+            .string()
+            .optional()
+            .max(200, "Ghi chú không được vượt quá 200 ký tự"),
+    });
+
+
+
+    const formMethod = useForm<IFormValue>({
+        mode: "onChange",
+        resolver: yupResolver(schema),
+        defaultValues: {},
+    });
+
+    const { watch } = formMethod;
+    const { provinces } = useProvinces();
+    const { districts } = useDistricts(watch("province_code") || "");
+    const { wards } = useWards(watch("district_code") || "");
+
+    useEffect(() => {
+        formMethod.reset({
+            discount_point: maxDiscount,
+            payment_method: 1,
+            customer_email: user.email,
+        })
+    }, [customer])
 
     useEffect(() => {
         if (user.id != "") {
             formMethod.reset({
-                customer_email: user.email
+                customer_email: user.email,
+                discount_point: maxDiscount,
             })
         }
         if (shippingAddresses?.success) {
@@ -69,6 +157,7 @@ const Checkout = () => {
                 district_code: shippingAddress?.district.code || "",
                 ward_code: shippingAddress?.ward.code || "",
                 street: shippingAddress?.street || "",
+                discount_point: customer?.data?.point || 0
             })
         }
 
@@ -77,11 +166,11 @@ const Checkout = () => {
     useEffect(() => {
         if (user.id != "") {
             formMethod.reset({
-                customer_email: user.email
+                customer_email: user.email,
+                discount_point: maxDiscount,
             })
         }
         if (shippingAddress?.data) {
-            console.log(shippingAddress);
             formMethod.reset({
                 customer_email: user.email || "",
                 customer_name: shippingAddress?.data?.full_name || "",
@@ -90,6 +179,7 @@ const Checkout = () => {
                 district_code: shippingAddress?.data?.district.code || "",
                 ward_code: shippingAddress?.data?.ward.code || "",
                 street: shippingAddress?.data?.street || "",
+                discount_point: customer?.data?.point || 0
             })
             const fetchFee = async () => {
                 try {
@@ -120,6 +210,7 @@ const Checkout = () => {
                 district_code: shippingAddress?.data?.district?.code || "",
                 ward_code: shippingAddress?.data?.ward?.code || "",
                 street: shippingAddress?.data?.street || "",
+                discount_point: maxDiscount,
             })
             return;
         }
@@ -140,12 +231,14 @@ const Checkout = () => {
                 district_code: shippingAddress?.district.code || "",
                 ward_code: shippingAddress?.ward.code || "",
                 street: shippingAddress?.street || "",
+                discount_point: maxDiscount,
             })
         }
     }, [provinces, districts, wards]);
 
-    const handleCheckout = async (values: any) => {
-        console.log(values);
+    const handleCheckout = async (values: IFormValue) => {
+        setIsLoading(true);
+
         const orderPayload = {
             customer_name: watch('customer_name'),
             customer_phone: watch('customer_phone'),
@@ -154,36 +247,59 @@ const Checkout = () => {
                 book_inventory_id: item.book_inventory_id,
                 quantity: item.quantity
             })),
-            payment_method: values.paymentMethod === "cod" ? false : true,
+            payment_method: values.payment_method === 1 ? false : true,
             note: values.note || "",
             province_code: watch("province_code"),
             district_code: watch("district_code"),
             ward_code: watch("ward_code"),
             street: watch('street'),
+            discount_point: watch("discount_point"),
         };
 
         try {
             const response = await createNewOrder(orderPayload);
             if (response.result) {
                 message.success("Đặt hàng thành công!");
-                if (values.paymentMethod !== "cod" && response.data != null && typeof response.data === 'string') {
+                if (values.payment_method !== 1 && response.data != null && typeof response.data === 'string') {
                     window.location.href = response.data;
+                    setIsLoading(false);
                 } else if (typeof response.data == 'object') {
                     navigate("/order-result?orderId=" + response.data.orderCode);
+                    await clearCart();
                 }
 
             } else {
                 message.error(response?.reason)
+                setIsLoading(false);
             }
         } catch (error) {
             console.error("Failed to create order:", error);
             message.error("Đặt hàng thất bại. Vui lòng thử lại!");
         }
+
+        setIsLoading(false);
     };
+
+    useEffect(() => {
+
+        if (totalPrice + fee < (customer?.data?.point || 0)) {
+            setMaxDiscount(totalPrice + fee)
+            formMethod.setValue("discount_point", totalPrice + fee || 0)
+        } else {
+            setMaxDiscount(customer?.data?.point || 0)
+            formMethod.setValue("discount_point", customer?.data?.point || 0)
+        }
+
+    }, [totalPrice, fee, customer?.data?.point])
+
+    useEffect(() => {
+        setTotalAmount(totalPrice + fee - (formMethod.getValues("discount_point") || 0))
+    }, [totalPrice, fee, watch("discount_point")])
+
     return (
         <MainLayout>
             <div style={{ paddingTop: "20px" }}>
-                <Form layout="vertical" onFinish={handleCheckout}>
+                <Form layout="vertical" onFinish={formMethod.handleSubmit(handleCheckout)}>
                     <Row gutter={24}>
                         <Col xs={23} lg={14}>
                             <Card bordered style={{ marginBottom: "20px" }}>
@@ -195,7 +311,7 @@ const Checkout = () => {
                                     label="Họ và Tên"
                                     placeholder="Tên khách hàng"
                                     control={formMethod.control}
-                                    errors={formMethod.formState.errors.full_name}
+                                    errors={formMethod.formState.errors.customer_name}
                                 />
 
                                 <TextInput
@@ -203,15 +319,17 @@ const Checkout = () => {
                                     label="Số điện thoại"
                                     placeholder="Số điện thoại"
                                     control={formMethod.control}
-                                    errors={formMethod.formState.errors.phone_number}
+                                    errors={formMethod.formState.errors.customer_phone}
                                 />
-                                <Form.Item
+                                <TextInput
+                                    name="customer_email"
                                     label="Email"
-                                    name="email"
-                                // rules={[{ required: true, type: "email", message: "Vui lòng nhập email hợp lệ" }]}
-                                >
-                                    <Input value={user.email} defaultValue={user.email} disabled />
-                                </Form.Item>
+                                    placeholder="Email"
+                                    control={formMethod.control}
+                                    errors={formMethod.formState.errors.customer_phone}
+                                    disabled
+                                />
+
                                 <SelectInput
                                     name="province_code"
                                     label="Tỉnh/Thành phố"
@@ -253,6 +371,7 @@ const Checkout = () => {
                                     label="Số nhà, tên đường"
                                     placeholder="Số nhà, tên đường"
                                     control={formMethod.control}
+                                    errors={formMethod.formState.errors.street}
                                 />
                                 <Form.Item label="Ghi chú giao hàng" name="note">
                                     <Input.TextArea rows={3} placeholder="Ghi chú giao hàng (nếu có)" />
@@ -321,28 +440,41 @@ const Checkout = () => {
                                     >
                                         <Text>Tổng cộng</Text>
                                         <Text style={{ color: "#1E90FF", fontSize: "18px" }}>
-                                            {(totalPrice + fee).toLocaleString()}đ
+                                            {(totalAmount).toLocaleString()}đ
                                         </Text>
                                     </div>
                                 </div>
                             </Card>
 
                             <Card bordered style={{ marginTop: "20px" }}>
+                                <Title level={4}>Dùng điểm thưởng <Text className="italic">(Mỗi điểm tương ứng 1đ)</Text></Title>
+
+                                <TextInput
+                                    name="discount_point"
+                                    label={`Số điểm - Tối đa ${maxDiscount} điểm`}
+                                    placeholder="Nhập số điểm (nếu có)"
+                                    control={formMethod.control}
+                                    min={0}
+                                    max={customer?.data.point || 0}
+                                    type="number"
+                                    errors={formMethod.formState.errors.discount_point}
+
+                                />
                                 <Title level={4}>Phương thức thanh toán</Title>
-                                <Form.Item
-                                    name="paymentMethod"
-                                    rules={[{ required: true, message: "Chọn phương thức thanh toán" }]}
-                                >
-                                    <Radio.Group>
-                                        <Space direction="vertical">
-                                            <Radio value="cod">Thanh toán khi nhận hàng (COD)</Radio>
-                                            <Radio value="online">Chuyển khoản online</Radio>
-                                        </Space>
-                                    </Radio.Group>
-                                </Form.Item>
+                                <RadioInput
+                                    name="payment_method"
+                                    label=""
+                                    control={formMethod.control}
+                                    errors={formMethod.formState.errors.payment_method}
+                                    options={[
+                                        { label: "Thanh toán khi nhận hàng (COD)", value: 1 },
+                                        { label: "Chuyển khoản online", value: 2 },
+                                    ]}
+                                    rules={{ required: "Please select a payment method" }}
+                                />
                                 <Space style={{ marginTop: "20px" }}>
                                     <Button onClick={() => console.log("Go Back")}>Quay lại</Button>
-                                    <Button type="primary" htmlType="submit">
+                                    <Button type="primary" htmlType="submit" loading={isLoading}>
                                         Đặt hàng
                                     </Button>
                                 </Space>

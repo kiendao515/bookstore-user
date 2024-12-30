@@ -111,6 +111,7 @@ export interface OrderDetail {
     street: string
     status: string
     payment_type: boolean
+    discount_point: number
     shipping_code: string
     shipping_company: string
     note: string
@@ -128,7 +129,7 @@ export interface OrderDetail {
     total_amount: number
 }
 export interface OrderItem {
-    bookName: string,
+    book_name: string,
     quantity: number,
     price: number,
     type: string
