@@ -1,5 +1,5 @@
 import { useQuery } from 'react-query';
-import { calculateFee, getCarts, getCities, getDistricts, getFullAddress, getOrderById, getOrderByOrderCode, getOrders, getWards } from './request';
+import { calculateFee, getCarts, getCities, getCombinedOrder, getDistricts, getFullAddress, getOrderById, getOrderByOrderCode, getOrders, getWards } from './request';
 import { ICalculateFee, IReqParams } from './types';
 
 export const useOrderDetail = (id: string, reload?: number) => {
@@ -104,6 +104,15 @@ export const useFee = (body:ICalculateFee, reload?: number) => {
     const { data, ...rest } = useQuery([`/api/v1/shipping/fee`, reload],
         async () => {
             const result = await calculateFee(body);
+            return result;
+        },
+    );
+    return { data: data?.data, ...rest };
+}
+export const useCombinedOrder = (reload?: number) => {
+    const { data, ...rest } = useQuery([`/api/v1/orders/combine`, reload],
+        async () => {
+            const result = await getCombinedOrder();
             return result;
         },
     );

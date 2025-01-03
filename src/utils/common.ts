@@ -193,6 +193,8 @@ export const handleOrderStatus = (status: string) => {
       return "Chờ xác nhận";
     case "READY_TO_PACKAGE":
       return "Chờ gói hàng";
+    case "COMBINED_ORDER":
+      return "Chờ gom đơn";
     case "READY_TO_SHIP":
       return "Sẵn sàng gửi";
     case "SHIPPING":

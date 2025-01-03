@@ -202,3 +202,19 @@ export interface ICalculateFee {
     weight: number,
     value: number
 }
+export interface IOrderCombinedResponse {
+    result: boolean
+    data: ICombinedOrder[]
+}
+export interface ICombinedOrder{
+    order_code: string,
+    total_amount: number
+}
+export interface ICombinedOrderFee{
+    province_code: string;
+    district_code: string;
+    ward_code: string;
+    street: string;
+    order_items: IOrderItem[]
+    related_order_id: string
+}

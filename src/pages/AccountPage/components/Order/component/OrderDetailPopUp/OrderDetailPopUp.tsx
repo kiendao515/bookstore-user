@@ -135,7 +135,7 @@ const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
                                 <Text style={{ fontWeight: "500", color: "#666" }}>Phí ship</Text>
                             </Col>
                             <Col span={16} style={{ textAlign: "right" }}>
-                                <Text>{order?.data.shipping_fee.toLocaleString()}đ</Text>
+                                <Text>{order?.data.shipping_fee?.toLocaleString() || 0}đ</Text>
                             </Col>
                             <Col span={8}>
                                 <Text style={{ fontWeight: "500", color: "#666" }}>Điểm giảm giá</Text>

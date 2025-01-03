@@ -1,10 +1,10 @@
 import { request } from "../axios";
 import { IBaseResponse } from "../interface";
-import { BaseResponse, IAddressRes, ICalculateFee, ICreateCart, ICreateOrder, ICreateOrderRes, IFullAddressRes, IOrderResponse, IReqParams, IUpdateOrder, OrderDetailRes, RetryPayment } from "./types";
+import { BaseResponse, IAddressRes, ICalculateFee, ICombinedOrderFee, ICreateCart, ICreateOrder, ICreateOrderRes, IFullAddressRes, IOrderCombinedResponse, IOrderResponse, IReqParams, IUpdateOrder, OrderDetailRes, RetryPayment } from "./types";
 
 export const createNewOrder = async (body: ICreateOrder): Promise<ICreateOrderRes> => {
   const { data } = await request({
-    url: '/api/v1/orders',
+    url: '/api/v1/orders/combine',
     method: 'POST',
     data: body,
   });
@@ -124,3 +124,18 @@ export const calculateFee = async (body: ICalculateFee): Promise<BaseResponse> =
   });
   return data;
 }
+export const calculateCombinedOrderFee = async (body: ICombinedOrderFee): Promise<BaseResponse> => {
+  const { data } = await request({
+    url: '/api/v1/orders/combine/fee',
+    method: 'POST',
+    data: body,
+  });
+  return data;
+}
+export const getCombinedOrder = async (): Promise<IOrderCombinedResponse> => {
+  const { data } = await request({
+    url: '/api/v1/orders/combine',
+    method: 'GET',
+  });
+  return data;
+};

@@ -20,7 +20,7 @@ const OrderResult = () => {
     }, [searchParams.get("orderId")])
 
     useEffect(() => {
-        if (order?.data?.payment_type && order?.data?.status == "READY_TO_PACKAGE") {
+        if (order?.data?.payment_type && (order?.data?.status == "READY_TO_PACKAGE" || order?.data?.status == "COMBINED_ORDER")) {
             setLoading(false)
             setOrderStatus(true)
             clearCart();
@@ -47,7 +47,7 @@ const OrderResult = () => {
 
     return (
         <MainLayout>
-            <div className="flex justify-center items-center">
+            <div className="flex justify-center items-center mb-10">
 
                 {loading ? (
                     <Spin size="default" />
@@ -86,7 +86,8 @@ const OrderResult = () => {
                                     margin: 0,
                                 }}
                             >
-                                Đặt hàng thành công!
+                                {order?.data?.status == "READY_TO_PACKAGE" ? "Đặt hàng thành công!":"Gom đơn hàng thành công!"}
+                                
                             </Title>
                         </div>
                         <Text

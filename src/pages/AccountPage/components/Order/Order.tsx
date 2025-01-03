@@ -29,6 +29,9 @@ const Order = (props: IOrderProps) => {
             case "CREATED":
                 color = "orange";
                 break;
+            case "COMBINED_ORDER":
+                color = "purple";
+                break;
             case "READY_TO_PACKAGE":
                 color = "blue"; // Chờ gói hàng
                 break;
@@ -127,11 +130,34 @@ const Order = (props: IOrderProps) => {
         orderCode: order.order_code,
         status: order.status,
         quantity: Array.isArray(order.order_items)
-            ? order.order_items.reduce((total: number, item: any) => total + item.quantity, 0) : 0,
-        totalAmount: order.total_amount,
+            ? order.order_items.reduce((total: number, item: any) => total + item.quantity, 0)
+            : 0,
+        totalAmount: order.total_amount || 0,
         createdAt: order.created_at,
         id: order.id,
+        relatedOrderId: order.related_order_id,
     }));
+
+    const groupedOrders = dataSource?.reduce((acc: Record<string, any>, order: any) => {
+        if (order.relatedOrderId && order.relatedOrderId !== order.orderCode) {
+            if (!acc[order.relatedOrderId]) {
+                acc[order.relatedOrderId] = {
+                    ...dataSource.find((rootOrder) => rootOrder.orderCode === order.relatedOrderId),
+                    children: [],
+                };
+            }
+            acc[order.relatedOrderId].children.push(order); 
+        } else {
+            if (!acc[order.orderCode]) {
+                acc[order.orderCode] = { ...order, children: [] };
+            }
+        }
+        return acc;
+    }, {});
+    
+
+    const structuredOrders = Object.values(groupedOrders|| []);
+
 
     return (
         <>
@@ -197,14 +223,57 @@ const Order = (props: IOrderProps) => {
                     <div>
                         <Text className="mobile-title" style={{ color: "#888888" }}>[ Đơn hàng ]</Text>
                         <div style={{ marginTop: 30, paddingBottom: 200 }}>
-                            <Table
+                            {/* <Table
                                 dataSource={dataSource}
                                 columns={columns}
                                 pagination={false}
                                 rowKey="key"
                                 bordered
                                 style={{ background: "#fff" }}
+                            /> */}
+                            <Table
+                                dataSource={structuredOrders}
+                                columns={columns}
+                                rowKey="key"
+                                bordered
+                                expandable={{
+                                    expandedRowRender: (record) => (
+                                        <div style={{ paddingLeft: "50px", backgroundColor: "#fafafa", borderRadius: "8px" }}>
+                                            <Typography.Title level={5}>Đơn hàng gom cùng</Typography.Title>
+                                            <List
+                                                dataSource={record.children}
+                                                renderItem={(childOrder) => (
+                                                    <List.Item
+                                                        style={{
+                                                            display: "flex",
+                                                            justifyContent: "space-between",
+                                                            borderBottom: "1px solid #f0f0f0",
+                                                            padding: "8px 0",
+                                                        }}
+                                                    >
+                                                        <div>
+                                                            <Text strong>{`Mã đơn: ${childOrder.orderCode}`}</Text>
+                                                            <div>Tổng tiền: {childOrder.totalAmount.toLocaleString()}đ</div>
+                                                            <div>Ngày tạo: {moment(childOrder.createdAt).format("DD/MM/YYYY")}</div>
+                                                        </div>
+                                                        <Button
+                                                            type="link"
+                                                            style={{ color: "#007bff" }}
+                                                            onClick={() => setSelectedId(childOrder.orderCode)}
+                                                        >
+                                                            Chi tiết
+                                                        </Button>
+                                                    </List.Item>
+                                                )}
+                                            />
+                                        </div>
+                                    ),
+                                    rowExpandable: (record) => record.children && record.children.length > 0,
+                                }}
+                                pagination={false}
                             />
+
+
                         </div>
                     </div>
 

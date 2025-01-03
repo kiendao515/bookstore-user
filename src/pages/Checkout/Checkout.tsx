@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { Form, Input, Button, Radio, Typography, Card, Divider, Space, Row, Col, message, FormProps } from "antd";
+import { Form, Input, Button, Radio, Typography, Card, Divider, Space, Row, Col, message, FormProps, Switch, Modal, List } from "antd";
 import MainLayout from "@/layout";
-import { useDistricts, useProvinces, useWards } from "@/api/order/queries";
+import { useCombinedOrder, useDistricts, useProvinces, useWards } from "@/api/order/queries";
 import { useForm } from "react-hook-form";
 import { getUser } from "@/store/duck/auth/slice";
 import { useAppSelector } from "@/hooks/useRedux";
-import { calculateFee, clearCart, createNewOrder } from "@/api/order";
+import { calculateCombinedOrderFee, calculateFee, clearCart, createNewOrder } from "@/api/order";
 import { useLocation, useNavigate } from "react-router-dom";
 import { handleStatusBook } from "@/utils/common";
 import { useShippingAddressDetail, useShippingAddresses } from "@/api/shipment";
@@ -18,9 +18,13 @@ import * as yup from "yup";
 import { IFormValue } from "./interface";
 import { yupResolver } from "@hookform/resolvers/yup";
 import RadioInput from "@/ui/FormInput/RadioInput";
+import CombinedOrder from "./components/CombinedOrder/CombinedOrder";
 
 const { Title, Text } = Typography;
-
+interface Order {
+    id: string;
+    totalAmount: number;
+}
 const Checkout = () => {
     const [selectedId, setSelectedId] = useState<string>();
     const user = useAppSelector(getUser);
@@ -36,8 +40,10 @@ const Checkout = () => {
     const navigate = useNavigate()
     const [maxDiscount, setMaxDiscount] = useState(0)
     const [totalAmount, setTotalAmount] = useState(0)
-
-
+    const [orderStatus, setOrderStatus] = useState(2); // Trạng thái đơn hàng
+    const [isModalVisible, setIsModalVisible] = useState(false); // Hiển thị popup
+    const [selectedOrder, setSelectedOrder] = useState(""); // Đơn được chọn để gom
+    const orders = useCombinedOrder();
     const schema = yup.object().shape({
         customer_email: yup
             .string()
@@ -98,7 +104,35 @@ const Checkout = () => {
             .optional()
             .max(200, "Ghi chú không được vượt quá 200 ký tự"),
     });
+    const handleOrderStatusChange = async (value: any) => {
+        setOrderStatus(value);
+        console.log(value);
 
+        if (value == 1) {
+            setFee(0);
+        } else {
+            // đi tính phí đơn gom
+            const feePayload = {
+                order_items: cartItems.map((item: any) => ({
+                    book_inventory_id: item.book_inventory_id,
+                    quantity: item.quantity
+                })),
+                province_code: watch("province_code"),
+                district_code: watch("district_code"),
+                ward_code: watch("ward_code"),
+                street: watch('street'),
+                related_order_id: selectedOrder
+            };
+            let fee = await calculateCombinedOrderFee(feePayload)
+            console.log(fee);
+            setFee(fee.data);
+        }
+    };
+
+    const handleSelectOrder = (orderId: string) => {
+        setSelectedOrder(orderId);
+        console.log("Đơn hàng được chọn:", orderId);
+    };
 
 
     const formMethod = useForm<IFormValue>({
@@ -254,6 +288,8 @@ const Checkout = () => {
             ward_code: watch("ward_code"),
             street: watch('street'),
             discount_point: watch("discount_point"),
+            combined_order: orderStatus,
+            related_order_id: selectedOrder
         };
 
         try {
@@ -446,6 +482,18 @@ const Checkout = () => {
                                 </div>
                             </Card>
 
+                            <Card bordered>
+                                <Title level={4}> Thông tin nhận hàng</Title>
+                                <Radio.Group
+                                    onChange={(e) => handleOrderStatusChange(e.target.value)}
+                                    value={orderStatus}
+                                    style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+                                >
+                                    <Radio value="3">Đơn lẻ</Radio>
+                                    <Radio value="1" disabled={watch("payment_method") == 1} onClick={() => setIsModalVisible(!isModalVisible)}>Đơn gom (chờ gom thêm)</Radio>
+                                    <Radio value="2" disabled={watch("payment_method") == 1} onClick={() => setIsModalVisible(!isModalVisible)}>Đơn gom (đã gom đủ)</Radio>
+                                </Radio.Group>
+                            </Card>
                             <Card bordered style={{ marginTop: "20px" }}>
                                 <Title level={4}>Dùng điểm thưởng <Text className="italic">(Mỗi điểm tương ứng 1đ)</Text></Title>
 
@@ -468,7 +516,7 @@ const Checkout = () => {
                                     errors={formMethod.formState.errors.payment_method}
                                     options={[
                                         { label: "Thanh toán khi nhận hàng (COD)", value: 1 },
-                                        { label: "Chuyển khoản online", value: 2 },
+                                        { label: "Thanh toán trực tuyến", value: 2 },
                                     ]}
                                     rules={{ required: "Please select a payment method" }}
                                 />
@@ -495,6 +543,16 @@ const Checkout = () => {
                             </PopUp>
                         </div>
 
+                    )
+                }
+                {
+                    isModalVisible && orders?.data?.length > 0 && (
+                        <CombinedOrder
+                            visible={isModalVisible}
+                            onClose={() => setIsModalVisible(false)}
+                            orders={orders?.data || []}
+                            onSelect={handleSelectOrder}
+                        />
                     )
                 }
             </div>
