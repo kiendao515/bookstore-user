@@ -205,13 +205,18 @@ const ViewCart = () => {
 
                                     <div>{totalPrice.toLocaleString()} đ</div>
                                 </div>
-                                <Button
-                                    type="primary"
-                                    style={{ width: "100%", marginTop: "10px" }}
-                                    onClick={() => navigate("/checkout", { state: { cartItems, totalPrice } })}
-                                >
-                                    Thanh toán
-                                </Button>
+                                {
+                                    cartItems.length > 0 && (
+                                        <Button
+                                            type="primary"
+                                            style={{ width: "100%", marginTop: "10px" }}
+                                            onClick={() => navigate("/checkout", { state: { cartItems, totalPrice } })}
+                                        >
+                                            Thanh toán
+                                        </Button>
+
+                                    )
+                                }
                             </div>
                         </div>
 
@@ -229,23 +234,19 @@ const ViewCart = () => {
                             }}
                         >
                             <div>
-                                {AMOUNT_FREE_SHIP - totalPrice > 0 && (
-                                    <Text type="secondary">
-                                        Mua thêm{" "}
-                                        <Text strong>{(AMOUNT_FREE_SHIP - totalPrice).toLocaleString()} đ</Text>{" "}
-                                        để được freeship.
-                                    </Text>
-                                )}
-                            </div>
-                            <div>
                                 <Text strong>Tổng thanh toán: {totalPrice.toLocaleString()} đ</Text>
-                                <Button
-                                    type="primary"
-                                    style={{ marginLeft: 20 }}
-                                    onClick={() => navigate("/checkout", { state: { cartItems, totalPrice } })}
-                                >
-                                    Thanh toán
-                                </Button>
+                                {
+                                    cartItems.length > 0 && (
+                                        <Button
+                                            type="primary"
+                                            style={{ marginLeft: 20 }}
+                                            onClick={() => navigate("/checkout", { state: { cartItems, totalPrice } })}
+                                        >
+                                            Thanh toán
+                                        </Button>
+
+                                    )
+                                }
                             </div>
                         </Card>
                     )

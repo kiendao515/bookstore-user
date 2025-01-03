@@ -73,7 +73,7 @@ export interface IUserSummaryResponse {
 export interface IUser {
   id: string;
   email: string;
-  full_name: string;
+  name: string;
   date_of_birth: string;
   phone_number: string;
   role: string;

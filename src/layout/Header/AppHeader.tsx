@@ -3,7 +3,7 @@ import { RootState } from "@/store";
 import { getUser } from "@/store/duck/auth/slice";
 import { setToggleByKey } from "@/store/duck/togglePopUp/slice";
 import { HeartOutlined, ShoppingCartOutlined, UserOutlined } from "@ant-design/icons";
-import { Layout, Menu } from "antd";
+import { Layout } from "antd";
 import { useLocation, useNavigate } from "react-router-dom";
 const { Header } = Layout;
 
@@ -12,6 +12,7 @@ const AppHeader = (props: IHeaderProps) => {
     const { toggleAuth } = useAppSelector((state: RootState) => state.togglePopUp);
     const dispatch = useAppDispatch();
     const user = useAppSelector(getUser);
+    console.log("user", user)
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -73,7 +74,7 @@ const AppHeader = (props: IHeaderProps) => {
 
                 </Header>
                 <div className="flex gap-[10px] items-center">
-                    <HeartOutlined style={{ fontSize: "20px", color: "#1677ff" }} />
+                    <HeartOutlined style={{ fontSize: "20px", color: "#1677ff" }} onClick={() => navigate("/account?index=4")} />
                     <ShoppingCartOutlined
                         style={{ fontSize: "20px", color: "#1677ff" }}
                         onClick={() => navigate("/cart")}
@@ -86,10 +87,7 @@ const AppHeader = (props: IHeaderProps) => {
                             }
                         />
                     ) : (
-                        <UserOutlined
-                            style={{ fontSize: "20px", color: "#1677ff" }}
-                            onClick={() => navigate("/account")}
-                        />
+                        <div className="text-[15px] text-blue-700 font-semibold hover:cursor-pointer" onClick={() => navigate("/account")}>{user.name}</div>
                     )}
                 </div>
             </div>

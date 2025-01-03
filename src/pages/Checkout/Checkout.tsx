@@ -9,7 +9,6 @@ import { calculateCombinedOrderFee, calculateFee, clearCart, createNewOrder } fr
 import { useLocation, useNavigate } from "react-router-dom";
 import { handleStatusBook } from "@/utils/common";
 import { useShippingAddressDetail, useShippingAddresses } from "@/api/shipment";
-import PopUp from "@/ui/PopUp/PopUp";
 import ShippingAddressPopUp from "./components/ShippingAddressPopUp/ShippingAddressPopUp";
 import TextInput from "@/ui/FormInput/TextInput";
 import SelectInput from "@/ui/FormInput/SelectInput";
@@ -21,10 +20,6 @@ import RadioInput from "@/ui/FormInput/RadioInput";
 import CombinedOrder from "./components/CombinedOrder/CombinedOrder";
 
 const { Title, Text } = Typography;
-interface Order {
-    id: string;
-    totalAmount: number;
-}
 const Checkout = () => {
     const [selectedId, setSelectedId] = useState<string>();
     const user = useAppSelector(getUser);
@@ -106,7 +101,6 @@ const Checkout = () => {
     });
     const handleOrderStatusChange = async (value: any) => {
         setOrderStatus(value);
-        console.log(value);
 
         if (value == 1) {
             setFee(0);
@@ -128,6 +122,7 @@ const Checkout = () => {
             setFee(fee.data);
         }
     };
+
 
     const handleSelectOrder = (orderId: string) => {
         setSelectedOrder(orderId);
@@ -332,9 +327,16 @@ const Checkout = () => {
         setTotalAmount(totalPrice + fee - (formMethod.getValues("discount_point") || 0))
     }, [totalPrice, fee, watch("discount_point")])
 
+    useEffect(() => {
+        if (watch("payment_method") == 1) {
+            setOrderStatus(3);
+            handleOrderStatusChange(3);
+        }
+    }, [watch("payment_method")])
+
     return (
         <MainLayout>
-            <div style={{ paddingTop: "20px" }}>
+            <div style={{ paddingTop: "20px", paddingBottom: "20px" }}>
                 <Form layout="vertical" onFinish={formMethod.handleSubmit(handleCheckout)}>
                     <Row gutter={24}>
                         <Col xs={23} lg={14}>
@@ -442,7 +444,7 @@ const Checkout = () => {
                                             <Text>{item.name}</Text>
                                             <Text>x{item.quantity}</Text>
                                             <Text>{handleStatusBook(item.type)}</Text>
-                                            <Text>{(item.price * item.quantity).toLocaleString()}đ</Text>
+                                            <Text>{(item.price * item.quantity || 0).toLocaleString()}đ</Text>
                                         </div>
                                     ))}
                                     <Divider />
@@ -454,7 +456,7 @@ const Checkout = () => {
                                         }}
                                     >
                                         <Text>Tạm tính</Text>
-                                        <Text>{totalPrice.toLocaleString()}đ</Text>
+                                        <Text>{(totalPrice || 0).toLocaleString()}đ</Text>
                                     </div>
                                     <div
                                         style={{
@@ -464,7 +466,7 @@ const Checkout = () => {
                                         }}
                                     >
                                         <Text>Phí vận chuyển</Text>
-                                        <Text>{fee.toLocaleString()}đ</Text>
+                                        <Text>{(fee || 0).toLocaleString()}đ</Text>
                                     </div>
                                     <Divider />
                                     <div
@@ -476,23 +478,26 @@ const Checkout = () => {
                                     >
                                         <Text>Tổng cộng</Text>
                                         <Text style={{ color: "#1E90FF", fontSize: "18px" }}>
-                                            {(totalAmount).toLocaleString()}đ
+                                            {(totalAmount || 0).toLocaleString()}đ
                                         </Text>
                                     </div>
                                 </div>
                             </Card>
 
-                            <Card bordered>
+                            <Card bordered className="mt-[20px]">
                                 <Title level={4}> Thông tin nhận hàng</Title>
                                 <Radio.Group
                                     onChange={(e) => handleOrderStatusChange(e.target.value)}
                                     value={orderStatus}
                                     style={{ display: "flex", flexDirection: "column", gap: "10px" }}
                                 >
-                                    <Radio value="3">Đơn lẻ</Radio>
-                                    <Radio value="1" disabled={watch("payment_method") == 1} onClick={() => setIsModalVisible(!isModalVisible)}>Đơn gom (chờ gom thêm)</Radio>
-                                    <Radio value="2" disabled={watch("payment_method") == 1} onClick={() => setIsModalVisible(!isModalVisible)}>Đơn gom (đã gom đủ)</Radio>
+                                    <Radio value={3}>Đơn lẻ</Radio>
+                                    <Radio value={1} disabled={watch("payment_method") == 1} onClick={() => setIsModalVisible(!isModalVisible)}>Đơn gom (chờ gom thêm)</Radio>
+                                    <Radio value={2} disabled={watch("payment_method") == 1} onClick={() => setIsModalVisible(!isModalVisible)}>Đơn gom (đã gom đủ)</Radio>
                                 </Radio.Group>
+                                <div className="mt-[5px]">
+                                    <Text className="italic">(Chỉ áp dụng gom đơn khi thanh toán trực tuyến)</Text>
+                                </div>
                             </Card>
                             <Card bordered style={{ marginTop: "20px" }}>
                                 <Title level={4}>Dùng điểm thưởng <Text className="italic">(Mỗi điểm tương ứng 1đ)</Text></Title>
@@ -522,7 +527,9 @@ const Checkout = () => {
                                 />
                                 <Space style={{ marginTop: "20px" }}>
                                     <Button onClick={() => console.log("Go Back")}>Quay lại</Button>
-                                    <Button type="primary" htmlType="submit" loading={isLoading}>
+                                    <Button
+                                        className="flex justify-center items-center"
+                                        type="primary" htmlType="submit" loading={isLoading}>
                                         Đặt hàng
                                     </Button>
                                 </Space>
@@ -533,14 +540,12 @@ const Checkout = () => {
                 {
                     toggleAddress && (
                         <div>
-                            <PopUp toggle={toggleAddress} setToggle={() => setToggleAddress(!toggleAddress)}>
-                                <ShippingAddressPopUp
-                                    reload={reload}
-                                    setSelectedId={setSelectedId}
-                                    toggleAddress={toggleAddress}
-                                    setToggleAddress={setToggleAddress}
-                                />
-                            </PopUp>
+                            <ShippingAddressPopUp
+                                reload={reload}
+                                setSelectedId={setSelectedId}
+                                toggleAddress={toggleAddress}
+                                setToggleAddress={setToggleAddress}
+                            />
                         </div>
 
                     )

@@ -13,7 +13,7 @@ const initialState: IAuthenticateStore = {
   user: {
     id: "",
     email: '',
-    full_name: '',
+    name: '',
     role: "",
     date_of_birth: '',
     phone_number: '',
@@ -39,7 +39,7 @@ export const authSlice = createSlice({
         user: {
           id: "",
           email: '',
-          full_name: '',
+          name: '',
           role: "",
           date_of_birth: '',
           phone_number: '',

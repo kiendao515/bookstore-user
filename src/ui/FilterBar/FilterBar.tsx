@@ -5,10 +5,10 @@ import { List, Typography } from 'antd';
 const { Text } = Typography;
 
 const FilterBar = (props: IFilterBarProps) => {
-    const { filterValues = [], isPage = false, setBookParams, bookParams, searchField = "category_id" } = props;
+    const { filterValues = [], setBookParams, bookParams, searchField = "category_id" } = props;
 
     return (
-        <div className={`w-full border border-gray-300 rounded-[5px]`}>
+        <div className={`w-full border-r-[1px] border-gray-300`}>
             <List
                 size="small"
                 dataSource={filterValues}
@@ -25,7 +25,7 @@ const FilterBar = (props: IFilterBarProps) => {
                                 backgroundColor: isSelected ? '#E6F7FF' : '#fff',
                                 cursor: 'pointer',
                                 transition: 'all 0.3s',
-                                borderRadius: '5px',
+                                border: "0px"
                             }}
                             className={`hover:bg-[#bae7ff] ${isSelected ? 'ant-list-item-selected' : ''}`}
                         >

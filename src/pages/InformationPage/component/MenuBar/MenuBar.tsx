@@ -22,7 +22,7 @@ const MenuBar = (props: IMenuBarProps) => {
         },
     ]
     return (
-        <div className="border border-gray-300 rounded-[5px] ">
+        <div className="border-r-[1px] border-gray-300 ">
             <List
                 size="small"
                 dataSource={menus}
@@ -37,7 +37,7 @@ const MenuBar = (props: IMenuBarProps) => {
                                 backgroundColor: menuItem.index == index ? '#E6F7FF' : '#fff',
                                 cursor: 'pointer',
                                 transition: 'all 0.3s',
-                                borderRadius: '5px',
+                                border: "0px"
                             }}
                             className={`hover:bg-[#bae7ff] ${menuItem.index == index ? 'ant-list-item-selected' : ''}`}
                         >

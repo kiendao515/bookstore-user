@@ -67,7 +67,7 @@ const App = () => {
                   zIndex: 9999,
                 }}
               >
-                <Button type="primary" onClick={() => setModalOpen(!modalOpen)}>
+                <Button type="primary" onClick={() => setModalOpen(!modalOpen)} className="flex justify-center items-center">
                   <CustomerServiceOutlined />
                 </Button>
               </div>

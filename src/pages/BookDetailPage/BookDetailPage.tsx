@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Breadcrumb, Button, Divider, Image, InputNumber, Radio, Space, Tag, Typography, Row, Col, Spin, message } from "antd";
-import { HeartOutlined, ShareAltOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import { HeartOutlined, HeartTwoTone, ShareAltOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import BreadcrumbItem from "antd/es/breadcrumb/BreadcrumbItem";
 import MainLayout from "@/layout";
-import { useBookDetail } from "@/api/books";
+import { updateBookFavorite, useBookDetail } from "@/api/books";
 import { useNavigate, useParams } from "react-router-dom";
 import { addToCart } from "@/api/order";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
@@ -11,6 +11,10 @@ import { setToggleByKey } from "@/store/duck/togglePopUp/slice";
 import { RootState } from "@/store";
 import BookRelative from "./component/BookRelative/BookRelative";
 import TemporaryOut from "@/ui/TemporaryOut/TemporaryOut";
+import { useSelector } from "react-redux";
+import { useMutation } from "react-query";
+import { setBookFavorite } from "@/store/duck/bookFavorite/slice";
+import { useAuthToggle } from "@/context/AuthToggleContext";
 const { Title, Text } = Typography;
 
 interface CartItem {
@@ -26,15 +30,10 @@ interface CartItem {
 const BookDetail = () => {
   const { id } = useParams<{ id: string }>();
   const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
+  const [redHeart, setRedHeart] = useState(false);
+  const { bookIds = [] } = useSelector((state: RootState) => state.bookFavorite);
+  const dispatch = useAppDispatch();
+  const { toggleAuthPopup } = useAuthToggle();
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null);
   const { book } = useBookDetail(id!);
@@ -45,10 +44,67 @@ const BookDetail = () => {
   const [quantity, setQuantity] = useState<number>(1);
   const user = useAppSelector((state: RootState) => state.auth.user);
   const { toggleAuth } = useAppSelector((state: RootState) => state.togglePopUp);
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState<CartItem[]>([]); // State giỏ hàng
   const [loading, setLoading] = useState(true);
+  const [addToCartLoading, setAddToCartLoading] = useState(false);
+
+
+  useEffect(() => {
+    if (id && bookIds.includes(id)) {
+      setRedHeart(true);
+    } else {
+      setRedHeart(false);
+    }
+
+  }, [bookIds])
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const { mutate } = useMutation(updateBookFavorite, {
+    onSuccess: async (data) => {
+      if (data.result) {
+        let newBookIds = [...bookIds]
+        if (id && bookIds.includes(id)) {
+          newBookIds = newBookIds.filter((bookId) => bookId !== id);
+        } else {
+          if (id) {
+            newBookIds.push(id);
+          }
+        }
+        dispatch(setBookFavorite({
+          accountId: user.id,
+          bookIds: newBookIds
+        }));
+      } else {
+        console.error('Failed to update favorite books:', data.reason);
+      }
+    },
+    onError: (error) => {
+      console.error('Error updating favorite books:', error);
+    }
+  });
+
+  const handleFavoriteButtonClick = () => {
+    if (user.id === "") {
+      toggleAuthPopup();
+      dispatch(setToggleByKey({
+        key: "toggleAuth",
+        value: !toggleAuth
+      }))
+    } else {
+      if (id) {
+        mutate(id);
+      }
+    }
+  };
+
   const handleTypeChange = (type: string) => {
     setSelectedType(type);
 
@@ -60,8 +116,10 @@ const BookDetail = () => {
   };
 
   const handleAddToCart = async () => {
+    setAddToCartLoading(true);
     if (!selectedType) {
       message.warning("Vui lòng chọn phân loại trước khi thêm vào giỏ hàng.");
+      setAddToCartLoading(false);
       return;
     }
 
@@ -71,6 +129,7 @@ const BookDetail = () => {
 
     if (!selectedInventory) {
       message.error("Không tìm thấy thông tin phân loại sách.");
+      setAddToCartLoading(false);
       return;
     }
 
@@ -88,6 +147,7 @@ const BookDetail = () => {
         message.error("Thêm vào giỏ hàng thất bại. Vui lòng thử lại.");
       }
     }
+    setAddToCartLoading(false);
   };
 
   const handleBuyNow = async () => {
@@ -231,7 +291,17 @@ const BookDetail = () => {
             <div className="flex justify-between items-center">
               <Title level={3}>{book?.data.name}</Title>
               <div className="flex items-center space-x-4">
-                <HeartOutlined className="text-lg cursor-pointer text-gray-500" />
+                <HeartTwoTone
+                  className="hover:cursor-pointer hover:text-red-600 text-lg text-gray-500"
+                  twoToneColor={redHeart ? "#ff0000" : "#d9d9d9"}
+                  onClick={handleFavoriteButtonClick}
+                  onMouseEnter={() => setRedHeart(true)}
+                  onMouseLeave={() => {
+                    if (!id || !bookIds.includes(id)) {
+                      setRedHeart(false);
+                    }
+                  }}
+                />
                 <ShareAltOutlined className="text-lg cursor-pointer text-gray-500" />
               </div>
             </div>
@@ -251,7 +321,7 @@ const BookDetail = () => {
 
             </Title>
             {availableBookCount <= 0 && (
-              <Typography.Text type="danger" style={{ marginTop: '5px',fontSize:'20px', display: 'block' }}>
+              <Typography.Text type="danger" style={{ marginTop: '5px', fontSize: '20px', display: 'block' }}>
                 Tình trạng : Sách tạm thời hết hàng
               </Typography.Text>
             )}
@@ -289,6 +359,7 @@ const BookDetail = () => {
                       type="primary"
                       icon={<ShoppingCartOutlined />}
                       size="large"
+                      loading={addToCartLoading}
                       className="bg-blue-600 flex justify-center"
                       onClick={handleAddToCart}
                     >

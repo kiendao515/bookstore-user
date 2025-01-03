@@ -34,18 +34,18 @@ const WelcomeSection: React.FC = () => {
                         name="book_name"
                         control={formMethod.control}
                         render={({ field }) => (
-                            <div className='w-2/3 lg:w-1/2 '>
+                            <div className='w-2/3 lg:w-1/2'>
                                 <Input
                                     {...field}
                                     placeholder="Nhập tên sách"
                                     suffix={
                                         <SearchOutlined
                                             type='submit'
-                                            className="cursor-pointer text-blue-500 w-[23px] h-[23px]"
+                                            className="cursor-pointer text-blue-500 w-[20px] h-[20px] self-center justify-self-center"
                                             onClick={() => formMethod.handleSubmit(onHandleSubmit)()}
                                         />
                                     }
-                                    className="p-2 border border-gray-300 rounded-lg"
+                                    className="p-2 border border-gray-300 rounded-lg flex items-center"
                                     onPressEnter={formMethod.handleSubmit(onHandleSubmit)}
                                 />
                                 {formMethod.formState.errors.book_name && (<p className='text-red-600 italic text-[14px]'>{formMethod.formState.errors.book_name.message}</p>)}

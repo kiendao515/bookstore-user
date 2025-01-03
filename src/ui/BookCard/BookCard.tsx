@@ -11,10 +11,10 @@ import { useMutation } from "react-query";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import TemporaryOut from "../TemporaryOut/TemporaryOut";
-import { message } from "antd";
+import { Button, message } from "antd";
 import { addToCart } from "@/api/order";
 
-const BookCard: React.FC<BookCardProps> = ({ book,id, image, title, author, price, soldCount, link, quantity = 0 }) => {
+const BookCard: React.FC<BookCardProps> = ({ book, id, image, title, author, price, soldCount, link, quantity = 0 }) => {
     const { toggleAuth } = useAppSelector((state: RootState) => state.togglePopUp)
     const navigate = useNavigate()
     const dispatch = useAppDispatch();
@@ -23,6 +23,7 @@ const BookCard: React.FC<BookCardProps> = ({ book,id, image, title, author, pric
     const { bookIds = [] } = useSelector((state: RootState) => state.bookFavorite);
     const [redHeart, setRedHeart] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1024);
+    const [loadingAddToCart, setLoadingAddToCart] = useState(false);
 
     useEffect(() => {
         if (bookIds.includes(id)) {
@@ -77,6 +78,7 @@ const BookCard: React.FC<BookCardProps> = ({ book,id, image, title, author, pric
         }
     };
     const handleAddToCart = async () => {
+        setLoadingAddToCart(true);
         if (user.id == '' && user.email == '') {
             dispatch(setToggleByKey({ key: "toggleAuth", value: !toggleAuth }));
         } else {
@@ -89,10 +91,11 @@ const BookCard: React.FC<BookCardProps> = ({ book,id, image, title, author, pric
                 }
             } catch (error) {
                 console.log(error);
-                
+
                 message.error("Thêm vào giỏ hàng thất bại. Vui lòng thử lại.");
             }
         }
+        setLoadingAddToCart(false);
     };
     return (
         <div className={`flex flex-col w-full relative lg:p-[20px] p-[10px] rounded-[5px] border border-[#D9D9D9] shadow-sm`}>
@@ -145,9 +148,13 @@ const BookCard: React.FC<BookCardProps> = ({ book,id, image, title, author, pric
                     {
                         quantity > 0 && (
 
-                            <button onClick={handleAddToCart} className="bg-[#1890FF] text-white text-sm h-[30px] lg:h-[30px] w-full lg:w-[114px] lg:mt-[0px] mt-[5px]">
+                            <Button
+                                loading={loadingAddToCart}
+                                onClick={handleAddToCart}
+                                className="flex gap-[10px] bg-[#1890FF] text-white text-sm h-[30px] lg:h-[30px] w-full lg:w-[114px] lg:mt-[0px] mt-[5px]"
+                            >
                                 Đặt hàng
-                            </button>
+                            </Button>
                         )
                     }
                 </div>

@@ -30,45 +30,40 @@ const ShippingAddressPopUp = (props: IShippingAddressPopUpProps) => {
             onCancel={() => setToggleAddress(false)}
             footer={null}
             title="Danh sách địa chỉ đã lưu"
-            width={isMobile ? "100%" : 800}
             centered
-            bodyStyle={{ maxHeight: "70vh", overflowY: "auto" }}
+
         >
             <List
                 dataSource={shippingAddresses?.data || []}
                 renderItem={(shippingAddress) => (
-                    <List.Item
-                        actions={[
-                            <Button
-                                type="link"
-                                onClick={() => handleSelectAddress(shippingAddress.id)}
-                                icon={<NarrowIcon />}
-                            >
-                                Chọn
-                            </Button>,
-                        ]}
-                    >
+                    <List.Item>
                         <Space direction="vertical" style={{ width: "100%" }}>
                             <Text>
                                 <b>{shippingAddress.full_name}</b> | {shippingAddress.phone_number}
                             </Text>
                             <Text>{`${shippingAddress.street}, ${shippingAddress.district.full_name}`}</Text>
                             <Text>{`${shippingAddress.ward.full_name}, ${shippingAddress.province.full_name}`}</Text>
-                            {shippingAddress.default && (
-                                <Text type="secondary" italic>
-                                    Mặc định
-                                </Text>
-                            )}
+                            <div style={{ display: "flex", gap: "20px", alignItems: "center" }}>
+                                <div>
+                                    {shippingAddress.default && (
+                                        <Text type="secondary" italic>
+                                            Mặc định
+                                        </Text>
+                                    )}
+                                </div>
+                                <Button
+                                    type="primary"
+                                    onClick={() => handleSelectAddress(shippingAddress.id)}
+                                    icon={<NarrowIcon />}
+                                >
+                                    Chọn
+                                </Button>
+                            </div>
                             <Divider />
                         </Space>
                     </List.Item>
                 )}
             />
-            <div style={{ textAlign: "right", marginTop: "10px" }}>
-                <Button onClick={() => setToggleAddress(false)} type="primary" icon={<NarrowIcon />}>
-                    Lưu
-                </Button>
-            </div>
         </Modal>
     );
 };
