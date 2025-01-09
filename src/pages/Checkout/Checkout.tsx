@@ -118,10 +118,12 @@ const Checkout = () => {
                 related_order_id: selectedOrder
             };
             let fee = await calculateCombinedOrderFee(feePayload)
-            console.log(fee);
             setFee(fee.data);
         }
     };
+    useEffect(() => {
+        handleOrderStatusChange(orderStatus);
+    }, [selectedOrder])
 
 
     const handleSelectOrder = (orderId: string) => {

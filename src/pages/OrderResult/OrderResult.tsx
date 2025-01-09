@@ -7,7 +7,7 @@ const { Title, Text } = Typography;
 import MainLayout from '@/layout';
 import { Button, Spin, Typography } from 'antd';
 import { useOrderDetail } from '@/api/order/queries';
-import { clearCart } from '@/api/order';
+import { clearCart, retryPayment } from '@/api/order';
 
 const OrderResult = () => {
     let [searchParams] = useSearchParams();
@@ -43,6 +43,16 @@ const OrderResult = () => {
             toast.error(order.message);
         }
     }, [order]);
+    const onRetry = async () => {
+        let orderId = searchParams.get("orderId");
+        if (orderId) {
+            let data = await retryPayment(orderId?.toString());
+            if (data.result) {
+                window.location.href = data.reason;
+            }
+        }
+    };
+
 
 
     return (
@@ -151,9 +161,7 @@ const OrderResult = () => {
                                 marginBottom: "10px",
                                 fontWeight: "bold",
                             }}
-                            onClick={() => {
-                                console.log("Thanh toán lại");
-                            }}
+                            onClick={onRetry}
                         >
                             Thanh toán lại
                         </Button>

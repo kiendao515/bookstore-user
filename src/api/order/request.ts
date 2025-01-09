@@ -76,7 +76,7 @@ export const getOrderByOrderCode = async (id: string): Promise<OrderDetailRes> =
 }
 export const retryPayment = async (id: string): Promise<RetryPayment> => {
   const { data } = await request({
-    url: `/api/v2/orders/repayment/${id}`,
+    url: `/api/v1/orders/repayment/${id}`,
     method: 'GET',
   });
   return data;

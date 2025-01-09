@@ -160,9 +160,9 @@ export interface IBookItem {
     book: IBook
 }
 export interface RetryPayment {
-    success: boolean,
+    result: boolean,
     data: ICreateOrderData,
-    message: string
+    reason: string
 }
 export interface IReqParams {
     page?: number;
