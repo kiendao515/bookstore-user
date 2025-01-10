@@ -5,7 +5,7 @@ import { useCombinedOrder, useDistricts, useProvinces, useWards } from "@/api/or
 import { useForm } from "react-hook-form";
 import { getUser } from "@/store/duck/auth/slice";
 import { useAppSelector } from "@/hooks/useRedux";
-import { calculateCombinedOrderFee, calculateFee, clearCart, createNewOrder } from "@/api/order";
+import { calculateCombinedOrderFee, calculateFee, clearCart, createNewOrder, ICombinedOrder } from "@/api/order";
 import { useLocation, useNavigate } from "react-router-dom";
 import { handleStatusBook } from "@/utils/common";
 import { useShippingAddressDetail, useShippingAddresses } from "@/api/shipment";
@@ -26,7 +26,7 @@ const Checkout = () => {
     const { user: customer } = useUserProfile()
     const [fee, setFee] = useState(25000)
     const location = useLocation();
-    const [reload] = useState(0);
+    const [reload, setReload] = useState(0);
     const { cartItems, totalPrice } = location.state || { cartItems: [], totalPrice: 0 };
     const { shippingAddress } = useShippingAddressDetail(selectedId);
     const [toggleAddress, setToggleAddress] = useState(false);
@@ -35,7 +35,8 @@ const Checkout = () => {
     const navigate = useNavigate()
     const [maxDiscount, setMaxDiscount] = useState(0)
     const [totalAmount, setTotalAmount] = useState(0)
-    const [orderStatus, setOrderStatus] = useState(2); // Trạng thái đơn hàng
+    const [orderStatus, setOrderStatus] = useState(3); // Trạng thái đơn hàng
+    const [disabled, setDisabled] = useState(false)
     const [isModalVisible, setIsModalVisible] = useState(false); // Hiển thị popup
     const [selectedOrder, setSelectedOrder] = useState(""); // Đơn được chọn để gom
     const orders = useCombinedOrder();
@@ -99,12 +100,16 @@ const Checkout = () => {
             .optional()
             .max(200, "Ghi chú không được vượt quá 200 ký tự"),
     });
+
     const handleOrderStatusChange = async (value: any) => {
         setOrderStatus(value);
 
         if (value == 1) {
             setFee(0);
         } else {
+            if (disabled && value == 3) {
+                setDisabled(false);
+            }
             // đi tính phí đơn gom
             const feePayload = {
                 order_items: cartItems.map((item: any) => ({
@@ -126,30 +131,73 @@ const Checkout = () => {
     }, [selectedOrder])
 
 
-    const handleSelectOrder = (orderId: string) => {
-        setSelectedOrder(orderId);
-        console.log("Đơn hàng được chọn:", orderId);
+    const handleSelectOrder = (order: ICombinedOrder) => {
+        if(order == null) {
+            setSelectedOrder("")
+            return;
+        }
+        setSelectedOrder(order.order_code);
+        formMethod.reset({
+            ...formMethod.getValues(),
+            customer_name: order.customer_name,
+            customer_phone: order.customer_phone,
+            province_code: order.province.code,
+            ward_code: order.ward.code,
+            district_code: order.district.code,
+            street: order.street
+        })
+        setDisabled(true)
+        setReload(reload + 1);
+        console.log("Đơn hàng được chọn:", order.order_code);
     };
-
 
     const formMethod = useForm<IFormValue>({
         mode: "onChange",
         resolver: yupResolver(schema),
-        defaultValues: {},
+        defaultValues: {
+            payment_method: 2,
+        },
     });
 
     const { watch } = formMethod;
-    const { provinces } = useProvinces();
+    const { provinces } = useProvinces(reload);
     const { districts } = useDistricts(watch("province_code") || "");
     const { wards } = useWards(watch("district_code") || "");
 
     useEffect(() => {
         formMethod.reset({
             discount_point: maxDiscount,
-            payment_method: 1,
+            payment_method: 2,
             customer_email: user.email,
         })
     }, [customer])
+
+    useEffect(() => {
+        const feePayload = {
+            order_items: cartItems.map((item: any) => ({
+                book_inventory_id: item.book_inventory_id,
+                quantity: item.quantity
+            })),
+            province_code: watch("province_code"),
+            district_code: watch("district_code"),
+            ward_code: watch("ward_code"),
+            street: watch('street'),
+            related_order_id: selectedOrder
+        };
+        const fetchFee = async () => {
+            try {
+                const fee = await calculateCombinedOrderFee(feePayload);
+                setFee(fee.data);
+            } catch (error) {
+                console.error("Error calculating combined order fee:", error);
+            }
+        };
+        if (orderStatus == 1) {
+            setFee(0);
+        } else {
+            fetchFee();
+        }
+    }, [watch("province_code"), watch("district_code"), watch("ward_code"), watch("street")]);
 
     useEffect(() => {
         if (user.id != "") {
@@ -352,6 +400,7 @@ const Checkout = () => {
                                     placeholder="Tên khách hàng"
                                     control={formMethod.control}
                                     errors={formMethod.formState.errors.customer_name}
+                                    disabled={disabled}
                                 />
 
                                 <TextInput
@@ -360,6 +409,7 @@ const Checkout = () => {
                                     placeholder="Số điện thoại"
                                     control={formMethod.control}
                                     errors={formMethod.formState.errors.customer_phone}
+                                    disabled={disabled}
                                 />
                                 <TextInput
                                     name="customer_email"
@@ -380,6 +430,7 @@ const Checkout = () => {
                                         label: province.full_name,
                                     }))}
                                     errors={formMethod.formState.errors.province_code}
+                                    disabled={disabled}
                                 />
 
                                 <SelectInput
@@ -392,6 +443,7 @@ const Checkout = () => {
                                         label: district.full_name,
                                     }))}
                                     errors={formMethod.formState.errors.district_code}
+                                    disabled={disabled}
                                 />
 
                                 <SelectInput
@@ -404,6 +456,7 @@ const Checkout = () => {
                                         label: ward.full_name,
                                     }))}
                                     errors={formMethod.formState.errors.ward_code}
+                                    disabled={disabled}
                                 />
 
                                 <TextInput
@@ -412,6 +465,7 @@ const Checkout = () => {
                                     placeholder="Số nhà, tên đường"
                                     control={formMethod.control}
                                     errors={formMethod.formState.errors.street}
+                                    disabled={disabled}
                                 />
                                 <Form.Item label="Ghi chú giao hàng" name="note">
                                     <Input.TextArea rows={3} placeholder="Ghi chú giao hàng (nếu có)" />
@@ -419,7 +473,12 @@ const Checkout = () => {
                                 {
                                     user.id != "" && (
                                         <div className='mb-[5px] mt-[5px] w-full'>
-                                            <button type='button' className="text-black bg-[#DFDFDF] hover:bg-[#9BC3FF] w-full xl:w-fit h-[42px] px-[5px]" onClick={() => setToggleAddress(!toggleAddress)}>
+                                            <button
+                                                type='button'
+                                                className="text-black bg-[#DFDFDF] hover:bg-[#9BC3FF] w-full xl:w-fit h-[42px] px-[5px] disabled:bg-slate-50 disable:hover:bg-slate-50"
+                                                onClick={() => setToggleAddress(!toggleAddress)}
+                                                disabled={disabled}
+                                            >
                                                 chọn địa chỉ khác
                                             </button>
                                         </div>
@@ -491,6 +550,7 @@ const Checkout = () => {
                                 <Radio.Group
                                     onChange={(e) => handleOrderStatusChange(e.target.value)}
                                     value={orderStatus}
+                                    defaultValue={3}
                                     style={{ display: "flex", flexDirection: "column", gap: "10px" }}
                                 >
                                     <Radio value={3}>Đơn lẻ</Radio>
@@ -521,9 +581,10 @@ const Checkout = () => {
                                     label=""
                                     control={formMethod.control}
                                     errors={formMethod.formState.errors.payment_method}
+                                    defaultValue={2}
                                     options={[
-                                        { label: "Thanh toán khi nhận hàng (COD)", value: 1 },
                                         { label: "Thanh toán trực tuyến", value: 2 },
+                                        { label: "Thanh toán khi nhận hàng (COD)", value: 1 },
                                     ]}
                                     rules={{ required: "Please select a payment method" }}
                                 />
@@ -555,6 +616,7 @@ const Checkout = () => {
                 {
                     isModalVisible && orders?.data?.length > 0 && (
                         <CombinedOrder
+                            setIsModalVisible={visible => setIsModalVisible(visible)}
                             visible={isModalVisible}
                             onClose={() => setIsModalVisible(false)}
                             orders={orders?.data || []}

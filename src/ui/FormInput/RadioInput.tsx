@@ -11,6 +11,7 @@ interface RadioInputProps {
     rules?: any; // Validation rules for the field
     direction?: "vertical" | "horizontal"; // Layout direction of the radios
     [key: string]: any; // Accept additional props dynamically
+    defaultValue?: any
 }
 
 const RadioInput: React.FC<RadioInputProps> = ({
@@ -21,6 +22,7 @@ const RadioInput: React.FC<RadioInputProps> = ({
     options,
     rules = {},
     direction = "vertical",
+    defaultValue = {}
 }) => {
 
     return (
@@ -32,9 +34,10 @@ const RadioInput: React.FC<RadioInputProps> = ({
             <Controller
                 name={name}
                 control={control}
+                defaultValue={defaultValue}
                 rules={rules}
                 render={({ field }) => (
-                    <Radio.Group {...field}>
+                    <Radio.Group {...field} value={field.value || defaultValue}>
                         <Space direction={direction}>
                             {options.map((option) => (
                                 <Radio key={option.value} value={option.value}>

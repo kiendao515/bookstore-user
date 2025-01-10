@@ -141,11 +141,8 @@ const CreateShippingAddressPopUp = ({ setReload, setToggle }: ICreateShippingAdd
                 </Form.Item>
 
                 <Form.Item>
-                    <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                        <Button type="primary" htmlType="submit" loading={isLoading}>
-                            <NarrowIcon /> Thêm mới
-                        </Button>
-                    </Space>
+                    <Button type="primary" htmlType="submit" loading={isLoading}>Thêm mới
+                    </Button>
                 </Form.Item>
             </Form>
         </div>

@@ -207,8 +207,19 @@ export interface IOrderCombinedResponse {
     data: ICombinedOrder[]
 }
 export interface ICombinedOrder{
-    order_code: string,
-    total_amount: number
+    order_code: string;
+    total_amount: number;
+    customer_name: string;
+    customer_phone: string;
+    province: IAddress
+    district: IAddress
+    ward: IAddress
+    street: string
+}
+
+export interface IAddress {
+    code: string,
+    full_name: string,
 }
 export interface ICombinedOrderFee{
     province_code: string;
