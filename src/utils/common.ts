@@ -165,7 +165,7 @@ export const imageUrlToFile = async (url: string): Promise<File> => {
 export const handleStatusBook = (status: string) => {
   switch (status) {
     case "OLD":
-      return "tạm"
+      return "cũ"
     case "MEDIUM":
       return "khá"
     case "GOOD":

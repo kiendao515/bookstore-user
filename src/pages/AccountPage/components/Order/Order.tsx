@@ -76,11 +76,11 @@ const Order = (props: IOrderProps) => {
             align: "center",
         },
         {
-            title: "Số lượng",
-            dataIndex: "quantity",
-            key: "quantity",
-            render: (_: any, record: any) =>
-                `${record.quantity} quyển`,
+            title: "Hình thức thanh toán",
+            dataIndex: "paymentType",
+            key: "paymentType",
+            render: (record: any) =>
+                `${record == true ? "Thanh toán trực tuyến":"Thanh toán sau khi nhận hàng"}`,
             align: "center",
         },
         {
@@ -133,6 +133,7 @@ const Order = (props: IOrderProps) => {
             ? order.order_items.reduce((total: number, item: any) => total + item.quantity, 0)
             : 0,
         totalAmount: order.total_amount || 0,
+        paymentType: order.payment_type,
         createdAt: order.created_at,
         id: order.id,
         relatedOrderId: order.related_order_id,
@@ -187,7 +188,7 @@ const Order = (props: IOrderProps) => {
                                             </Tag>
                                         </div>
                                         <div style={{ marginBottom: 8 }}>
-                                            <Text strong>Số lượng:</Text> {order.quantity} quyển
+                                            <Text strong>Hình thức thanh toán:</Text> {order?.payment_type ==1 ? "Thanh toán trực tuyến":"Thanh toán sau khi nhận hàng"} quyển
                                         </div>
                                         <div style={{ marginBottom: 8 }}>
                                             <Text strong>Tổng tiền:</Text>{" "}
@@ -259,7 +260,10 @@ const Order = (props: IOrderProps) => {
                                                         <Button
                                                             type="link"
                                                             style={{ color: "#007bff" }}
-                                                            onClick={() => setSelectedId(childOrder.orderCode)}
+                                                            onClick={() =>{
+                                                                setToggleDetail(true);
+                                                                setSelectedId(childOrder.id)}
+                                                            }
                                                         >
                                                             Chi tiết
                                                         </Button>

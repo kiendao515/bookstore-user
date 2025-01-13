@@ -1,14 +1,38 @@
-import { Typography, List, Space, Row, Col, Spin } from "antd";
+import { Typography, List, Space, Row, Col, Spin, Button, message } from "antd";
 import moment from "moment";
 import { handleOrderStatus, handleStatusBook } from "@/utils/common";
 import { useOrderDetailForUser } from "@/api/order/queries";
 import IOrderDetailPopUp from "./interface";
+import { traceOrder } from "@/api/order";
+import { useState } from "react";
+import TrackOrderPopup from "../TrackOrderPopup/TrackOrderPopup";
+
 
 const { Text, Title } = Typography;
 
 const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
     const { id } = props;
     const { order, isLoading } = useOrderDetailForUser(id); // `isLoading` từ hook
+    const [trackingVisible, setTrackingVisible] = useState(false);
+    const [trackingData, setTrackingData] = useState({ pickLog: [], deliverLog: [] });
+    // Hàm xử lý truy vết đơn
+    const handleTrackOrder = async () => {
+        try {
+            const response = await traceOrder(order?.data.shipping_code);
+            if (response?.data?.data) {
+                setTrackingData({
+                    pickLog: response.data.data.PickLog || [],
+                    deliverLog: response.data.data.DeliverLog || [],
+                });
+                setTrackingVisible(true); // Mở popup
+            } else {
+                message.warning("Không tìm thấy thông tin truy vết.");
+            }
+        } catch (error) {
+            message.error("Không thể truy vết đơn, vui lòng thử lại sau.");
+            console.error(error);
+        }
+    };
 
     return (
         <Spin spinning={isLoading} tip="Đang tải dữ liệu...">
@@ -119,7 +143,7 @@ const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
                                             <Text>x{book.quantity}</Text>
                                         </Col>
                                         <Col span={6} style={{ textAlign: "right" }}>
-                                            <Text>{book.price.toLocaleString()}đ</Text>
+                                            <Text>{book.price?.toLocaleString()}đ</Text>
                                         </Col>
                                     </Row>
                                 </List.Item>
@@ -141,7 +165,7 @@ const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
                                 <Text style={{ fontWeight: "500", color: "#666" }}>Điểm giảm giá</Text>
                             </Col>
                             <Col span={16} style={{ textAlign: "right" }}>
-                                <Text>{order?.data.discount_point.toLocaleString()}đ</Text>
+                                <Text>{order?.data?.discount_point?.toLocaleString()}đ</Text>
                             </Col>
                             <Col span={8}>
                                 <Text style={{ fontWeight: "600", color: "#333" }}>Tổng cộng</Text>
@@ -154,7 +178,7 @@ const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
                                         color: "#FF4D4F",
                                     }}
                                 >
-                                    {order?.data.total_amount.toLocaleString()}đ
+                                    {order?.data?.total_amount?.toLocaleString()}đ
                                 </Text>
                             </Col>
                         </Row>
@@ -162,6 +186,22 @@ const OrderDetailPopUp = (props: IOrderDetailPopUp) => {
                 ) : (
                     <Text></Text>
                 )}
+                {order?.data.shipping_code && (
+                    <Col span={24} style={{ textAlign: "center", marginTop: "16px" }}>
+                        <Button
+                            type="primary"
+                            onClick={handleTrackOrder}
+                        >
+                            Truy vết đơn
+                        </Button>
+                    </Col>
+                )}
+                <TrackOrderPopup
+                    visible={trackingVisible}
+                    onClose={() => setTrackingVisible(false)}
+                    pickLog={trackingData.pickLog}
+                    deliverLog={trackingData.deliverLog}
+                />
             </div>
         </Spin>
     );

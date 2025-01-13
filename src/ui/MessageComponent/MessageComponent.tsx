@@ -57,7 +57,7 @@ const MessageComponent: React.FC<MessageComponentProps> = ({ userMessage }) => {
         {bookSuggestions?.map((book,index) => (
           <li key={book._id}>
             <a
-              href={`https://hopsach.webhop.me/book-detail/${book._id}`}
+              href={`https://hopsach.sytes.net/book-detail/${book._id}`}
               target="_blank"
               rel="noreferrer"
             >

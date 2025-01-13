@@ -138,4 +138,11 @@ export const getCombinedOrder = async (): Promise<IOrderCombinedResponse> => {
     method: 'GET',
   });
   return data;
-};
+}
+export const traceOrder = async(id:string):Promise<any>=>{
+  const {data} = await request({
+    url : `/api/v1/shipping?id=`+id,
+    method:'GET'
+  })
+  return data;
+}
